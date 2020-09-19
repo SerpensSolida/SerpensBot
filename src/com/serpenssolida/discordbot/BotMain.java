@@ -16,13 +16,14 @@ public class BotMain
 	{
 		try
 		{
-			api = (new JDABuilder(Security.BOT_TOKEN)).build();
+			api = JDABuilder.createDefault(Security.BOT_TOKEN).build();
 			api.awaitReady();
 			System.out.println("Bot ready!");
 		}
 		catch (LoginException e)
 		{
 			System.out.println("Login error.");
+			e.printStackTrace();
 		}
 		catch (InterruptedException e)
 		{
