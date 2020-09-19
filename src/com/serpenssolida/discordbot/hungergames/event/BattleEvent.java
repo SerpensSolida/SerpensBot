@@ -34,7 +34,7 @@ public class BattleEvent extends HungerGamesEvent
 		if (targetSet.isEmpty())
 			return new EventResult("", EventResult.State.Failed); //Quit event.
 		
-		//Get a random player.
+		//Get a random player from the chosen category.
 		Player player2 = (Player) RandomChoice.getRandom(targetSet.toArray());
 		
 		involvedPlayers.add(player1);

@@ -102,7 +102,7 @@ public class BotListener extends ListenerAdapter
 		if (author == null) return;
 		
 		//Ignore bot reaction.
-		if (BotMain.api.getSelfUser().getId().equals(author.getId()))  return;
+		if (BotMain.api.getSelfUser().getId().equals(author.getId())) return;
 		
 		//Get the message the reaction was added to.
 		event.getChannel().retrieveMessageById(event.getMessageId()).queue(message ->

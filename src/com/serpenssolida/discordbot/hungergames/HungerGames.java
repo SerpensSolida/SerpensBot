@@ -164,14 +164,14 @@ public class HungerGames
 		return this.day;
 	}
 	
-	public void incrementDay()
-	{
-		this.day++;
-	}
-	
 	public void setDay(int day)
 	{
 		this.day = day;
+	}
+	
+	public void incrementDay()
+	{
+		this.day++;
 	}
 	
 	public HashSet<Player> getDeadPlayers()

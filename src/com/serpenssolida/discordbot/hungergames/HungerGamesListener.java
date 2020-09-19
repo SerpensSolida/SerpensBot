@@ -258,7 +258,7 @@ public class HungerGamesListener extends BotListener
 				
 				fieldName = "Vittorie";
 				break;
-				
+			
 			case "kills":
 				embedBuilder.setTitle("Classifica uccisioni Hunger Games");
 				leaderboard.sort((character1, character2) -> character2.getKills() - character1.getKills());
@@ -270,7 +270,7 @@ public class HungerGamesListener extends BotListener
 				
 				fieldName = "Uccisioni";
 				break;
-				
+			
 			default:
 				messageBuilder.append("> L'argomento deve essere (wins|kills).");
 				channel.sendMessage(messageBuilder.build()).queue();

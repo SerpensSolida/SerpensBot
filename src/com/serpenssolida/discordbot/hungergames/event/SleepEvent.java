@@ -9,13 +9,13 @@ import java.util.HashSet;
 public class SleepEvent extends HungerGamesEvent
 {
 	public String[] messages = new String[]
-            {
-                    "user non si regge più in piedi e decide di fare un sonnellino, user guadagna damageHP.",
-                    "user si fa un sonnellino recuperando damageHP.",
-                    "user si appisola su una pietra e recupera damageHP.",
-                    "user dorme sereno guadagnando damageHP.",
-                    "user si mette a dormire per terra. user recupera damageHP."
-            };
+			{
+					"user non si regge più in piedi e decide di fare un sonnellino, user guadagna damageHP.",
+					"user si fa un sonnellino recuperando damageHP.",
+					"user si appisola su una pietra e recupera damageHP.",
+					"user dorme sereno guadagnando damageHP.",
+					"user si mette a dormire per terra. user recupera damageHP."
+			};
 	
 	public EventResult doEvent(HungerGames hg)
 	{

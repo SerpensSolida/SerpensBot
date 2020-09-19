@@ -11,7 +11,7 @@ import java.util.HashSet;
 
 public class EatFoodEvent extends HungerGamesEvent
 {
-	private String[] noFoodMessages = new String[]{
+	private String[] noFoodMessages = new String[] {
 			"user sta morendo di fame, amountHP.",
 			"la fame sta assalendo user, amountHP.",
 			"user non ci vede più dalla fame, amountHP.",
@@ -21,7 +21,7 @@ public class EatFoodEvent extends HungerGamesEvent
 			"user è in crisi di astinenza da cibo, amountHP."
 	};
 	
-	private String[] fullhealthMessage = new String[]{
+	private String[] fullhealthMessage = new String[] {
 			"user si sente sazio.",
 			"user potrebbe stare senza mangiare per giorni.",
 			"user ha la pancia piena.",

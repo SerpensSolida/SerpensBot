@@ -28,22 +28,31 @@ public abstract class Task
 	
 	/**
 	 * Consumes the given message and returns whether or not the task has finished.
-	 * @param message The message the task will consume.
+	 *
+	 * @param message
+	 * 		The message the task will consume.
+	 *
 	 * @return Whether or not the task has finished and can be removed.
 	 */
 	public abstract TaskResult consumeMessage(Message message);
 	
 	/**
 	 * Consumes the given reaction that has been added in the given message and returns whether or not the task has finished.
-	 * @param message The message that the reaction has been added on.
-	 * @param reaction The reaction the task will consume.
+	 *
+	 * @param message
+	 * 		The message that the reaction has been added on.
+	 * @param reaction
+	 * 		The reaction the task will consume.
+	 *
 	 * @return Whether or not the task has finished and can be removed.
 	 */
 	public abstract TaskResult consumeReaction(Message message, String reaction);
 	
 	/**
 	 * Send a message in the channel the task is running.
-	 * @param message Message to send to the channel.
+	 *
+	 * @param message
+	 * 		Message to send to the channel.
 	 */
 	public void sendMessage(Message message)
 	{

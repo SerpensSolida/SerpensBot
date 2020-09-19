@@ -24,7 +24,7 @@ public class EditCharacterTask extends Task
 		MENU,
 		NAME_CHARACTER,
 		ASSIGN_STATS,
-		IMAGE, //TODO: Ability to send avatar of the character.
+		ASSIGN_AVATAR, //TODO: Ability to send avatar of the character.
 		FINISHED
 	}
 	
@@ -177,7 +177,7 @@ public class EditCharacterTask extends Task
 				
 				if (abilities[i] < 0 || abilities[i] > 10)
 				{
-					throw new NumberFormatException("");
+					throw new NumberFormatException(""); //This is ugly.
 				}
 			}
 		}

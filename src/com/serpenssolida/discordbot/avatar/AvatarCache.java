@@ -20,7 +20,10 @@ public class AvatarCache
 {
 	/**
 	 * Get the give user's avatar from the cache.
-	 * @param user The user whose avatar is to be retrieved.
+	 *
+	 * @param user
+	 * 		The user whose avatar is to be retrieved.
+	 *
 	 * @return The avatar.
 	 */
 	public static BufferedImage getAvatar(User user)
