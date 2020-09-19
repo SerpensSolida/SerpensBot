@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.serpenssolida.discordbot.hungergames.io.CharacterData;
 import com.serpenssolida.discordbot.hungergames.io.HungerGamesData;
 
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -22,6 +23,7 @@ public class HungerGamesController
 	public static HungerGamesController instance; //Singleton data.
 	public static String folder = "hungergames/"; //Singleton data.
 	public static int SUM_STATS = 40;
+	public static Font font;
 	
 	private boolean running = false; //Whether or not the HungerGames is running.
 	private int count = 0; //Number of editions of the HungerGames.
@@ -34,7 +36,19 @@ public class HungerGamesController
 		if (instance == null)
 		{
 			instance = new HungerGamesController();
-			load();
+			
+			try
+			{
+				//Create the font.
+				HungerGamesController.font = Font.createFont(Font.TRUETYPE_FONT, new File(HungerGamesController.folder + "tahoma.ttf"))
+						.deriveFont(12f);
+			}
+			catch (FontFormatException | IOException e)
+			{
+				e.printStackTrace();
+			}
+			
+			HungerGamesController.load();
 		}
 		return instance;
 	}
@@ -78,7 +92,7 @@ public class HungerGamesController
 	
 	public static void save()
 	{
-		File fileCharacters = new File("characters.json");
+		File fileCharacters = new File(HungerGamesController.folder + "characters.json");
 		Gson gson = (new GsonBuilder()).setPrettyPrinting().create();
 		System.out.println("Salvataggio dati HungerGames.");
 		
@@ -133,7 +147,7 @@ public class HungerGamesController
 	
 	public static void saveSettings()
 	{
-		File fileData = new File("hg_data.json");
+		File fileData = new File(HungerGamesController.folder + "hg_data.json");
 		Gson gson = (new GsonBuilder()).setPrettyPrinting().create();
 		
 		try (PrintWriter writer = new PrintWriter(new FileWriter(fileData)))

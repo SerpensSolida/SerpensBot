@@ -18,9 +18,7 @@ import com.serpenssolida.discordbot.hungergames.event.SurpriseAttack;
 import com.serpenssolida.discordbot.hungergames.inventory.Weapon;
 import com.serpenssolida.discordbot.hungergames.io.ItemData;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Image;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -196,8 +194,9 @@ public class HungerGamesThread extends Thread
 		this.channel.sendFile(statusImage.toByteArray(), "status.png", new net.dv8tion.jda.api.utils.AttachmentOption[0]).queue();
 		
 		//Send the turn description.
-		embedBuilder.setTitle("Hunger Games - " + this.hg.getDay() + "° giorno.");
-		embedBuilder.setDescription(stringBuilder.toString());
+		embedBuilder.setTitle("Hunger Games - " + this.hg.getDay() + "° giorno.")
+				.setDescription(stringBuilder.toString())
+				.setFooter("Giocatori ancora in vita: " + this.hg.getAlivePlayers().size());
 		messageBuilder.setEmbed(embedBuilder.build());
 		
 		this.channel.sendMessage(messageBuilder.build()).queue();
@@ -268,7 +267,7 @@ public class HungerGamesThread extends Thread
 	{
 		BufferedImage tombImage = this.getTombImage(); //Tombstone image.
 		
-		//List of players that partecipated to the turn.
+		//List of players that participated to the turn.
 		HashSet<Player> involvedPlayers = this.hg.getInvolvedPlayers();
 		
 		int avatarSize = 64; //Size of the avatrs.
@@ -296,8 +295,6 @@ public class HungerGamesThread extends Thread
 			Image avatarImage = avatar.getScaledInstance(avatarSize, avatarSize, 4);
 			g.drawImage(avatarImage, posX, posY, null);
 			
-			//TODO: mettere la lapide.
-			
 			//Paint the avatar red if the player died during this turn.
 			if (involvedPlayer.isDead())
 			{
@@ -308,10 +305,11 @@ public class HungerGamesThread extends Thread
 				g.drawImage(tomb, posX, posY + avatarSize - avatarSize / 2 - avatarSize / 5, null);
 			}
 			
-			//Draw HP remaining. //TODO: Change font.
+			//Draw HP remaining.
 			g.setColor(new Color(197, 197, 197, 160));
 			g.fillRect(posX, posY + avatarSize - avatarSize / 5, avatarSize, avatarSize / 5);
 			g.setColor(Color.black);
+			g.setFont(HungerGamesController.font);
 			g.drawString("HP: " + (int) involvedPlayer.getHealth(), posX + 4, posY + avatarSize - avatarSize / 10 + 5);
 			
 			i++;
