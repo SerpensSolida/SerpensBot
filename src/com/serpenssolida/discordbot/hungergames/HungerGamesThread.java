@@ -83,7 +83,7 @@ public class HungerGamesThread extends Thread
 		}
 		
 		embedBuilder.setDescription(stringBuilder.toString())
-				.setTitle("**Partecipanti alla " + HungerGamesController.getCount() + 1 + "° edizione degli Hunger Games!**");
+				.setTitle("**Partecipanti alla " + (HungerGamesController.getCount() + 1) + "° edizione degli Hunger Games!**");
 		messageBuilder.setEmbed(embedBuilder.build());
 		
 		this.channel.sendMessage(messageBuilder.build()).queue();
