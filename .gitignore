@@ -21,6 +21,8 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+
 /src/com/serpenssolida/discordbot/Security.java
 /src/META-INF/
 /target/
@@ -28,3 +30,5 @@ hs_err_pid*
 /out/
 /avatar_cache/
 /.idea/
+/characters.json
+/hg_data.json

@@ -52,7 +52,7 @@ public class FoundItemEvent extends HungerGamesEvent
 		foundItemPlayers.add(player);
 		involvedPlayers.add(player);
 		
-		String eventString = this.replace((String) RandomChoice.getRandom(this.foundMessage), item, player) + "\n" + this.replace((String) RandomChoice.getRandom(this.foundMessage), item, player) + "\n";
+		String eventString = this.replace((String) RandomChoice.getRandom(this.foundMessage), item, player) + "\n";
 		return new EventResult(eventString, EventResult.State.Successful);
 	}
 	
