@@ -2,9 +2,11 @@
 Command bot for Discord
 
 # How to use
-1) Clone the repository
-2) In your IDE import the as project 
-3) Create a class named Security with this template:
+1) Clone the repository.
+2) In your IDE import the as project.
+3) Add maven as your framework.
+4) Mark "src" folder as source.
+6) Create a class named Security with this template:
 
     ```java
     package com.serpenssolida.discordbot;
@@ -15,5 +17,5 @@ Command bot for Discord
     }
     ```
     
-4) Place you token in the BOT_TOKEN variable.
-5) You can start coding.
+7) Place you token in the BOT_TOKEN variable.
+8) You can start coding.
