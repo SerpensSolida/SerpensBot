@@ -226,7 +226,7 @@ public class HungerGamesThread extends Thread
 	 */
 	public ItemData loadItems()
 	{
-		File file = new File("items.json");
+		File file = new File(HungerGamesController.folder + "items.json");
 		Gson gson = (new GsonBuilder()).setPrettyPrinting().enableComplexMapKeySerialization().create();
 		ItemData data = new ItemData();
 		try
@@ -334,7 +334,7 @@ public class HungerGamesThread extends Thread
 	
 	private BufferedImage getTombImage()
 	{
-		File tombFile = new File("tombstone.png");
+		File tombFile = new File(HungerGamesController.folder + "tombstone.png");
 		
 		try
 		{

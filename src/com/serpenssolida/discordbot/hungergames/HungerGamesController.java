@@ -20,6 +20,7 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 public class HungerGamesController
 {
 	public static HungerGamesController instance; //Singleton data.
+	public static String folder = "hungergames/"; //Singleton data.
 	public static int SUM_STATS = 40;
 	
 	private boolean running = false; //Whether or not the HungerGames is running.
@@ -54,7 +55,7 @@ public class HungerGamesController
 	
 	public static void load()
 	{
-		File fileCharacters = new File("characters.json");
+		File fileCharacters = new File(HungerGamesController.folder + "characters.json");
 		Gson gson = (new GsonBuilder()).setPrettyPrinting().create();
 		System.out.println("Cariamento dati HungerGames.");
 		
@@ -110,7 +111,7 @@ public class HungerGamesController
 	
 	public static void loadSettings()
 	{
-		File fileData = new File("hg_data.json");
+		File fileData = new File(HungerGamesController.folder + "hg_data.json");
 		Gson gson = (new GsonBuilder()).setPrettyPrinting().create();
 		
 		try (BufferedReader reader = new BufferedReader(new FileReader(fileData)))
