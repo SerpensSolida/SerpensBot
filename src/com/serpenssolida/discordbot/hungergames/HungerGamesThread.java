@@ -304,8 +304,8 @@ public class HungerGamesThread extends Thread
 				g.setColor(new Color(255, 0, 0, 100));
 				g.fillRect(posX, posY, avatarSize, avatarSize);
 				
-				/*Image tomb = tombImage.getScaledInstance(avatarSize / 4, avatarSize / 4, 4);
-				g.drawImage(tomb, posX, posY, null);*/
+				Image tomb = tombImage.getScaledInstance(avatarSize / 2, avatarSize / 2, 4);
+				g.drawImage(tomb, posX, posY + avatarSize - avatarSize / 2 - avatarSize / 5, null);
 			}
 			
 			//Draw HP remaining. //TODO: Change font.
