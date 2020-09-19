@@ -123,7 +123,7 @@ public class HungerGamesListener extends BotListener
 		
 		if (character != null)
 		{
-			User owner = BotMain.api.getUserById(character.getOwnerID()); //TODO: Change with retreiveUser.
+			User owner = BotMain.api.retrieveUserById(character.getOwnerID()).complete();
 			String ownerName = (owner != null) ? owner.getName() : null;
 			
 			String[] statsName = {"Vitalità", "Forza", "Abilità", "Special", "Velocità", "Resistenza", "Gusto"};
