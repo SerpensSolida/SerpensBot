@@ -65,6 +65,8 @@ public class HungerGamesThread extends Thread
 		EmbedBuilder embedBuilder = new EmbedBuilder();
 		StringBuilder stringBuilder = new StringBuilder();
 		HashSet<Player> alivePlayers = this.hg.getAlivePlayers();
+		
+		//Check if there are enough player to play the game.
 		if (alivePlayers.size() < 2)
 		{
 			messageBuilder.append("> Numero giocatori insufficenti. Chiedi a qualcuno di creare o abilitare il suo personaggio.");
@@ -72,53 +74,80 @@ public class HungerGamesThread extends Thread
 			HungerGamesController.setRunning(false);
 			return;
 		}
+		
+		//Send a message with the list of player and their status.
 		for (Player player : alivePlayers)
+		{
 			stringBuilder.append("**" + player + "**\n")
 					.append("HP:" + player.getMaxHealth() + "\n")
 					.append(player.getInventory())
 					.append("\n\n");
+		}
+		
 		embedBuilder.setDescription(stringBuilder.toString())
 				.setTitle("**Partecipanti alla " + HungerGamesController.getCount() + 1 + "° edizione degli Hunger Games!**");
 		messageBuilder.setEmbed(embedBuilder.build());
+		
 		this.channel.sendMessage(messageBuilder.build()).queue();
-		this.waitTime(HungerGamesController.getMessageSpeed());
+		
+		//Main game loop.
 		while (this.isHungerGamesRunning())
 		{
+			//Chose a random number of turns for the day.
 			int turnsNum = 4 + RandomChoice.random.nextInt(4);
-			embedBuilder = (new EmbedBuilder()).setTitle("Alba del " + this.hg.getDay() + "° giorno.");
+			
+			this.waitTime(HungerGamesController.getMessageSpeed());
+			
+			embedBuilder = new EmbedBuilder()
+					.setTitle("Alba del " + this.hg.getDay() + "° giorno.");
+			
 			this.channel.sendMessage(embedBuilder.build()).queue();
+			
+			//Process the turns.
 			for (int i = 0; i < turnsNum && this.isHungerGamesRunning(); i++)
 			{
 				this.doTurnCycle();
 				this.waitTime(HungerGamesController.getMessageSpeed());
 			}
+			
+			//Send a message containing the relashionships between players.
 			if (this.isHungerGamesRunning())
 			{
 				embedBuilder = (new EmbedBuilder()).setTitle("Alleanze e rivalità").setDescription(this.getRelationships());
 				this.channel.sendMessage(embedBuilder.build()).queue();
 			}
+			
 			this.hg.incrementDay();
-			this.waitTime(HungerGamesController.getMessageSpeed());
 		}
+		
 		if (alivePlayers.size() > 0)
 		{
-			Player winner = (Player) alivePlayers.toArray()[0];
+			Player winner = (Player) alivePlayers.toArray()[0]; //This player is the winner.
+			
 			messageBuilder = new MessageBuilder();
 			embedBuilder = (new EmbedBuilder()).setTitle("Il vincitore è **" + winner + "**!").setThumbnail(winner.getOwner().getAvatarUrl());
 			messageBuilder.setEmbed(embedBuilder.build());
+			
+			//Update player statistics.
 			winner.getCharacter().incrementWins();
 			HungerGamesController.getWinners().add(winner.getOwner().getId());
 		}
 		else
 		{
+			//All player died, no winner.
 			messageBuilder = new MessageBuilder();
 			embedBuilder = new EmbedBuilder();
+			
 			embedBuilder.setTitle("Nessun vincitore!");
 			embedBuilder.setDescription("Sono morti tutti i giocatori.");
+			
 			messageBuilder.setEmbed(embedBuilder.build());
 			HungerGamesController.getWinners().add(null);
 		}
+		
 		this.channel.sendMessage(messageBuilder.build()).queue();
+		
+		//Update HungerGames statistics.
 		HungerGamesController.setCount(HungerGamesController.getCount() + 1);
 		HungerGamesController.setRunning(false);
 		HungerGamesController.save();
@@ -129,7 +158,6 @@ public class HungerGamesThread extends Thread
 		MessageBuilder messageBuilder = new MessageBuilder();
 		StringBuilder stringBuilder = new StringBuilder();
 		EmbedBuilder embedBuilder = new EmbedBuilder();
-		
 		
 		if (RandomChoice.random.nextInt(100) == 1)
 		{
@@ -238,6 +266,8 @@ public class HungerGamesThread extends Thread
 	 */
 	public ByteArrayOutputStream generateStatusImage()
 	{
+		BufferedImage tombImage = this.getTombImage(); //Tombstone image.
+		
 		//List of players that partecipated to the turn.
 		HashSet<Player> involvedPlayers = this.hg.getInvolvedPlayers();
 		
@@ -273,9 +303,12 @@ public class HungerGamesThread extends Thread
 			{
 				g.setColor(new Color(255, 0, 0, 100));
 				g.fillRect(posX, posY, avatarSize, avatarSize);
+				
+				/*Image tomb = tombImage.getScaledInstance(avatarSize / 4, avatarSize / 4, 4);
+				g.drawImage(tomb, posX, posY, null);*/
 			}
 			
-			//Draw HP remainig.
+			//Draw HP remaining. //TODO: Change font.
 			g.setColor(new Color(197, 197, 197, 160));
 			g.fillRect(posX, posY + avatarSize - avatarSize / 5, avatarSize, avatarSize / 5);
 			g.setColor(Color.black);
@@ -297,6 +330,22 @@ public class HungerGamesThread extends Thread
 		}
 		
 		return outputStream;
+	}
+	
+	private BufferedImage getTombImage()
+	{
+		File tombFile = new File("tombstone.png");
+		
+		try
+		{
+			return ImageIO.read(tombFile);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return new BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
 	}
 	
 	/**

@@ -22,9 +22,9 @@ public class HungerGamesController
 	public static HungerGamesController instance; //Singleton data.
 	public static int SUM_STATS = 40;
 	
-	private boolean running; //Whether or not the HungerGames is running.
-	private int count; //Number of editions of the HungerGames.
-	private long messageSpeed; //Speed of the messages.
+	private boolean running = false; //Whether or not the HungerGames is running.
+	private int count = 0; //Number of editions of the HungerGames.
+	private long messageSpeed = 1000; //Speed of the messages.
 	private ArrayList<String> winners = new ArrayList<>(); //List of winners.
 	public HashMap<String, Character> characters = new HashMap<>(); //List of characters.
 	
@@ -208,8 +208,8 @@ public class HungerGamesController
 		return HungerGamesController.getInstance().messageSpeed;
 	}
 	
-	public static void setMessageSpeed(float messageSpeed)
+	public static void setMessageSpeed(float milliseconds)
 	{
-		HungerGamesController.getInstance().messageSpeed = (long) (messageSpeed * 1000);
+		HungerGamesController.getInstance().messageSpeed = (long) milliseconds;
 	}
 }

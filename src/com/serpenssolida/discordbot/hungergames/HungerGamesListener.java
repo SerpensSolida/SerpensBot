@@ -226,9 +226,9 @@ public class HungerGamesListener extends BotListener
 		}
 		else
 		{
-			HungerGamesController.setMessageSpeed(playbackSpeed);
+			HungerGamesController.setMessageSpeed(playbackSpeed * 1000);
 			HungerGamesController.saveSettings();
-			builder.append("> Velocità di riproduzione degli HungerGames settata a " + playbackSpeed);
+			builder.append("> Velocità di riproduzione degli HungerGames settata a " + playbackSpeed + " secondi.");
 		}
 		
 		channel.sendMessage(builder.toString()).queue();

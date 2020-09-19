@@ -9,9 +9,9 @@
       "endurance": 7,
       "taste": 1,
       "name": "Xeryan",
-      "wins": 8,
-      "kills": 30,
       "ownerID": "168677212520841216",
+      "wins": 11,
+      "kills": 36,
       "enabled": true
     },
     "143389122432598016": {
@@ -23,9 +23,9 @@
       "endurance": 6,
       "taste": 3,
       "name": "Yoichi",
-      "wins": 4,
-      "kills": 14,
       "ownerID": "143389122432598016",
+      "wins": 4,
+      "kills": 19,
       "enabled": true
     },
     "168501740608421889": {
@@ -37,9 +37,9 @@
       "endurance": 5,
       "taste": 2,
       "name": "Pippo Franco",
+      "ownerID": "168501740608421889",
       "wins": 2,
       "kills": 19,
-      "ownerID": "168501740608421889",
       "enabled": true
     },
     "168415138288762880": {
@@ -51,9 +51,9 @@
       "endurance": 6,
       "taste": 4,
       "name": "tiz",
-      "wins": 1,
-      "kills": 5,
       "ownerID": "168415138288762880",
+      "wins": 1,
+      "kills": 9,
       "enabled": true
     },
     "525339273915007016": {
@@ -65,9 +65,9 @@
       "endurance": 5,
       "taste": 2,
       "name": "baloonSpot",
-      "wins": 0,
-      "kills": 11,
       "ownerID": "525339273915007016",
+      "wins": 0,
+      "kills": 13,
       "enabled": true
     },
     "170627207167868928": {
@@ -79,9 +79,9 @@
       "endurance": 10,
       "taste": 1,
       "name": "Nando F. Mauro",
-      "wins": 5,
-      "kills": 29,
       "ownerID": "170627207167868928",
+      "wins": 7,
+      "kills": 36,
       "enabled": true
     },
     "230717664241123338": {
@@ -93,9 +93,9 @@
       "endurance": 7,
       "taste": 1,
       "name": "Lod",
-      "wins": 6,
-      "kills": 27,
       "ownerID": "230717664241123338",
+      "wins": 7,
+      "kills": 32,
       "enabled": true
     }
   }
