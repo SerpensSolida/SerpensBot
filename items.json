@@ -1,0 +1,884 @@
+{
+  "foods": [
+    {
+      "hpRestored": 20.0,
+      "name": "pane",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 6.0,
+      "name": "pizza hawaiana",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 60.0,
+      "name": "pizza con le patatine",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 20.0,
+      "name": "bottiglia di brandy",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 60.0,
+      "name": "babbà",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 30.0,
+      "name": "salamino",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 55.0,
+      "name": "panettone con canditi",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 15.0,
+      "name": "mangime per cani",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 25.0,
+      "name": "moneta di cioccolato",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 60.0,
+      "name": "big chungus gommoso",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 30.0,
+      "name": "barretta energetica",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 30.0,
+      "name": "vasetto di pesche sciroppate",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 50.0,
+      "name": "pizza tonno e cipolle",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 22.0,
+      "name": "mela",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 40.0,
+      "name": "spaghettino aglio, olio e peperoncino",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 14.0,
+      "name": "fragola con la panna",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 14.0,
+      "name": "ciliege",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 12.0,
+      "name": "cocktail al sudore",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 25.0,
+      "name": "biscotti",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 45.0,
+      "name": "pizza di carlo cracco",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 50.0,
+      "name": "scatoletta di tonno",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 20.0,
+      "name": "vasetto di prugne secche",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 48.0,
+      "name": "vasetto di babbà al rum",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 62.0,
+      "name": "babbà ripieno di panna",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 45.0,
+      "name": "kinder fetta al latte",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 48.0,
+      "name": "kinder pinguì",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 47.0,
+      "name": "kinder sorpresa",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 50.0,
+      "name": "kinder bueno white",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 10.0,
+      "name": "salsa piccante",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 15.0,
+      "name": "bottiglia di liquore al carciofo",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 45.0,
+      "name": "hamburgher",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 14.0,
+      "name": "cibo per criceti",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 24.0,
+      "name": "vasetto di pesche",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 50.0,
+      "name": "gemma di indiexpo commestibile",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 33.0,
+      "name": "bastoncino candito",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 36.0,
+      "name": "polenta e osei",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 25.0,
+      "name": "mangime per polli",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 7.0,
+      "name": "vasetto di lombrichi",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 12.0,
+      "name": "cetriolo",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 50.0,
+      "name": "Gran BigMc",
+      "useMessage": "",
+      "consumable": true
+    },
+    {
+      "hpRestored": 40.0,
+      "name": "patatine del mcdonald",
+      "useMessage": "",
+      "consumable": true
+    }
+  ],
+  "weapons": [
+    {
+      "damage": 55,
+      "chance": 20,
+      "type": "Strength",
+      "name": "spada di diamante di minecraft",
+      "useMessage": "user affonda la weapon nella carne di receiver che perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 30,
+      "chance": 20,
+      "type": "Strength",
+      "name": "mattone",
+      "useMessage": "user spacca un weapon in testa a receiver togliendogli damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 35,
+      "chance": 20,
+      "type": "Strength",
+      "name": "una statuetta di ugo",
+      "useMessage": "user usa la weapon come un martello e colpisce receiver che perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 25,
+      "chance": 20,
+      "type": "Ability",
+      "name": "amo vecchio",
+      "useMessage": "user pesca un magikarp col suo weapon e lo lancia verso receiver togliendogli damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 50,
+      "chance": 20,
+      "type": "Special",
+      "name": "macbook pro esplosivo",
+      "useMessage": "user lancia il weapon verso receiver che esplodendo gli toglie damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 60,
+      "chance": 20,
+      "type": "Special",
+      "name": "master sword",
+      "useMessage": "user colpisce receiver con la sua weapon, receiver perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 45,
+      "chance": 20,
+      "type": "Special",
+      "name": "spara onde",
+      "useMessage": "user spara un onda supersonica contro receiver che perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 38,
+      "chance": 20,
+      "type": "Ability",
+      "name": "spara chiodi",
+      "useMessage": "user spara dei chiodi verso receiver che perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 34,
+      "chance": 20,
+      "type": "Special",
+      "name": "scarpe tacco 13",
+      "useMessage": "user lancia le sue weapon verso receiver togliendogli damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 40,
+      "chance": 20,
+      "type": "Ability",
+      "name": "coltello",
+      "useMessage": "user usa il weapon per pugnalare receiver togliendogli damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 55,
+      "chance": 20,
+      "type": "Special",
+      "name": "sega elettrica",
+      "useMessage": "user taglia un dito a receiver con la sua weapon, receiver perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 55,
+      "chance": 20,
+      "type": "Special",
+      "name": "spara rutti",
+      "useMessage": "user carica un rutto violento e lo rilascia verso receiver togliedogli damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 55,
+      "chance": 20,
+      "type": "Special",
+      "name": "iphone 6 piegato",
+      "useMessage": "user lancia l'weapon contro receiver che perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 34,
+      "chance": 20,
+      "type": "Ability",
+      "name": "mitragliatore a semi di anguria",
+      "useMessage": "user usa il suo weapon e colpisce ripetutamente receiver che perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 60,
+      "chance": 20,
+      "type": "Special",
+      "name": "cannone delle bestemmie",
+      "useMessage": "user tira un porcone a receiver togliendogli damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 40,
+      "chance": 20,
+      "type": "Ability",
+      "name": "cacciavite",
+      "useMessage": "user pugnala receiver col weapon togliendogli damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 77,
+      "chance": 20,
+      "type": "Ability",
+      "name": "spada laser",
+      "useMessage": "user: \"Io sono il senato\", si lancia vorticosamente con la weapon verso receiver che perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 55,
+      "chance": 20,
+      "type": "Strength",
+      "name": "dildo gigante rosa",
+      "useMessage": "user usa un weapon per far del male a receiver, receiver perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 33,
+      "chance": 20,
+      "type": "Ability",
+      "name": "graffetta",
+      "useMessage": "user maestro della weapon colpisce con precisione receiver che perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 90,
+      "chance": 20,
+      "type": "Special",
+      "name": "pelo di barba di Chuck Norris",
+      "useMessage": "user usa il weapon per danneggiare receiver, receiver perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 25,
+      "chance": 20,
+      "type": "Special",
+      "name": "ciabatta",
+      "useMessage": "user lancia la sua weapon a receiver che perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 30,
+      "chance": 20,
+      "type": "Ability",
+      "name": "fionda",
+      "useMessage": "user lancia una pietra con la sua weapon togliendo damageHP a receiver.",
+      "consumable": false
+    },
+    {
+      "damage": 90,
+      "chance": 20,
+      "type": "Special",
+      "name": "trinitrotoluene",
+      "useMessage": "user detona il weapon facendo esplodere receiver che perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 70,
+      "chance": 20,
+      "type": "Special",
+      "name": "lanciarazzi di Serius Sam",
+      "useMessage": "user spara un missile con il weapon e fa saltare in aria receiver che perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 45,
+      "chance": 20,
+      "type": "Strength",
+      "name": "tirapugni d\u0027acciaio",
+      "useMessage": "user tira un pugno col suo weapon e ferisce receiver che perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 70,
+      "chance": 20,
+      "type": "Special",
+      "name": "NVidia RTX 3090",
+      "useMessage": "user renderizza receiver usando la sua weapon e facendogli damageHP di danno.",
+      "consumable": false
+    },
+    {
+      "damage": 70,
+      "chance": 20,
+      "type": "Special",
+      "name": "coronavirus",
+      "useMessage": "user non ha usato la mascherina e mischia il weapon a receiver che perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 60,
+      "chance": 20,
+      "type": "Special",
+      "name": "carica esplosiva",
+      "useMessage": "user piazza una weapon per receiver, receiver ci casca in pieno perdendo damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 48,
+      "chance": 20,
+      "type": "Strength",
+      "name": "martello",
+      "useMessage": "user lancia il suo weapon contro receiver causandogli damageHP di danno.",
+      "consumable": false
+    },
+    {
+      "damage": 60,
+      "chance": 20,
+      "type": "Strength",
+      "name": "zweinhader +15",
+      "useMessage": "user taglia in due receiver con la sua weapon, receiver perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 70,
+      "chance": 20,
+      "type": "Strength",
+      "name": "grosso randello di Phalanx +15",
+      "useMessage": "user usando il weapon frantuma il cranio a receiver che perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 70,
+      "chance": 20,
+      "type": "Ability",
+      "name": "spadone del cavaliere nero +5",
+      "useMessage": "user spacca in due receiver usando lo weapon, receiver perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 64,
+      "chance": 20,
+      "type": "Special",
+      "name": "mano della piromanzia +15",
+      "useMessage": "user lancia le vestige del caos verso receiver con la sua weapon, receiver perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 70,
+      "chance": 20,
+      "type": "Special",
+      "name": "spada maggica di sir Daniel Fortesque",
+      "useMessage": "user, brandendo la weapon, rotea il suo torso correndo contro receiver togliendogli damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 32,
+      "chance": 20,
+      "type": "Ability",
+      "name": "shuriken",
+      "useMessage": "user lancia uno weapon a receiver togliendogli damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 66,
+      "chance": 20,
+      "type": "Special",
+      "name": "rasengan",
+      "useMessage": "user si precipita contro receiver col suo weapon e gli toglie damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 44,
+      "chance": 20,
+      "type": "Special",
+      "name": "pistola a raggio calorico",
+      "useMessage": "user riscalda receiver con la weapon facendogli perdere damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 35,
+      "chance": 20,
+      "type": "Strength",
+      "name": "mazza chiodata",
+      "useMessage": "user agita la sua weapon contro receiver e gli toglie damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 60,
+      "chance": 20,
+      "type": "Special",
+      "name": "maledizione",
+      "useMessage": "user usa maledizione contro receiver. receiver perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 67,
+      "chance": 20,
+      "type": "Ability",
+      "name": "ago",
+      "useMessage": "user punge receiver con weapon causanndogli damageHP di danno.",
+      "consumable": false
+    },
+    {
+      "damage": 69,
+      "chance": 20,
+      "type": "Ability",
+      "name": "Tensa Zangetsu",
+      "useMessage": "user lancia un Getsuga Tensho a receiver causandogli damageHP di danno.",
+      "consumable": false
+    },
+    {
+      "damage": 75,
+      "chance": 20,
+      "type": "Special",
+      "name": "Konami code",
+      "useMessage": "user preme ↑ ↑ ↓ ↓ ← → ← → B A START sul controller e toglie damageHP a receiver.",
+      "consumable": false
+    },
+    {
+      "damage": 90,
+      "chance": 20,
+      "type": "Special",
+      "name": "il codice di cpbot",
+      "useMessage": "user usa weapon contro receiver harcodandolo, receiver perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 25,
+      "chance": 20,
+      "type": "Strength",
+      "name": "sasso",
+      "useMessage": "user tira un weapon a receiver togliendogli damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 77,
+      "chance": 20,
+      "type": "Special",
+      "name": "granata sacra",
+      "useMessage": "user lancia una weapon verso receiver purificandolo e togliendogli damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 79,
+      "chance": 20,
+      "type": "Ability",
+      "name": "falce di Mr. Morte",
+      "useMessage": "user usa la weapon prendendo di stricio receiver che perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 50,
+      "chance": 20,
+      "type": "Special",
+      "name": "flipendo",
+      "useMessage": "user lancia un weapon a receiver che perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 45,
+      "chance": 20,
+      "type": "Special",
+      "name": "keyblade",
+      "useMessage": "user chiava receiver con il suo weapon togliendogli damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 75,
+      "chance": 20,
+      "type": "Strength",
+      "name": "dente di drago",
+      "useMessage": "receiver apre una porta, dietro la porta c'è user che lo schianta a terra col weapon togliendogli damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 90,
+      "chance": 20,
+      "type": "Strength",
+      "name": "martello di 10t",
+      "useMessage": "user colpisce receiver col weapon piantandolo per terra e togliendogli damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 90,
+      "chance": 20,
+      "type": "Special",
+      "name":"Za Warudo",
+      "useMessage": "user: \"ZA WARUDO!\". user lancia dei coltelli verso receiver. user: \"Che il tempo torni a scorrere.\" receiver prende damageHP di danno.",
+      "consumable": false
+    },
+    {
+      "damage": 75,
+      "chance": 20,
+      "type": "Special",
+      "name": "plettro del destino",
+      "useMessage": "user suona un pezzo esplosivo con il weapon a receiver togliendogli damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 77,
+      "chance": 20,
+      "type": "Strength",
+      "name": "sberla alla schiena di Cannavacciuolo",
+      "useMessage": "user chiede aiuto a Cannavacciuolo, receiver prende weapon e perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 60,
+      "chance": 20,
+      "type": "Special",
+      "name": "la sfiga che porta Don Matteo",
+      "useMessage": "user presenta Don Matteo a receiver, receiver inciampa e si fa male perdendo damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 81,
+      "chance": 20,
+      "type": "Special",
+      "name": "martello mostruosamente grande",
+      "useMessage": "user tira fuori il weapon, receiver perde damageHP per lo spavento.",
+      "consumable": false
+    },
+    {
+      "damage": 90,
+      "chance": 20,
+      "type": "Strength",
+      "name": "United States of SMAAAASH",
+      "useMessage": "user usa One For All per colpire receiver con weapon, receiver perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 65,
+      "chance": 20,
+      "type": "Strength",
+      "name": "ammazzachemazza",
+      "useMessage": "user: \"Scelgo la mazza numero 11\". receiver: \"Posso consigliarti la mazza numero 2\". user: \"No.\" receiver prende una mazza 11 in faccia e perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 77,
+      "chance": 20,
+      "type": "Strength",
+      "name": "pugno di lato fortissimissimo",
+      "useMessage": "user tira un weapon a receiver, receiver perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 89,
+      "chance": 20,
+      "type": "Strength",
+      "name": "amicizia con Rapanzano",
+      "useMessage": "user usa l'weapon, Rapanzano tira una sberla a receiver facendogli perdere damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 93,
+      "chance": 20,
+      "type": "Strength",
+      "name": "amicizia con Bud Spencer",
+      "useMessage": "user usa l'weapon, Bud Spencer tira un pugno a receiver facendogli perdere damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 91,
+      "chance": 20,
+      "type": "Strength",
+      "name": "ORA ORA ORA ORA ORA ORA ORA ORA",
+      "useMessage": "user a receiver: \"weapon\". receiver perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 90,
+      "chance": 20,
+      "type": "Strength",
+      "name": "MUDA MUDA MUDA MUDA MUDA MUDA MUDA MUDA",
+      "useMessage": "user a receiver: \"weapon\". receiver perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 50,
+      "chance": 20,
+      "type": "Strength",
+      "name": "pietra abbastanza pesante",
+      "useMessage": "user lancia una weapon verso receiver facendgoli damageHP di danno.",
+      "consumable": false
+    },
+    {
+      "damage": 75,
+      "chance": 20,
+      "type": "Strength",
+      "name": "mamma grassa di chi legge qui",
+      "useMessage": "user lancia la weapon addosso a receiver facendogli damageHP di danno.",
+      "consumable": false
+    },
+    {
+      "damage": 80,
+      "chance": 20,
+      "type": "Ability",
+      "name": "fucile di precisione",
+      "useMessage": "user spara un colpo da 100m con weapon colpendo receiver e togliendogli damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 64,
+      "chance": 20,
+      "type": "Ability",
+      "name": "tecnica delle 64 chiusure",
+      "useMessage": "user usa la weapon contro receiver, receiver perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 90,
+      "chance": 20,
+      "type": "Ability",
+      "name": "backstab con l'anello del calabrone",
+      "useMessage": "user prende alle spalle receiver facendo un weapon e togliendogli damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 50,
+      "chance": 20,
+      "type": "Ability",
+      "name": "coltelli da lancio",
+      "useMessage": "user lancia 10 coltelli verso receiver, colpendolo con 1 coltello e facendo damageHP di danno.",
+      "consumable": false
+    },
+    {
+      "damage": 70,
+      "chance": 20,
+      "type": "Ability",
+      "name": "cerbottana velenosissima",
+      "useMessage": "user avvelena receiver con weapon togliendogli damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 94,
+      "chance": 20,
+      "type": "Ability",
+      "name": "*teleports behind you*: \"nothing personal kid\"",
+      "useMessage": "user *teleports behind receiver*: \"nothing personal kid\", receiver perde damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 76,
+      "chance": 20,
+      "type": "Ability",
+      "name": "spara aghi di precisione",
+      "useMessage": "user spara degli aghi da 40m con weapon prendendo receiver e togliendogli damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 70,
+      "chance": 20,
+      "type": "Ability",
+      "name": "uchigatana",
+      "useMessage": "user affonda l'weapon nelle carni di receiver togliendogli damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 77,
+      "chance": 20,
+      "type": "Ability",
+      "name": "spada di Quelaag",
+      "useMessage": "user brucia receiver con la weapon togliendogli damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 90,
+      "chance": 20,
+      "type": "Ability",
+      "name": "tecnica del dolore millenario",
+      "useMessage": "user usa la weapon contro receiver togliendogli damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 50,
+      "chance": 20,
+      "type": "Ability",
+      "name": "giavellotto",
+      "useMessage": "user fa un lancio da 150m e colpisce receiver in pieno causandogli damageHP di danno.",
+      "consumable": false
+    },
+    {
+      "damage": 64,
+      "chance": 20,
+      "type": "Ability",
+      "name": "coltello a serramanico",
+      "useMessage": "user accoltella receiver con weapon togliedogli damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 78,
+      "chance": 20,
+      "type": "Ability",
+      "name": "Excalibur",
+      "useMessage": "user sferra un fendente con weapon verso receiver togliendogli damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 66,
+      "chance": 20,
+      "type": "Ability",
+      "name": "boomerang di Xena",
+      "useMessage": "user lancia il weapon che rimbalzando 6 volte su alberi e muri colpisce receiver togliendogli damageHP.",
+      "consumable": false
+    },
+    {
+      "damage": 95,
+      "chance": 20,
+      "type": "Ability",
+      "name": "*suono del parry*, \"non toccare Teo\"",
+      "useMessage": "receiver ha provato a toccare Teo ma all'improvviso: weapon e receiver perde damageHP per mano di user.",
+      "consumable": false
+    }
+  ]
+}
