@@ -18,7 +18,7 @@ import java.util.HashMap;
 public class BotMain
 {
 	public static JDA api;
-	public static String commandSymbol = "/";
+	public static String commandSymbol = "!";
 	
 	public static void main(String[] args)
 	{
