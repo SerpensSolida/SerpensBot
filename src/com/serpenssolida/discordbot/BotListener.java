@@ -159,7 +159,9 @@ public class BotListener extends ListenerAdapter
 			Command command = this.getCommand(commandID);
 			if (command != null)
 			{
-				builder.appendFormat("> Comando `%s`\n> \n", command.getId()).appendFormat("> Utilizzo: `%s`\n", command.getArgumentsDescription()).appendFormat("> %s", command.getHelp());
+				builder.appendFormat("> Comando `%s`\n> \n", command.getId())
+						.appendFormat("> Utilizzo: `%s`\n", command.getArgumentsDescription())
+						.appendFormat("> %s", command.getHelp());
 			}
 			else
 			{
