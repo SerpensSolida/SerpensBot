@@ -1,5 +1,6 @@
 package com.serpenssolida.discordbot;
 
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -12,6 +13,8 @@ public interface CommandAction
 	/**
 	 * Called when the command is sent to the chat.
 	 *
+	 *
+	 * @param guild
 	 * @param channel
 	 * 		Channel where the message was sent.
 	 * @param message
@@ -23,5 +26,5 @@ public interface CommandAction
 	 *
 	 * @return
 	 */
-	boolean doAction(MessageChannel channel, Message message, User author, String[] args);
+	boolean doAction(Guild guild, MessageChannel channel, Message message, User author, String[] args);
 }

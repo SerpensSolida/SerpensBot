@@ -3,7 +3,6 @@ package com.serpenssolida.discordbot.hungergames;
 import com.serpenssolida.discordbot.BotListener;
 import com.serpenssolida.discordbot.BotMain;
 import com.serpenssolida.discordbot.Command;
-import com.serpenssolida.discordbot.Task;
 import com.serpenssolida.discordbot.hungergames.task.CreateCharacterTask;
 import com.serpenssolida.discordbot.hungergames.task.EditCharacterTask;
 
@@ -23,78 +22,74 @@ public class HungerGamesListener extends BotListener
 		super("hg");
 		
 		//Command for creating a character.
-		Command command = (new Command("create", 0)).setCommandListener((channel, message, author, args) ->
+		Command command = (new Command("create", 0)).setCommandListener((guild, channel, message, author, args) ->
 		{
 			if (this.stopIfHungerGamesIsRunning(channel))
 				this.addTask(new CreateCharacterTask(author, channel));
 			return true;
 		});
 		command.setHelp("Fa partire la procedura per la creazione di un personaggio.");
-		command.setUsage(BotMain.commandSymbol + BotMain.commandSymbol + " create");
 		this.addCommand(command);
 		
 		//Command for displaying character info.
-		command = (new Command("character", 1)).setCommandListener((channel, message, author, args) ->
+		command = (new Command("character", 1)).setCommandListener((guild, channel, message, author, args) ->
 		{
 			this.sendCharacterCard(channel, message, author, args);
 			return true;
 		});
 		command.setMinArgumentNumber(0);
 		command.setHelp("Invia alla chat la card delle statistiche del personaggio.");
-		command.setUsage(BotMain.commandSymbol + BotMain.commandSymbol + " character");
 		this.addCommand(command);
 		
 		//Command for editing a character.
-		command = (new Command("edit", 0)).setCommandListener((channel, message, author, args) ->
+		command = (new Command("edit", 0)).setCommandListener((guild, channel, message, author, args) ->
 		{
 			if (this.stopIfHungerGamesIsRunning(channel))
 				this.addTask(new EditCharacterTask(author, channel));
 			return true;
 		});
 		command.setHelp("Fa partire la procedura di modifica del personaggio.");
-		command.setUsage(BotMain.commandSymbol + BotMain.commandSymbol + " edit");
 		this.addCommand(command);
 		
 		//Command for enabling or disabling a character.
-		command = (new Command("enable", 1)).setCommandListener((channel, message, author, args) ->
+		command = (new Command("enable", 1)).setCommandListener((guild, channel, message, author, args) ->
 		{
 			if (this.stopIfHungerGamesIsRunning(channel))
 				this.setCharacterEnabled(channel, author, args);
 			return true;
 		});
 		command.setHelp("Abilita/Disabilita il personaggio. Un personaggio disabilitato non parteciperà agli HungerGames.");
-		command.setUsage(BotMain.commandSymbol + BotMain.commandSymbol + " enable (true|false)");
+		command.setArgumentsDescription("(true|false)");
 		this.addCommand(command);
 		
 		//Command for starting a new HungerGames.
-		command = (new Command("start", 0)).setCommandListener((channel, message, author, args) ->
+		command = (new Command("start", 0)).setCommandListener((guild, channel, message, author, args) ->
 		{
 			if (this.stopIfHungerGamesIsRunning(channel))
 				HungerGamesController.startHungerGames(channel);
 			return true;
 		});
 		command.setHelp("Inizia un edizione degli Hunger Games!");
-		command.setUsage(BotMain.commandSymbol + BotMain.commandSymbol + " start");
 		this.addCommand(command);
 		
 		//Command for editing playback speed of the HungerGames.
-		command = (new Command("speed", 1)).setCommandListener((channel, message, author, args) ->
+		command = (new Command("speed", 1)).setCommandListener((guild, channel, message, author, args) ->
 		{
 			this.setPlaybackSpeed(channel, args);
 			return true;
 		});
 		command.setHelp("Modifica la velocità di riproduzione degli Hunger Games (velocità minima 1 secondo).");
-		command.setUsage(BotMain.commandSymbol + BotMain.commandSymbol + " speed secondi");
+		command.setArgumentsDescription("secondi");
 		this.addCommand(command);
 		
 		//Command for displaying leaderboards of the Hunger Games.
-		command = (new Command("leaderboard", 1)).setCommandListener((channel, message, author, args) ->
+		command = (new Command("leaderboard", 1)).setCommandListener((guild, channel, message, author, args) ->
 		{
 			this.sendLeaderboard(channel, args);
 			return true;
 		});
 		command.setHelp("Modifica la velocità di riproduzione degli Hunger Games (velocità minima 1 secondo).");
-		command.setUsage(BotMain.commandSymbol + BotMain.commandSymbol + " leaderboard (wins|kills)");
+		command.setArgumentsDescription("(wins|kills)");
 		this.addCommand(command);
 	}
 	

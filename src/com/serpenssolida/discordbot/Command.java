@@ -1,5 +1,6 @@
 package com.serpenssolida.discordbot;
 
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -13,7 +14,8 @@ public class Command
 	private int maxArgumentNumber; //Max number of argument of the command.
 	private int minArgumentNumber; //Min number of argument of the command.
 	private String help; //String that describe the command.
-	private String usage; //String that describe how to use the command.
+	private String argumentsDescription; //String that describe arguments of the command.
+	private String modulePrefix; //Prefix of the module that owns this command.
 	private CommandAction action; //Callback that is called when the command is sent to the chat.
 	
 	public Command(String id, int maxArgumentNumber)
@@ -51,9 +53,9 @@ public class Command
 	 *
 	 * @return
 	 */
-	public boolean doAction(MessageChannel channel, Message message, User author, String[] args)
+	public boolean doAction(Guild guild, MessageChannel channel, Message message, User author, String[] args)
 	{
-		return (this.action != null && this.action.doAction(channel, message, author, args));
+		return (this.action != null && this.action.doAction(guild, channel, message, author, args));
 	}
 	
 	/**
@@ -84,14 +86,14 @@ public class Command
 		this.help = help;
 	}
 	
-	public String getUsage()
+	public String getArgumentsDescription()
 	{
-		return this.usage;
+		return (BotMain.commandSymbol + this.modulePrefix + " " + this.id + " " + this.argumentsDescription).strip();
 	}
 	
-	public void setUsage(String usage)
+	public void setArgumentsDescription(String argumentsDescription)
 	{
-		this.usage = usage;
+		this.argumentsDescription = argumentsDescription;
 	}
 	
 	public int getMinArgumentNumber()
@@ -118,6 +120,16 @@ public class Command
 		}
 		
 		return data;
+	}
+	
+	public String getModulePrefix()
+	{
+		return this.modulePrefix;
+	}
+	
+	public void setModulePrefix(String modulePrefix)
+	{
+		this.modulePrefix = modulePrefix;
 	}
 	
 	public static class CommandData

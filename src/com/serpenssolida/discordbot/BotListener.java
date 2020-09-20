@@ -5,7 +5,7 @@ import java.util.Map;
 import javax.annotation.Nonnull;
 
 import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.User;
@@ -15,37 +15,39 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class BotListener extends ListenerAdapter
 {
-	protected String modulePrefix = ""; //Prefix of the module, used for commands.
+	private String modulePrefix = ""; //Prefix of the module, used for commands.
+	private String internalID = ""; //Internal id used for retrieving listeners from the list.
 	private HashMap<User, Task> tasks = new HashMap<>(); //List of task currently running. //TODO: Make task unique per player and not per module.
 	private HashMap<String, Command> commands = new HashMap<>(); //List of commands of the module.
 	
 	public BotListener(String modulePrefix)
 	{
 		this.modulePrefix = modulePrefix;
+		this.internalID = this.modulePrefix;
 		
-		Command command = (new Command("cancel", 0)).setCommandListener((channel, message, author, args) ->
+		Command command = (new Command("cancel", 0)).setCommandListener((guild, channel, message, author, args) ->
 		{
 			this.cancelTask(channel, author);
 			return true;
 		});
 		command.setHelp("Cancella la procedura corrente.");
-		command.setUsage(BotMain.commandSymbol + this.modulePrefix + " cancel");
 		this.addCommand(command);
 		
-		command = (new Command("help", 1)).setCommandListener((channel, message, author, args) ->
+		command = (new Command("help", 1)).setCommandListener((guild, channel, message, author, args) ->
 		{
 			this.sendHelp(channel, author, args);
 			return true;
 		});
 		command.setMinArgumentNumber(0);
 		command.setHelp("Mostra questo messaggio oppure le info su come usare il comando dato.");
-		command.setUsage(BotMain.commandSymbol + this.modulePrefix + " help [nome_comando]");
+		command.setArgumentsDescription("[nome_comando]");
 		this.addCommand(command);
 	}
 	
 	public void onMessageReceived(@Nonnull MessageReceivedEvent event)
 	{
 		String message = event.getMessage().getContentDisplay().replaceAll(" +", " "); //Received message.
+		Guild guild = event.getGuild();
 		User author = event.getAuthor(); //Author of the message.
 		MessageChannel channel = event.getChannel(); //Channel where the message was sent.
 		String commandPrefix = BotMain.commandSymbol + this.modulePrefix; //Command prefix of the module.
@@ -74,7 +76,7 @@ public class BotListener extends ListenerAdapter
 			//Check if the number of arguments is correct.
 			if (argNum >= command.getMinArgumentNumber() && argNum <= command.getMaxArgumentNumber())
 			{
-				command.doAction(channel, event.getMessage(), author, arguments); //Run the command.
+				command.doAction(guild, channel, event.getMessage(), author, arguments); //Run the command.
 			}
 			else
 			{
@@ -148,7 +150,7 @@ public class BotListener extends ListenerAdapter
 			builder.append("> Lista comandi modulo Hunger Games\n> \n");
 			for (Map.Entry<String, Command> command : this.commands.entrySet())
 			{
-				builder.appendFormat("> `%s` %s\n", command.getValue().getUsage(), command.getValue().getHelp());
+				builder.appendFormat("> `%s` %s\n", command.getValue().getArgumentsDescription(), command.getValue().getHelp());
 			}
 		}
 		else
@@ -157,7 +159,7 @@ public class BotListener extends ListenerAdapter
 			Command command = this.getCommand(commandID);
 			if (command != null)
 			{
-				builder.appendFormat("> Comando `%s`\n> \n", command.getId()).appendFormat("> Utilizzo: `%s`\n", command.getUsage()).appendFormat("> %s", command.getHelp());
+				builder.appendFormat("> Comando `%s`\n> \n", command.getId()).appendFormat("> Utilizzo: `%s`\n", command.getArgumentsDescription()).appendFormat("> %s", command.getHelp());
 			}
 			else
 			{
@@ -167,9 +169,39 @@ public class BotListener extends ListenerAdapter
 		channel.sendMessage(builder.build()).queue();
 	}
 	
+	public void setModulePrefix(String modulePrefix)
+	{
+		for (Command command : this.commands.values())
+		{
+			command.setModulePrefix(modulePrefix);
+		}
+		
+		this.modulePrefix = modulePrefix;
+	}
+	
+	public String getModulePrefix()
+	{
+		return this.modulePrefix;
+	}
+	
+	public String getInternalID()
+	{
+		return this.internalID;
+	}
+	
+	public void setInternalID(String internalID)
+	{
+		this.internalID = internalID;
+	}
+	
 	public void addCommand(Command command)
 	{
 		this.commands.put(command.getId(), command);
+	}
+	
+	public void removeCommand(String id)
+	{
+		this.commands.remove(id);
 	}
 	
 	public Command getCommand(String id)
