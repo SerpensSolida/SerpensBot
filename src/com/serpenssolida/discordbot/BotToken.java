@@ -2,7 +2,7 @@ package com.serpenssolida.discordbot;
 
 public class BotToken
 {
-	public String token;
+	private String token;
 	
 	public String getToken()
 	{
