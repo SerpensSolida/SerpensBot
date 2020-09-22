@@ -88,7 +88,7 @@ public class HungerGamesListener extends BotListener
 			this.sendLeaderboard(channel, args);
 			return true;
 		});
-		command.setHelp("Modifica la velocità di riproduzione degli Hunger Games (velocità minima 1 secondo).");
+		command.setHelp("Visualizza le classifiche degli HungerGames.");
 		command.setArgumentsDescription("(wins|kills)");
 		this.addCommand(command);
 		
