@@ -10,7 +10,7 @@ Command bot for Discord
 
     ```json
     {
-       "botToken" : "place your token here." 
+       "token" : "place your token here." 
     }
     ```
     

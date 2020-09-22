@@ -56,6 +56,8 @@ public class BotMain
 		{
 			BotToken botToken = gson.fromJson(reader, BotToken.class);
 			
+			System.out.println("Token caricato: " + botToken.getToken());
+			
 			return botToken.getToken();
 		}
 		catch (FileNotFoundException e)
