@@ -22,9 +22,11 @@ public class BotMain
 	
 	public static void main(String[] args)
 	{
+		String token = BotMain.getBotToken();
+		
 		try
 		{
-			api = JDABuilder.createDefault(Security.BOT_TOKEN).build();
+			api = JDABuilder.createDefault(token).build();
 			api.awaitReady();
 			System.out.println("Bot ready!");
 		}
@@ -42,6 +44,30 @@ public class BotMain
 		api.addEventListener(new HungerGamesListener());
 		
 		BotMain.loadSettings();
+	}
+	
+	private static String getBotToken()
+	{
+		File tokenFile = new File("bot.json");
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		System.out.println("Caricamento token.");
+		
+		try (BufferedReader reader = new BufferedReader(new FileReader(tokenFile)))
+		{
+			BotToken botToken = gson.fromJson(reader, BotToken.class);
+			
+			return botToken.getToken();
+		}
+		catch (FileNotFoundException e)
+		{
+			System.out.println("Nessun file dei impostazioni da caricare.");
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+		
+		return "";
 	}
 	
 	public static void loadSettings()
