@@ -198,7 +198,11 @@ public class BotListener extends ListenerAdapter
 	
 	public void addCommand(Command command)
 	{
-		this.commands.put(command.getId(), command);
+		if (command != null)
+		{
+			command.setModulePrefix(this.modulePrefix);
+			this.commands.put(command.getId(), command);
+		}
 	}
 	
 	public void removeCommand(String id)
