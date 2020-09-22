@@ -22,7 +22,10 @@ public class BotMain
 	
 	public static void main(String[] args)
 	{
-		String token = BotMain.getBotToken();
+		String token = BotMain.getBotToken(); //Loading the token from file.
+		
+		//Setting headless mode. We are using some drawing function without the gui.
+		System.setProperty("java.awt.headless", "true");
 		
 		try
 		{

@@ -37,7 +37,7 @@ public class HungerGamesController
 		{
 			instance = new HungerGamesController();
 			
-			/*try
+			try
 			{
 				//Create the font.
 				HungerGamesController.font = Font.createFont(Font.TRUETYPE_FONT, new File(HungerGamesController.folder + "tahoma.ttf"))
@@ -46,7 +46,7 @@ public class HungerGamesController
 			catch (FontFormatException | IOException e)
 			{
 				e.printStackTrace();
-			}*/
+			}
 			
 			HungerGamesController.load();
 		}

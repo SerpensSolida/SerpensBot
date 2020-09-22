@@ -309,7 +309,7 @@ public class HungerGamesThread extends Thread
 			g.setColor(new Color(197, 197, 197, 160));
 			g.fillRect(posX, posY + avatarSize - avatarSize / 5, avatarSize, avatarSize / 5);
 			g.setColor(Color.black);
-			//g.setFont(HungerGamesController.font);
+			g.setFont(HungerGamesController.font);
 			g.drawString("HP: " + (int) involvedPlayer.getHealth(), posX + 4, posY + avatarSize - avatarSize / 10 + 5);
 			
 			i++;
