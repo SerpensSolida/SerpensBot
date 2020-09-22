@@ -91,6 +91,15 @@ public class HungerGamesListener extends BotListener
 		command.setHelp("Modifica la velocità di riproduzione degli Hunger Games (velocità minima 1 secondo).");
 		command.setArgumentsDescription("(wins|kills)");
 		this.addCommand(command);
+		
+		//Command for displaying leaderboards of the Hunger Games.
+		command = (new Command("stop", 0)).setCommandListener((guild, channel, message, author, args) ->
+		{
+			this.stopHungerGames(channel, author);
+			return true;
+		});
+		command.setHelp("Interrompe l'esecuzione degli HungerGames.");
+		this.addCommand(command);
 	}
 	
 	private void sendCharacterCard(MessageChannel channel, Message message, User author, String[] args)
@@ -282,6 +291,24 @@ public class HungerGamesListener extends BotListener
 		messageBuilder.setEmbed(embedBuilder.build());
 		
 		channel.sendMessage(messageBuilder.build()).queue();
+	}
+	
+	private void stopHungerGames(MessageChannel channel, User author)
+	{
+		MessageBuilder builder = new MessageBuilder();
+		
+		if (HungerGamesController.isHungerGamesRunning())
+		{
+			HungerGamesController.stopHungerGames();
+			
+			builder.appendFormat("> Gli HungerGames sono stati fermati da %s.", author.getName());
+		}
+		else
+		{
+			builder.appendFormat("> Nessun HungerGames in esecuzione.");
+		}
+		
+		channel.sendMessage(builder.build()).queue();
 	}
 	
 	private boolean stopIfHungerGamesIsRunning(MessageChannel channel)

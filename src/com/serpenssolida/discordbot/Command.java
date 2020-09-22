@@ -23,6 +23,7 @@ public class Command
 		this.id = id;
 		this.maxArgumentNumber = maxArgumentNumber;
 		this.minArgumentNumber = maxArgumentNumber;
+		this.argumentsDescription = "";
 	}
 	
 	/**

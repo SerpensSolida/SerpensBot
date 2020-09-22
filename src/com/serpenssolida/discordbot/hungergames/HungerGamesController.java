@@ -28,8 +28,9 @@ public class HungerGamesController
 	private boolean running = false; //Whether or not the HungerGames is running.
 	private int count = 0; //Number of editions of the HungerGames.
 	private long messageSpeed = 1000; //Speed of the messages.
+	private Thread gameThread;
 	private ArrayList<String> winners = new ArrayList<>(); //List of winners.
-	public HashMap<String, Character> characters = new HashMap<>(); //List of characters.
+	private HashMap<String, Character> characters = new HashMap<>(); //List of characters.
 	
 	private static HungerGamesController getInstance()
 	{
@@ -65,6 +66,8 @@ public class HungerGamesController
 		
 		Thread t = new HungerGamesThread(channel);
 		t.start();
+		
+		HungerGamesController.getInstance().gameThread = t;
 	}
 	
 	public static void load()
@@ -185,6 +188,12 @@ public class HungerGamesController
 	public static void setRunning(boolean running)
 	{
 		HungerGamesController.getInstance().running = running;
+	}
+	
+	public static void stopHungerGames()
+	{
+		HungerGamesController.getInstance().gameThread.interrupt();
+		HungerGamesController.getInstance().running = false;
 	}
 	
 	public static Character getCharacter(String authorID)

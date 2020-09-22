@@ -36,7 +36,6 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 public class HungerGamesThread extends Thread
 {
 	private MessageChannel channel;
-	
 	private HungerGames hg;
 	
 	private static HungerGamesEvent[] events = {
@@ -58,6 +57,19 @@ public class HungerGamesThread extends Thread
 	}
 	
 	public void run()
+	{
+		try
+		{
+			this.runHungerGames();
+		}
+		catch (InterruptedException e)
+		{
+			System.out.println("Gli HungerGames sono stati fermati.");
+			Thread.currentThread().interrupt();
+		}
+	}
+	
+	private void runHungerGames() throws InterruptedException
 	{
 		MessageBuilder messageBuilder = new MessageBuilder();
 		EmbedBuilder embedBuilder = new EmbedBuilder();
@@ -89,12 +101,12 @@ public class HungerGamesThread extends Thread
 		this.channel.sendMessage(messageBuilder.build()).queue();
 		
 		//Main game loop.
-		while (this.isHungerGamesRunning())
+		while (this.isHungerGamesRunning() && !this.isInterrupted())
 		{
 			//Chose a random number of turns for the day.
 			int turnsNum = 4 + RandomChoice.random.nextInt(4);
 			
-			this.waitTime(HungerGamesController.getMessageSpeed());
+			Thread.sleep(HungerGamesController.getMessageSpeed());
 			
 			embedBuilder = new EmbedBuilder()
 					.setTitle("Alba del " + this.hg.getDay() + "° giorno.");
@@ -105,7 +117,7 @@ public class HungerGamesThread extends Thread
 			for (int i = 0; i < turnsNum && this.isHungerGamesRunning(); i++)
 			{
 				this.doTurnCycle();
-				this.waitTime(HungerGamesController.getMessageSpeed());
+				Thread.sleep(HungerGamesController.getMessageSpeed());
 			}
 			
 			//Send a message containing the relashionships between players.
@@ -118,37 +130,40 @@ public class HungerGamesThread extends Thread
 			this.hg.incrementDay();
 		}
 		
-		if (alivePlayers.size() > 0)
+		if (!this.isInterrupted())
 		{
-			Player winner = (Player) alivePlayers.toArray()[0]; //This player is the winner.
+			if (alivePlayers.size() > 0)
+			{
+				Player winner = (Player) alivePlayers.toArray()[0]; //This player is the winner.
+				
+				messageBuilder = new MessageBuilder();
+				embedBuilder = (new EmbedBuilder()).setTitle("Il vincitore è **" + winner + "**!").setThumbnail(winner.getOwner().getAvatarUrl());
+				messageBuilder.setEmbed(embedBuilder.build());
+				
+				//Update player statistics.
+				winner.getCharacter().incrementWins();
+				HungerGamesController.getWinners().add(winner.getOwner().getId());
+			}
+			else
+			{
+				//All player died, no winner.
+				messageBuilder = new MessageBuilder();
+				embedBuilder = new EmbedBuilder();
+				
+				embedBuilder.setTitle("Nessun vincitore!");
+				embedBuilder.setDescription("Sono morti tutti i giocatori.");
+				
+				messageBuilder.setEmbed(embedBuilder.build());
+				HungerGamesController.getWinners().add(null);
+			}
 			
-			messageBuilder = new MessageBuilder();
-			embedBuilder = (new EmbedBuilder()).setTitle("Il vincitore è **" + winner + "**!").setThumbnail(winner.getOwner().getAvatarUrl());
-			messageBuilder.setEmbed(embedBuilder.build());
+			this.channel.sendMessage(messageBuilder.build()).queue();
 			
-			//Update player statistics.
-			winner.getCharacter().incrementWins();
-			HungerGamesController.getWinners().add(winner.getOwner().getId());
+			//Update HungerGames statistics.
+			HungerGamesController.setCount(HungerGamesController.getCount() + 1);
+			HungerGamesController.setRunning(false);
+			HungerGamesController.save();
 		}
-		else
-		{
-			//All player died, no winner.
-			messageBuilder = new MessageBuilder();
-			embedBuilder = new EmbedBuilder();
-			
-			embedBuilder.setTitle("Nessun vincitore!");
-			embedBuilder.setDescription("Sono morti tutti i giocatori.");
-			
-			messageBuilder.setEmbed(embedBuilder.build());
-			HungerGamesController.getWinners().add(null);
-		}
-		
-		this.channel.sendMessage(messageBuilder.build()).queue();
-		
-		//Update HungerGames statistics.
-		HungerGamesController.setCount(HungerGamesController.getCount() + 1);
-		HungerGamesController.setRunning(false);
-		HungerGamesController.save();
 	}
 	
 	private void doTurnCycle()
@@ -157,7 +172,7 @@ public class HungerGamesThread extends Thread
 		StringBuilder stringBuilder = new StringBuilder();
 		EmbedBuilder embedBuilder = new EmbedBuilder();
 		
-		if (RandomChoice.random.nextInt(100) == 1)
+		if (RandomChoice.random.nextInt(100) == 1 && this.isHungerGamesRunning() && !this.isInterrupted())
 		{
 			//Global event.
 			EventResult eventResult = (new GlobalDamageEvent()).doEvent(this.hg);
@@ -168,7 +183,7 @@ public class HungerGamesThread extends Thread
 			//Choose a random number of local events and execute them.
 			int eventNum = 6 + RandomChoice.random.nextInt(4);
 			
-			for (int i = 0; i < eventNum && this.isHungerGamesRunning(); i++)
+			for (int i = 0; i < eventNum && this.isHungerGamesRunning() && !this.isInterrupted(); i++)
 			{
 				EventResult eventResult; //Result of the event.
 				int tries = 5; //Number of tries.
@@ -416,18 +431,6 @@ public class HungerGamesThread extends Thread
 	{
 		float[] probs = {0.35F, 0.25F, 0.05F, 0.05F, 0.05F, 0.05F, 0.1F, 0.1F};
 		return (HungerGamesEvent) RandomChoice.getRandomWithProbability(events, probs);
-	}
-	
-	public void waitTime(long time)
-	{
-		try
-		{
-			Thread.sleep(time);
-		}
-		catch (InterruptedException e)
-		{
-			e.printStackTrace();
-		}
 	}
 	
 	private void calculate()
