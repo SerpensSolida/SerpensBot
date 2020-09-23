@@ -26,7 +26,7 @@ public class CreateCharacterTask extends Task
 		super(user, channel);
 		
 		MessageBuilder builder = (new MessageBuilder()).append("> Stai creando un personaggio! Inserisci il nome del tuo personaggio. (max 16 caratteri)");
-		this.sendMessage(builder.build());
+		this.sendMessageWithAbort(builder.build());
 		
 		this.state = State.NAME_CHARACTER;
 		this.character = new Character(user.getId());
