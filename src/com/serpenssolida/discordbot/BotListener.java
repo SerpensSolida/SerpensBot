@@ -76,6 +76,11 @@ public class BotListener extends ListenerAdapter
 			//Check if the number of arguments is correct.
 			if (argNum >= command.getMinArgumentNumber() && argNum <= command.getMaxArgumentNumber())
 			{
+				if (BotMain.deleteCommandMessages)
+				{
+					channel.deleteMessageById(event.getMessageId()).queue();
+				}
+				
 				command.doAction(guild, channel, event.getMessage(), author, arguments); //Run the command.
 			}
 			else

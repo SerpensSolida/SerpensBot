@@ -31,8 +31,50 @@ public class SettingsListener extends BotListener
 		command.setArgumentsDescription("[module_name] [new_prefix]");
 		this.addCommand(command);
 		
+		//Command for changing the module prefix of a module.
+		command = (new Command("deletecommand", 1)).setCommandListener((guild, channel, message, author, args) ->
+		{
+			this.setDeleteCommandMessages(guild, channel, author, args);
+			return true;
+		});
+		command.setHelp("Se settato a true il bot cancellera i comandi inviati in chat.");
+		command.setArgumentsDescription("(true|false)");
+		this.addCommand(command);
+		
 		//Listener does not create tasks so there is non need for cancel command.
 		this.removeCommand("cancel");
+	}
+	
+	private void setDeleteCommandMessages(Guild guild, MessageChannel channel, User author, String[] args)
+	{
+		String argument = args[0];
+		Member authorMember = guild.retrieveMember(author).complete();
+		StringBuilder builder = new StringBuilder();
+		
+		if (!this.isAdmin(authorMember) && !authorMember.isOwner())
+		{
+			channel.sendMessage("> Devi essere il proprietario o moderatore del server per modificare il prefisso di un modulo.").queue();
+			return;
+		}
+		
+		switch (argument)
+		{
+			case "true":
+				BotMain.deleteCommandMessages = true;
+				builder.append("> Cancellerò i comandi che sono stati inviati in chat.");
+				break;
+				
+			case "false":
+				BotMain.deleteCommandMessages = false;
+				builder.append("> Lascierò i comandi che sono stati inviati in chat.");
+				break;
+				
+			default:
+				builder.append("> Devi inserire (true|false) come argomento.");
+		}
+		
+		channel.sendMessage(builder.toString()).queue();
+		BotMain.saveSettings();
 	}
 	
 	private void modulePrefixCommand(Guild guild, MessageChannel channel, User author, String[] args)
@@ -136,7 +178,7 @@ public class SettingsListener extends BotListener
 		
 		if (!this.isAdmin(authorMember) && !authorMember.isOwner())
 		{
-			channel.sendMessage("> Devi essere il proprietario o moderatore del server").queue();
+			channel.sendMessage("> Devi essere il proprietario o moderatore del server per modificare il prefisso di un modulo.").queue();
 			return;
 		}
 		

@@ -19,6 +19,7 @@ public class BotMain
 {
 	public static JDA api;
 	public static String commandSymbol = "!";
+	public static boolean deleteCommandMessages;
 	
 	public static void main(String[] args)
 	{
@@ -86,6 +87,7 @@ public class BotMain
 			SettingsData settingsData = gson.fromJson(reader, SettingsData.class);
 			
 			BotMain.commandSymbol = settingsData.getCommandSymbol();
+			BotMain.deleteCommandMessages = settingsData.getDeleteCommandMessages();
 			HashMap<String, String> modulePrefixes = settingsData.getModulePrefixes();
 			
 			for (Object registeredListener : api.getEventManager().getRegisteredListeners())
@@ -138,6 +140,9 @@ public class BotMain
 			}
 			
 			settingsData.setModulePrefixes(modulePrefixes);
+			
+			//Add delete command messages flag.
+			settingsData.setDeleteCommandMessages(BotMain.deleteCommandMessages);
 			
 			writer.println(gson.toJson(settingsData));
 		}
