@@ -164,7 +164,8 @@ public class BotListener extends ListenerAdapter
 		EmbedBuilder embedBuilder = new EmbedBuilder();
 		
 		//Add footer
-		embedBuilder.setFooter("Richiesto da " + author.getName());
+		embedBuilder.setFooter("Richiesto da " + author.getName(), author.getAvatarUrl());
+		embedBuilder.setAuthor(BotMain.api.getSelfUser().getName(), "https://github.com/SerpensSolida/SerpensBot", BotMain.api.getSelfUser().getAvatarUrl());
 		
 		if (args == null)
 		{
