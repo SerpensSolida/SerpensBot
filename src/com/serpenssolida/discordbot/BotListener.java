@@ -25,7 +25,7 @@ public class BotListener extends ListenerAdapter
 		this.modulePrefix = modulePrefix;
 		this.internalID = this.modulePrefix;
 		
-		Command command = (new Command("cancel", 0)).setCommandListener((guild, channel, message, author, args) ->
+		Command command = new Command("cancel", 0).setCommandListener((guild, channel, message, author, args) ->
 		{
 			this.cancelTask(channel, author);
 			return true;
@@ -33,7 +33,7 @@ public class BotListener extends ListenerAdapter
 		command.setHelp("Cancella la procedura corrente.");
 		this.addCommand(command);
 		
-		command = (new Command("help", 1)).setCommandListener((guild, channel, message, author, args) ->
+		command = new Command("help", 1).setCommandListener((guild, channel, message, author, args) ->
 		{
 			this.sendHelp(channel, author, args);
 			return true;

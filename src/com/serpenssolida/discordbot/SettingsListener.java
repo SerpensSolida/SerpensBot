@@ -11,7 +11,7 @@ public class SettingsListener extends BotListener
 		super("settings");
 		
 		//Command for changing the symbol for calling a command.
-		Command command = (new Command("symbol", 1)).setCommandListener((guild, channel, message, author, args) ->
+		Command command = new Command("symbol", 1).setCommandListener((guild, channel, message, author, args) ->
 		{
 			this.setBotCommandSymbol(guild, channel, author, args);
 			return true;
@@ -21,7 +21,7 @@ public class SettingsListener extends BotListener
 		this.addCommand(command);
 		
 		//Command for changing the module prefix of a module.
-		command = (new Command("prefix", 2)).setCommandListener((guild, channel, message, author, args) ->
+		command = new Command("prefix", 2).setCommandListener((guild, channel, message, author, args) ->
 		{
 			this.modulePrefixCommand(guild, channel, author, args);
 			return true;
@@ -32,7 +32,7 @@ public class SettingsListener extends BotListener
 		this.addCommand(command);
 		
 		//Command for changing the module prefix of a module.
-		command = (new Command("deletecommand", 1)).setCommandListener((guild, channel, message, author, args) ->
+		command = new Command("deletecommand", 1).setCommandListener((guild, channel, message, author, args) ->
 		{
 			this.setDeleteCommandMessages(guild, channel, author, args);
 			return true;

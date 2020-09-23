@@ -22,7 +22,7 @@ public class HungerGamesListener extends BotListener
 		super("hg");
 		
 		//Command for creating a character.
-		Command command = (new Command("create", 0)).setCommandListener((guild, channel, message, author, args) ->
+		Command command = new Command("create", 0).setCommandListener((guild, channel, message, author, args) ->
 		{
 			if (this.stopIfHungerGamesIsRunning(channel))
 				this.addTask(new CreateCharacterTask(author, channel));
@@ -32,7 +32,7 @@ public class HungerGamesListener extends BotListener
 		this.addCommand(command);
 		
 		//Command for displaying character info.
-		command = (new Command("character", 1)).setCommandListener((guild, channel, message, author, args) ->
+		command = new Command("character", 1).setCommandListener((guild, channel, message, author, args) ->
 		{
 			this.sendCharacterCard(channel, message, author, args);
 			return true;
@@ -43,7 +43,7 @@ public class HungerGamesListener extends BotListener
 		this.addCommand(command);
 		
 		//Command for editing a character.
-		command = (new Command("edit", 0)).setCommandListener((guild, channel, message, author, args) ->
+		command = new Command("edit", 0).setCommandListener((guild, channel, message, author, args) ->
 		{
 			if (this.stopIfHungerGamesIsRunning(channel))
 				this.addTask(new EditCharacterTask(author, channel));
@@ -53,7 +53,7 @@ public class HungerGamesListener extends BotListener
 		this.addCommand(command);
 		
 		//Command for enabling or disabling a character.
-		command = (new Command("enable", 1)).setCommandListener((guild, channel, message, author, args) ->
+		command = new Command("enable", 1).setCommandListener((guild, channel, message, author, args) ->
 		{
 			if (this.stopIfHungerGamesIsRunning(channel))
 				this.setCharacterEnabled(channel, author, args);
@@ -64,7 +64,7 @@ public class HungerGamesListener extends BotListener
 		this.addCommand(command);
 		
 		//Command for starting a new HungerGames.
-		command = (new Command("start", 0)).setCommandListener((guild, channel, message, author, args) ->
+		command = new Command("start", 0).setCommandListener((guild, channel, message, author, args) ->
 		{
 			if (this.stopIfHungerGamesIsRunning(channel))
 				HungerGamesController.startHungerGames(channel);
@@ -74,7 +74,7 @@ public class HungerGamesListener extends BotListener
 		this.addCommand(command);
 		
 		//Command for editing playback speed of the HungerGames.
-		command = (new Command("speed", 1)).setCommandListener((guild, channel, message, author, args) ->
+		command = new Command("speed", 1).setCommandListener((guild, channel, message, author, args) ->
 		{
 			this.setPlaybackSpeed(channel, args);
 			return true;
@@ -84,7 +84,7 @@ public class HungerGamesListener extends BotListener
 		this.addCommand(command);
 		
 		//Command for displaying leaderboards of the Hunger Games.
-		command = (new Command("leaderboard", 1)).setCommandListener((guild, channel, message, author, args) ->
+		command = new Command("leaderboard", 1).setCommandListener((guild, channel, message, author, args) ->
 		{
 			this.sendLeaderboard(channel, args);
 			return true;
@@ -94,7 +94,7 @@ public class HungerGamesListener extends BotListener
 		this.addCommand(command);
 		
 		//Command for displaying leaderboards of the Hunger Games.
-		command = (new Command("stop", 0)).setCommandListener((guild, channel, message, author, args) ->
+		command = new Command("stop", 0).setCommandListener((guild, channel, message, author, args) ->
 		{
 			this.stopHungerGames(channel, author);
 			return true;
