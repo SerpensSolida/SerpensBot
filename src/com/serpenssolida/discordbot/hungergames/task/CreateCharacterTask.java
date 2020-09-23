@@ -26,7 +26,7 @@ public class CreateCharacterTask extends Task
 		super(user, channel);
 		
 		MessageBuilder builder = (new MessageBuilder()).append("> Stai creando un personaggio! Inserisci il nome del tuo personaggio. (max 16 caratteri)");
-		channel.sendMessage(builder.build()).queue();
+		this.sendMessage(builder.build());
 		
 		this.state = State.NAME_CHARACTER;
 		this.character = new Character(user.getId());
@@ -55,10 +55,9 @@ public class CreateCharacterTask extends Task
 		return result;
 	}
 	
-	public Task.TaskResult consumeReaction(Message message, String reactionName)
+	public Task.TaskResult reactionAdded(Message message, String reaction)
 	{
-		//No need to check for reaction.
-		return Task.TaskResult.NotFinished;
+		return TaskResult.Finished;
 	}
 	
 	private Task.TaskResult manageNameCharacterState(Message receivedMessage)
@@ -69,7 +68,7 @@ public class CreateCharacterTask extends Task
 		if (name.length() <= 0 || name.length() > 16)
 		{
 			MessageBuilder messageBuilder = (new MessageBuilder()).appendCodeLine((name.length() <= 0) ? "Devi inserire un nome!" : "Il nome non può essere più lungo di 15 caratteri!");
-			this.sendMessage(messageBuilder.build());
+			this.sendMessageWithAbort(messageBuilder.build());
 			return Task.TaskResult.NotFinished;
 		}
 		
@@ -85,7 +84,7 @@ public class CreateCharacterTask extends Task
 				.append("Vitalità, Forza, Abilità, Special, Velocità, Resistenza e Gusto. ")
 				.appendFormat("\n> La somma dei valori delle caratteristiche deve essere %s punti e ogni caratteristica deve essere compresa tra 0 e 10!", HungerGamesController.SUM_STATS);
 		
-		this.sendMessage(builder.build());
+		this.sendMessageWithAbort(builder.build());
 		return Task.TaskResult.NotFinished;
 	}
 	
@@ -105,7 +104,7 @@ public class CreateCharacterTask extends Task
 					.append("Vitalità, Forza, Abilità, Special, Velocità, Resistenza e Gusto. ")
 					.appendFormat("\n> La somma dei valori delle caratteristiche deve essere %s punti e ogni caratteristica deve essere compresa tra 0 e 10!", HungerGamesController.SUM_STATS);
 			
-			this.sendMessage(messageBuilder.build());
+			this.sendMessageWithAbort(messageBuilder.build());
 			return Task.TaskResult.NotFinished;
 		}
 		
@@ -128,7 +127,7 @@ public class CreateCharacterTask extends Task
 			MessageBuilder messageBuilder = new MessageBuilder()
 					.append("> Formato delle caratteristiche errato. Inserisci solo numeri tra 0 e 10!");
 			
-			this.sendMessage(messageBuilder.build());
+			this.sendMessageWithAbort(messageBuilder.build());
 			return Task.TaskResult.NotFinished;
 		}
 		
@@ -137,7 +136,7 @@ public class CreateCharacterTask extends Task
 			MessageBuilder messageBuilder = new MessageBuilder()
 					.appendFormat("\n> La somma dei valori delle caratteristiche deve essere %d punti! Somma dei valori inseriti: %s", HungerGamesController.SUM_STATS, sum);
 			
-			this.sendMessage(messageBuilder.build());
+			this.sendMessageWithAbort(messageBuilder.build());
 			return Task.TaskResult.NotFinished;
 		}
 		
@@ -147,7 +146,7 @@ public class CreateCharacterTask extends Task
 		MessageBuilder builder = new MessageBuilder()
 				.append("> Creazione personaggio completata!");
 		
-		this.sendMessage(builder.build());
+		this.sendMessageWithAbort(builder.build());
 		this.state = State.FINISHED;
 		
 		return Task.TaskResult.Finished;

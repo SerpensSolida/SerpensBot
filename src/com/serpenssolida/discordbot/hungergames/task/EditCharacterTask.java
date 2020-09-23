@@ -74,17 +74,17 @@ public class EditCharacterTask extends Task
 		return result;
 	}
 	
-	public Task.TaskResult consumeReaction(Message message, String reactionName)
+	public Task.TaskResult reactionAdded(Message message, String reaction)
 	{
 		MessageBuilder builder = new MessageBuilder();
 		
-		if (this.getState() != State.MENU)
-			return Task.TaskResult.NotFinished;
-		
 		//Check if the reaction is added to the menu.
-		if (this.reactionCheckMessage.getId().equals(message.getId()))
+		if (this.reactionCheckMessage != null && this.reactionCheckMessage.getId().equals(message.getId()))
 		{
-			switch (reactionName)
+			if (this.getState() != State.MENU)
+				return Task.TaskResult.NotFinished;
+			
+			switch (reaction)
 			{
 				case "🇦":
 					//Edit name of the player.
@@ -106,15 +106,17 @@ public class EditCharacterTask extends Task
 					
 					break;
 				
-				case "🇨":
+				case "❌":
 					this.getChannel().deleteMessageById(this.reactionCheckMessage.getId()).queue(); //Delete the menu.
 					
 					this.state = State.FINISHED;
 					return Task.TaskResult.Finished;
 			}
+			
+			this.getChannel().deleteMessageById(this.reactionCheckMessage.getId()).queue();
 		}
 		
-		this.sendMessage(builder.build());
+		this.sendMessageWithAbort(builder.build());
 		return Task.TaskResult.NotFinished;
 	}
 	
@@ -129,7 +131,7 @@ public class EditCharacterTask extends Task
 			MessageBuilder messageBuilder = new MessageBuilder();
 			messageBuilder.appendCodeLine((name.length() <= 0) ? "Devi inserire un nome!" : "Il nome non può essere più lungo di 16 caratteri!");
 			
-			this.sendMessage(messageBuilder.build());
+			this.sendMessageWithAbort(messageBuilder.build());
 			return Task.TaskResult.NotFinished;
 		}
 		
@@ -142,7 +144,7 @@ public class EditCharacterTask extends Task
 		MessageBuilder builder = new MessageBuilder();
 		builder.appendFormat("Nuovo nome del personaggio: %s", this.character.getDisplayName());
 		
-		this.sendMessage(builder.build());
+		this.getChannel().sendMessage(builder.build()).queue();
 		this.sendMenu();
 		return Task.TaskResult.NotFinished;
 	}
@@ -163,7 +165,7 @@ public class EditCharacterTask extends Task
 					.append("Vitalità, Forza, Abilità, Special, Velocità, Resistenza e Gusto.\n")
 					.appendFormat("> La somma dei valori delle caratteristiche deve essere %s punti e ogni caratteristica deve essere compresa tra 0 e 10!", SUM_STATS);
 			
-			this.sendMessage(messageBuilder.build());
+			this.sendMessageWithAbort(messageBuilder.build());
 			return Task.TaskResult.NotFinished;
 		}
 		
@@ -186,7 +188,7 @@ public class EditCharacterTask extends Task
 			MessageBuilder messageBuilder = new MessageBuilder()
 					.append("> Formato delle caratteristiche errato. Inserisci solo numeri tra 0 e 10!");
 			
-			this.sendMessage(messageBuilder.build());
+			this.sendMessageWithAbort(messageBuilder.build());
 			return Task.TaskResult.NotFinished;
 		}
 		
@@ -196,7 +198,7 @@ public class EditCharacterTask extends Task
 			MessageBuilder messageBuilder = new MessageBuilder()
 					.appendFormat("\n> La somma dei valori delle caratteristiche deve essere %d punti! Somma dei valori inseriti: %s", HungerGamesController.SUM_STATS, sum);
 			
-			this.sendMessage(messageBuilder.build());
+			this.sendMessageWithAbort(messageBuilder.build());
 			return Task.TaskResult.NotFinished;
 		}
 		
@@ -207,7 +209,7 @@ public class EditCharacterTask extends Task
 		MessageBuilder builder = new MessageBuilder()
 				.append("> Caratteristiche impostate correttamente.");
 		
-		this.sendMessage(builder.build());
+		this.getChannel().sendMessage(builder.build()).queue();
 		this.state = State.MENU;
 		
 		//Send the menu.
@@ -225,7 +227,7 @@ public class EditCharacterTask extends Task
 				.append("> Cosa vuoi modificare del tuo personaggio?\n> \n")
 				.append("> \t:regional_indicator_a: - Nome.\n")
 				.append("> \t:regional_indicator_b: - Statistiche.\n")
-				.append("> \t:regional_indicator_c: - Esci.\n");
+				.append("> \t:x: - Esci.\n");
 		
 		MessageAction messageAction = this.getChannel().sendMessage(builder.build());
 		
@@ -235,7 +237,7 @@ public class EditCharacterTask extends Task
 			this.reactionCheckMessage = message; //This message is the one used for checking the reaction.
 			message.addReaction("🇦").queue();
 			message.addReaction("🇧").queue();
-			message.addReaction("🇨").queue();
+			message.addReaction("❌").queue();
 		});
 	}
 	
