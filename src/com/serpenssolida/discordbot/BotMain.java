@@ -10,10 +10,20 @@ import javax.security.auth.login.LoginException;
 import com.serpenssolida.discordbot.hungergames.io.CharacterData;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.function.Predicate;
 
 public class BotMain
 {
@@ -30,8 +40,13 @@ public class BotMain
 		
 		try
 		{
-			api = JDABuilder.createDefault(token).build();
+			api = JDABuilder
+					.createDefault(token)
+					.setMemberCachePolicy(MemberCachePolicy.ALL)
+					.enableIntents(GatewayIntent.GUILD_MEMBERS)
+					.build();
 			api.awaitReady();
+			
 			System.out.println("Bot ready!");
 		}
 		catch (LoginException e)
@@ -48,6 +63,16 @@ public class BotMain
 		api.addEventListener(new HungerGamesListener());
 		
 		BotMain.loadSettings();
+	}
+	
+	public static ArrayList<Member> findUsersByName(Guild guild, String userName)
+	{
+		HashSet<Member> users = new HashSet<>();
+		
+		users.addAll(guild.getMembersByName(userName, true));
+		users.addAll(guild.getMembersByNickname(userName, true));
+		
+		return new ArrayList<>(users);
 	}
 	
 	private static String getBotToken()

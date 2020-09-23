@@ -7,13 +7,12 @@ import com.serpenssolida.discordbot.hungergames.task.CreateCharacterTask;
 import com.serpenssolida.discordbot.hungergames.task.EditCharacterTask;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 
 public class HungerGamesListener extends BotListener
 {
@@ -34,11 +33,12 @@ public class HungerGamesListener extends BotListener
 		//Command for displaying character info.
 		command = new Command("character", 1).setCommandListener((guild, channel, message, author, args) ->
 		{
-			this.sendCharacterCard(channel, message, author, args);
+			this.sendCharacterCard(guild, channel, message, author, args);
 			return true;
 		});
 		command.setMinArgumentNumber(0);
 		command.setJoinArguments(true);
+		command.setArgumentsDescription("[nome_utente|nickname_utente|tag_utente]");
 		command.setHelp("Invia alla chat la card delle statistiche del personaggio.");
 		this.addCommand(command);
 		
@@ -103,7 +103,7 @@ public class HungerGamesListener extends BotListener
 		this.addCommand(command);
 	}
 	
-	private void sendCharacterCard(MessageChannel channel, Message message, User author, String[] args)
+	private void sendCharacterCard(Guild guild, MessageChannel channel, Message message, User author, String[] args)
 	{
 		Character character = null;
 		
@@ -113,16 +113,37 @@ public class HungerGamesListener extends BotListener
 		}
 		else
 		{
-			List<User> users = message.getMentionedUsers();
+			ArrayList<Member> members = BotMain.findUsersByName(guild, args[0]);
+			List<User> taggedUsers = message.getMentionedUsers();
 			
-			if (users.size() > 0)
+			if (members.isEmpty())
 			{
-				character = HungerGamesController.getCharacter(users.get(0).getId());
+				//Try using tag.
+				if (taggedUsers.isEmpty())
+				{
+					MessageBuilder builder = new MessageBuilder()
+							.appendFormat("> L'utente con il nome/nickname `%s` non esiste oppure non è stato salvato dentro la cache, prova a usare il tag.", args[0]);
+					
+					channel.sendMessage(builder.build()).queue();
+					
+					return;
+				}
+				else
+				{
+					character = HungerGamesController.getCharacter(taggedUsers.get(0).getId());
+				}
+				
+			}
+			else if (members.size() > 1)
+			{
+				MessageBuilder builder = new MessageBuilder()
+						.appendFormat("> L'utente con il nome/nickname %s non esiste oppure non è stato salvato dentro la cache, prova a usare il tag.", args[0]);
+				
+				channel.sendMessage(builder.build()).queue();
 			}
 			else
 			{
-				channel.sendMessage("> Devi taggare un utente.").queue();
-				return;
+				character = HungerGamesController.getCharacter(members.get(0).getId());
 			}
 		}
 		
@@ -159,8 +180,8 @@ public class HungerGamesListener extends BotListener
 			}
 			
 			//Stats of the player.
-			StringBuilder stats = new StringBuilder();
-			stats.append("HungerGames vinti: " + character.getWins() + "\n")
+			StringBuilder stats = new StringBuilder()
+					.append("HungerGames vinti: " + character.getWins() + "\n")
 					.append("Uccisioni totali: " + character.getKills() + "\n");
 			
 			EmbedBuilder embedBuilder = new EmbedBuilder();
