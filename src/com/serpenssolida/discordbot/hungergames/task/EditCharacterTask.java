@@ -183,8 +183,8 @@ public class EditCharacterTask extends Task
 		}
 		catch (NumberFormatException e)
 		{
-			MessageBuilder messageBuilder = new MessageBuilder();
-			messageBuilder.append("> Formato delle caratteristiche errato. Inserisci solo numeri tra 0 e 10!");
+			MessageBuilder messageBuilder = new MessageBuilder()
+					.append("> Formato delle caratteristiche errato. Inserisci solo numeri tra 0 e 10!");
 			
 			this.sendMessage(messageBuilder.build());
 			return Task.TaskResult.NotFinished;
@@ -194,7 +194,7 @@ public class EditCharacterTask extends Task
 		if (sum != SUM_STATS)
 		{
 			MessageBuilder messageBuilder = new MessageBuilder()
-					.appendFormat("> La somma dei valori delle caratteristiche deve essere %d punti e ogni caratteristica deve essere compresa tra 0 e 10!", SUM_STATS);
+					.appendFormat("\n> La somma dei valori delle caratteristiche deve essere %d punti! Somma dei valori inseriti: %s", HungerGamesController.SUM_STATS, sum);
 			
 			this.sendMessage(messageBuilder.build());
 			return Task.TaskResult.NotFinished;
@@ -204,8 +204,8 @@ public class EditCharacterTask extends Task
 		this.character.setStats(abilities);
 		HungerGamesController.save();
 		
-		MessageBuilder builder = new MessageBuilder();
-		builder.append("> Caratteristiche impostate correttamente.");
+		MessageBuilder builder = new MessageBuilder()
+				.append("> Caratteristiche impostate correttamente.");
 		
 		this.sendMessage(builder.build());
 		this.state = State.MENU;

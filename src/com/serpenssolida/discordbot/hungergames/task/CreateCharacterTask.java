@@ -25,7 +25,7 @@ public class CreateCharacterTask extends Task
 	{
 		super(user, channel);
 		
-		MessageBuilder builder = (new MessageBuilder()).append("> Stai creando un personaggio! Inserisci il nome del tuo personaggio. (max 15 caratteri)");
+		MessageBuilder builder = (new MessageBuilder()).append("> Stai creando un personaggio! Inserisci il nome del tuo personaggio. (max 16 caratteri)");
 		channel.sendMessage(builder.build()).queue();
 		
 		this.state = State.NAME_CHARACTER;
@@ -83,7 +83,7 @@ public class CreateCharacterTask extends Task
 				.append("\n> Adesso assegna le caratteristiche al personaggio. Invia un messaggio con 7 numeri separati da uno spazio che rappresentano le caratteristiche del tuo personaggio.")
 				.append("\n> Le caratteristiche sono: ")
 				.append("Vitalità, Forza, Abilità, Special, Velocità, Resistenza e Gusto. ")
-				.appendFormat("\n> La somma dei valori delle caratteristiche deve essere %d punti.", HungerGamesController.SUM_STATS);
+				.appendFormat("\n> La somma dei valori delle caratteristiche deve essere %s punti e ogni caratteristica deve essere compresa tra 0 e 10!", HungerGamesController.SUM_STATS);
 		
 		this.sendMessage(builder.build());
 		return Task.TaskResult.NotFinished;
@@ -126,7 +126,7 @@ public class CreateCharacterTask extends Task
 		catch (NumberFormatException e)
 		{
 			MessageBuilder messageBuilder = new MessageBuilder()
-					.append("> Formato delle caratteristiche errato. Inserisci solo numeri!");
+					.append("> Formato delle caratteristiche errato. Inserisci solo numeri tra 0 e 10!");
 			
 			this.sendMessage(messageBuilder.build());
 			return Task.TaskResult.NotFinished;
@@ -135,7 +135,7 @@ public class CreateCharacterTask extends Task
 		if (sum != HungerGamesController.SUM_STATS)
 		{
 			MessageBuilder messageBuilder = new MessageBuilder()
-					.appendFormat("\n> La somma dei valori delle caratteristiche deve essere %d punti!", HungerGamesController.SUM_STATS);
+					.appendFormat("\n> La somma dei valori delle caratteristiche deve essere %d punti! Somma dei valori inseriti: %s", HungerGamesController.SUM_STATS, sum);
 			
 			this.sendMessage(messageBuilder.build());
 			return Task.TaskResult.NotFinished;
