@@ -45,6 +45,6 @@ public class GlobalDamageEvent extends HungerGamesEvent
 		involvedPlayers.addAll(alivePlayers);
 		alivePlayers.removeAll(deadPlayers);
 		
-		return new EventResult(eventString + "\n", EventResult.State.Successful);
+		return new EventResult(builder.toString(), EventResult.State.Successful);
 	}
 }
