@@ -7,7 +7,7 @@ import com.serpenssolida.discordbot.hungergames.Player;
 
 import java.util.HashSet;
 
-public class SurpriseAttack extends HungerGamesEvent
+public class SurpriseAttackEvent extends HungerGamesEvent
 {
 	String[] messages = new String[]
 			{

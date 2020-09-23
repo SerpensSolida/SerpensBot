@@ -14,7 +14,7 @@ import com.serpenssolida.discordbot.hungergames.event.IncidentEvent;
 import com.serpenssolida.discordbot.hungergames.event.RandomEvent;
 import com.serpenssolida.discordbot.hungergames.event.RelationshipEvent;
 import com.serpenssolida.discordbot.hungergames.event.SleepEvent;
-import com.serpenssolida.discordbot.hungergames.event.SurpriseAttack;
+import com.serpenssolida.discordbot.hungergames.event.SurpriseAttackEvent;
 import com.serpenssolida.discordbot.hungergames.inventory.Weapon;
 import com.serpenssolida.discordbot.hungergames.io.ItemData;
 
@@ -43,7 +43,7 @@ public class HungerGamesThread extends Thread
 			new BattleEvent(),
 			new EatFoodEvent(),
 			new FoundItemEvent(),
-			new SurpriseAttack(),
+			new SurpriseAttackEvent(),
 			new IncidentEvent(),
 			new SleepEvent(),
 			new RandomEvent(),
