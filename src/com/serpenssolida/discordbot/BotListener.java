@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nonnull;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -17,6 +18,7 @@ public class BotListener extends ListenerAdapter
 {
 	private String modulePrefix = ""; //Prefix of the module, used for commands.
 	private String internalID = ""; //Internal id used for retrieving listeners from the list.
+	private String moduleName = ""; //Readable name of the module.
 	private HashMap<User, Task> tasks = new HashMap<>(); //List of task currently running. //TODO: Make task unique per player and not per module.
 	private HashMap<String, Command> commands = new HashMap<>(); //List of commands of the module.
 	
@@ -159,31 +161,37 @@ public class BotListener extends ListenerAdapter
 	
 	private void sendHelp(MessageChannel channel, User author, String[] args)
 	{
-		MessageBuilder builder = new MessageBuilder();
+		StringBuilder stringBuilder = new StringBuilder();
+		EmbedBuilder embedBuilder = new EmbedBuilder();
+		
 		if (args == null)
 		{
-			builder.append("> Lista comandi modulo Hunger Games\n> \n");
-			for (Map.Entry<String, Command> command : this.commands.entrySet())
+			embedBuilder.setTitle("Lista comandi modulo " + this.getModuleName());
+			
+			for (Command command : this.commands.values())
 			{
-				builder.appendFormat("> `%s` %s\n", command.getValue().getArgumentsDescription(), command.getValue().getHelp());
+				embedBuilder.appendDescription("`" + command.getArgumentsDescription() + "`")
+						.appendDescription(" " + command.getHelp() + "\n");
 			}
+			
 		}
 		else
 		{
 			String commandID = args[0];
 			Command command = this.getCommand(commandID);
+			
 			if (command != null)
 			{
-				builder.appendFormat("> Comando `%s`\n> \n", command.getId())
-						.appendFormat("> Utilizzo: `%s`\n", command.getArgumentsDescription())
-						.appendFormat("> %s", command.getHelp());
+				embedBuilder.setTitle(String.format("Descrizione comando *%s*", command.getId()));
+				embedBuilder.appendDescription(String.format("Utilizzo: `%s`\n", command.getArgumentsDescription()))
+						.appendDescription(command.getHelp());
 			}
 			else
 			{
-				builder.appendFormat("> Il comando `%s` non esiste.", commandID);
+				embedBuilder.appendDescription(String.format("> Il comando `%s` non esiste.", commandID));
 			}
 		}
-		channel.sendMessage(builder.build()).queue();
+		channel.sendMessage(new MessageBuilder().setEmbed(embedBuilder.build()).build()).queue();
 	}
 	
 	public void setModulePrefix(String modulePrefix)
@@ -258,5 +266,15 @@ public class BotListener extends ListenerAdapter
 	public void removeTask(Task task)
 	{
 		this.tasks.remove(task.getUser());
+	}
+	
+	public String getModuleName()
+	{
+		return this.moduleName;
+	}
+	
+	public void setModuleName(String moduleName)
+	{
+		this.moduleName = moduleName;
 	}
 }

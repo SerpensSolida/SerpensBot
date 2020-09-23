@@ -19,6 +19,7 @@ public class HungerGamesListener extends BotListener
 	public HungerGamesListener()
 	{
 		super("hg");
+		this.setModuleName("HungerGames");
 		
 		//Command for creating a character.
 		Command command = new Command("create", 0).setCommandListener((guild, channel, message, author, args) ->

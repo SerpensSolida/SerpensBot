@@ -9,6 +9,7 @@ public class SettingsListener extends BotListener
 	public SettingsListener()
 	{
 		super("settings");
+		this.setModuleName("Settings");
 		
 		//Command for changing the symbol for calling a command.
 		Command command = new Command("symbol", 1).setCommandListener((guild, channel, message, author, args) ->
