@@ -3,37 +3,37 @@
     {
       "hpRestored": 20.0,
       "name": "pane",
-      "useMessage": "user azzanna la sua fetta di food e quadagna healedHP.",
+      "useMessage": "user azzanna la sua fetta di food e quadagna amountHP.",
       "consumable": true
     },
     {
       "hpRestored": -1.0,
       "name": "pizza hawaiana",
-      "useMessage": "user ha avuto il coraggio di mangiare una food,  healedHP.",
+      "useMessage": "user ha avuto il coraggio di mangiare una food,  amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 60.0,
       "name": "pizza con le patatine",
-      "useMessage": "user ordina una food, user si riempie il pancino guadagnando  healedHP..",
+      "useMessage": "user ordina una food, user si riempie il pancino guadagnando  amountHP..",
       "consumable": true
     },
     {
       "hpRestored": 20.0,
       "name": "bottiglia di brandy",
-      "useMessage": "user si scola la sua food e riprende healedHP.",
+      "useMessage": "user si scola la sua food e riprende amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 60.0,
       "name": "babbà",
-      "useMessage": "user alla vista di food recupera healedHP.",
+      "useMessage": "user alla vista di food recupera amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 30.0,
       "name": "salamino",
-      "useMessage": "user ingoia sano un food e rispristina healedHP.",
+      "useMessage": "user ingoia sano un food e rispristina amountHP.",
       "consumable": true
     },
     {
@@ -45,163 +45,163 @@
     {
       "hpRestored": 15.0,
       "name": "mangime per cani",
-      "useMessage": "user mangiucchia un po' di food e guadagna healedHP.",
+      "useMessage": "user mangiucchia un po' di food e guadagna amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 25.0,
       "name": "moneta di cioccolato",
-      "useMessage": "user ingurgita una moneta per la fame e sorpreso scopre che è una food, user guadagna healedHP.",
+      "useMessage": "user ingurgita una moneta per la fame e sorpreso scopre che è una food, user guadagna amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 60.0,
       "name": "big chungus gommoso",
-      "useMessage": "user azzana un food intero e recupera healedHP.",
+      "useMessage": "user azzana un food intero e recupera amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 30.0,
       "name": "barretta energetica",
-      "useMessage": "user scarta con furia una food e la mangia recuperando healedHP.",
+      "useMessage": "user scarta con furia una food e la mangia recuperando amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 20.0,
       "name": "patitne",
-      "useMessage": "user prende una patatina... e la mangia. user recupera healedHP.",
+      "useMessage": "user prende una patatina... e la mangia. user recupera amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 30.0,
       "name": "vasetto di pesche sciroppate",
-      "useMessage": "user si finisce un food intero e recupera healedHP.",
+      "useMessage": "user si finisce un food intero e recupera amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 50.0,
       "name": "pizza tonno e cipolle",
-      "useMessage": "user ordina una food da Mimmo, dopo averla finita user guadagna healedHP.",
+      "useMessage": "user ordina una food da Mimmo, dopo averla finita user guadagna amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 22.0,
       "name": "mela",
-      "useMessage": "user: \"Mhhh, buona questa cadrega!\", user recupera healedHP.",
+      "useMessage": "user: \"Mhhh, buona questa cadrega!\", user recupera amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 40.0,
       "name": "spaghettino aglio, olio e peperoncino",
-      "useMessage": "user si prepara un belissimo food, dopo aver fatto una scarpetta user recupera healedHP.",
+      "useMessage": "user si prepara un belissimo food, dopo aver fatto una scarpetta user recupera amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 14.0,
       "name": "fragola con la panna",
-      "useMessage": "user si mangia una food e guadagna healedHP.",
+      "useMessage": "user si mangia una food e guadagna amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 14.0,
       "name": "ciliege",
-      "useMessage": "user mangia una manciata di food recuperando healedHP.",
+      "useMessage": "user mangia una manciata di food recuperando amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 12.0,
       "name": "cocktail al sudore",
-      "useMessage": "user spreme la sua maglietta su un bicchiere, si chiude il naso con una molletta e ingoia il food, user guadagna healedHP.",
+      "useMessage": "user spreme la sua maglietta su un bicchiere, si chiude il naso con una molletta e ingoia il food, user guadagna amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 25.0,
       "name": "biscotti",
-      "useMessage": "user sgranocchia i food e recupera healedHP.",
+      "useMessage": "user sgranocchia i food e recupera amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 45.0,
       "name": "pizza di carlo cracco",
-      "useMessage": "user ordina la food con tutti i suoi averi, user recupera healedHP.",
+      "useMessage": "user ordina la food con tutti i suoi averi, user recupera amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 35.0,
       "name": "scatoletta di tonno",
-      "useMessage": "user si apre una food per mangiarsela. user guadagna healedHP.",
+      "useMessage": "user si apre una food per mangiarsela. user guadagna amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 20.0,
       "name": "vasetto di prugne secche",
-      "useMessage": "user finisce il suo food e recupera healedHP.",
+      "useMessage": "user finisce il suo food e recupera amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 48.0,
       "name": "vasetto di babbà al rum",
-      "useMessage": "user alla presenza del food si sente estasiato e recupera healedHP.",
+      "useMessage": "user alla presenza del food si sente estasiato e recupera amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 62.0,
       "name": "babbà ripieno di panna",
-      "useMessage": "user toccando il food guadagna healedHP.",
+      "useMessage": "user toccando il food guadagna amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 45.0,
       "name": "kinder fetta al latte",
-      "useMessage": "user si mangia una food recuperando healedHP.",
+      "useMessage": "user si mangia una food recuperando amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 48.0,
       "name": "kinder pinguì",
-      "useMessage": "user si pappa una bella food e recupera healedHP.",
+      "useMessage": "user si pappa una bella food e recupera amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 47.0,
       "name": "kinder sorpresa",
-      "useMessage": "user trova una statuina si Super Mario nel suo food, dalla felicità user recupera healedHP.",
+      "useMessage": "user trova una statuina si Super Mario nel suo food, dalla felicità user recupera amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 50.0,
       "name": "kinder bueno white",
-      "useMessage": "user si pappa il suo food recuperando healedHP.",
+      "useMessage": "user si pappa il suo food recuperando amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 10.0,
       "name": "salsa piccante",
-      "useMessage": "user per disperazione beve una bottiglia di food e recupera healedHP.",
+      "useMessage": "user per disperazione beve una bottiglia di food e recupera amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 15.0,
       "name": "bottiglia di liquore al carciofo",
-      "useMessage": "user si scola per bene la sua food recuperando healedHP.",
+      "useMessage": "user si scola per bene la sua food recuperando amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 15.0,
       "name": "finocchietto di nightwish",
-      "useMessage": "user si beve il food che ha fregato alla grigliata, user recupera healedHP.",
+      "useMessage": "user si beve il food che ha fregato alla grigliata, user recupera amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 45.0,
       "name": "hamburger",
-      "useMessage": "user si gusta il suo food recuperando così healedHP.",
+      "useMessage": "user si gusta il suo food recuperando così amountHP.",
       "consumable": true
     },
     {
       "hpRestored": 14.0,
       "name": "cibo per criceti",
-      "useMessage": "user mangiucchia una mangiata di food recuperando healedHP.",
+      "useMessage": "user mangiucchia una mangiata di food recuperando amountHP.",
       "consumable": true
     },
     {
@@ -213,7 +213,7 @@
     {
       "hpRestored": 50.0,
       "name": "gemma di indiexpo commestibile",
-      "useMessage": "user mangia una food, così facendo user ha potuto monetizzare il suo gioco su indiexpo e con il ricavo si è curato per healedHP.",
+      "useMessage": "user mangia una food, così facendo user ha potuto monetizzare il suo gioco su indiexpo e con il ricavo si è curato per amountHP.",
       "consumable": true
     },
     {
@@ -225,7 +225,7 @@
     {
       "hpRestored": 33.0,
       "name": "key di Naemo",
-      "useMessage": "user vende al mercato nero una food e col ricavato user ha potuto comprarsi del cibo recuperando così healedHP.",
+      "useMessage": "user vende al mercato nero una food e col ricavato user ha potuto comprarsi del cibo recuperando così amountHP.",
       "consumable": true
     },
     {
