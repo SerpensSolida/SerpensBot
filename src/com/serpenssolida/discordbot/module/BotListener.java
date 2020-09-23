@@ -197,6 +197,7 @@ public class BotListener extends ListenerAdapter
 				embedBuilder.appendDescription(String.format("> Il comando `%s` non esiste.", commandID));
 			}
 		}
+		
 		channel.sendMessage(new MessageBuilder().setEmbed(embedBuilder.build()).build()).queue();
 	}
 	

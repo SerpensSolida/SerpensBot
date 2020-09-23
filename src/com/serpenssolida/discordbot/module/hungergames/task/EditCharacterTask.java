@@ -30,6 +30,16 @@ public class EditCharacterTask extends Task
 	{
 		super(user, channel);
 		
+		//Abort task if there is an HungerGames running.
+		if (HungerGamesController.isHungerGamesRunning())
+		{
+			MessageBuilder builder = new MessageBuilder()
+					.append("> Non puoi usare questo comando mentre è in corso un HungerGames.");
+			channel.sendMessage(builder.build()).queue();
+			this.setInterrupted(true);
+			return;
+		}
+		
 		//Initialize task.
 		this.state = State.MENU;
 		this.character = HungerGamesController.getCharacter(user.getId());
@@ -51,6 +61,16 @@ public class EditCharacterTask extends Task
 		//Check if the user that started the task is the one who sent the message (This check should return ALWAYS true).
 		if (!receivedMessage.getAuthor().equals(this.getUser()))
 			return Task.TaskResult.NotFinished;
+		
+		//Abort task if there is an HungerGames running.
+		if (HungerGamesController.isHungerGamesRunning())
+		{
+			MessageBuilder builder = new MessageBuilder()
+					.append("> Non puoi completare la procedura perchè è in corso un HungerGames.");
+			this.sendMessage(builder.build());
+			
+			return TaskResult.Finished;
+		}
 		
 		switch (this.getState())
 		{
@@ -75,6 +95,16 @@ public class EditCharacterTask extends Task
 	public Task.TaskResult reactionAdded(Message message, String reaction)
 	{
 		MessageBuilder builder = new MessageBuilder();
+		
+		//Abort task if there is an HungerGames running.
+		if (HungerGamesController.isHungerGamesRunning())
+		{
+			builder = new MessageBuilder()
+					.append("> Non puoi completare la procedura perchè è in corso un HungerGames.");
+			this.sendMessage(builder.build());
+			
+			return TaskResult.Finished;
+		}
 		
 		//Check if the reaction is added to the menu.
 		if (this.reactionCheckMessage != null && this.reactionCheckMessage.getId().equals(message.getId()))

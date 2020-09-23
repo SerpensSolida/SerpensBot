@@ -25,7 +25,19 @@ public class CreateCharacterTask extends Task
 	{
 		super(user, channel);
 		
-		MessageBuilder builder = (new MessageBuilder()).append("> Stai creando un personaggio! Inserisci il nome del tuo personaggio. (max 16 caratteri)");
+		//Abort task if there is an HungerGames running.
+		if (HungerGamesController.isHungerGamesRunning())
+		{
+			MessageBuilder builder = new MessageBuilder()
+					.append("> Non puoi usare questo comando perchè è in corso un HungerGames.");
+			this.sendMessage(builder.build());
+			
+			this.setInterrupted(true);
+			return;
+		}
+		
+		MessageBuilder builder = new MessageBuilder()
+				.append("> Stai creando un personaggio! Inserisci il nome del tuo personaggio. (max 16 caratteri)");
 		this.sendMessageWithAbort(builder.build());
 		
 		this.state = State.NAME_CHARACTER;
@@ -36,6 +48,16 @@ public class CreateCharacterTask extends Task
 	{
 		if (!receivedMessage.getAuthor().equals(this.getUser()))
 			return Task.TaskResult.NotFinished;
+		
+		//Abort task if there is an HungerGames running.
+		if (HungerGamesController.isHungerGamesRunning())
+		{
+			MessageBuilder builder = new MessageBuilder()
+					.append("> Non puoi completare la procedura perchè è in corso un HungerGames.");
+			this.sendMessage(builder.build());
+			
+			return TaskResult.Finished;
+		}
 		
 		Task.TaskResult result;
 		
@@ -57,6 +79,16 @@ public class CreateCharacterTask extends Task
 	
 	public Task.TaskResult reactionAdded(Message message, String reaction)
 	{
+		//Abort task if there is an HungerGames running.
+		if (HungerGamesController.isHungerGamesRunning())
+		{
+			MessageBuilder builder = new MessageBuilder()
+					.append("> Non puoi completare la procedura perchè è in corso un HungerGames.");
+			this.sendMessage(builder.build());
+			
+			return TaskResult.Finished;
+		}
+		
 		return TaskResult.Finished;
 	}
 	

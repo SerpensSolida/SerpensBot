@@ -16,6 +16,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.MessageChannel;
 
 public class HungerGamesController
@@ -62,6 +63,15 @@ public class HungerGamesController
 	 */
 	public static void startHungerGames(MessageChannel channel)
 	{
+		//Cannot start a new HungerGames if there is already one running.
+		if (HungerGamesController.isHungerGamesRunning())
+		{
+			MessageBuilder builder = new MessageBuilder();
+			builder.append("> Non puoi usare questo comando mentre è in corso un HungerGames.");
+			channel.sendMessage(builder.build()).queue();
+			return;
+		}
+		
 		HungerGamesController.setRunning(true);
 		
 		Thread t = new HungerGamesThread(channel);

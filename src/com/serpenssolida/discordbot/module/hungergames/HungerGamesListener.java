@@ -23,8 +23,7 @@ public class HungerGamesListener extends BotListener
 		//Command for creating a character.
 		Command command = new Command("create", 0).setCommandListener((guild, channel, message, author, args) ->
 		{
-			if (this.stopIfHungerGamesIsRunning(channel))
-				this.addTask(new CreateCharacterTask(author, channel));
+			this.addTask(new CreateCharacterTask(author, channel));
 			return true;
 		});
 		command.setHelp("Fa partire la procedura per la creazione di un personaggio.");
@@ -45,8 +44,7 @@ public class HungerGamesListener extends BotListener
 		//Command for editing a character.
 		command = new Command("edit", 0).setCommandListener((guild, channel, message, author, args) ->
 		{
-			if (this.stopIfHungerGamesIsRunning(channel))
-				this.addTask(new EditCharacterTask(author, channel));
+			this.addTask(new EditCharacterTask(author, channel));
 			return true;
 		});
 		command.setHelp("Fa partire la procedura di modifica del personaggio.");
@@ -55,8 +53,7 @@ public class HungerGamesListener extends BotListener
 		//Command for enabling or disabling a character.
 		command = new Command("enable", 1).setCommandListener((guild, channel, message, author, args) ->
 		{
-			if (this.stopIfHungerGamesIsRunning(channel))
-				this.setCharacterEnabled(channel, author, args);
+			this.setCharacterEnabled(channel, author, args);
 			return true;
 		});
 		command.setHelp("Abilita/Disabilita il personaggio. Un personaggio disabilitato non parteciperà agli HungerGames.");
@@ -66,8 +63,7 @@ public class HungerGamesListener extends BotListener
 		//Command for starting a new HungerGames.
 		command = new Command("start", 0).setCommandListener((guild, channel, message, author, args) ->
 		{
-			if (this.stopIfHungerGamesIsRunning(channel))
-				HungerGamesController.startHungerGames(channel);
+			HungerGamesController.startHungerGames(channel);
 			return true;
 		});
 		command.setHelp("Inizia un edizione degli Hunger Games!");
@@ -211,6 +207,15 @@ public class HungerGamesListener extends BotListener
 		Character character = HungerGamesController.getCharacter(author.getId());
 		MessageBuilder builder = new MessageBuilder();
 		
+		//This command cannot be used while HungerGames is running.
+		if (HungerGamesController.isHungerGamesRunning())
+		{
+			builder = new MessageBuilder();
+			builder.append("> Non puoi usare questo comando mentre è in corso un HungerGames.");
+			channel.sendMessage(builder.build()).queue();
+			return;
+		}
+		
 		if (character != null)
 		{
 			boolean enable;
@@ -331,18 +336,5 @@ public class HungerGamesListener extends BotListener
 		}
 		
 		channel.sendMessage(builder.build()).queue();
-	}
-	
-	private boolean stopIfHungerGamesIsRunning(MessageChannel channel)
-	{
-		//TODO: Find more elegant way.
-		if (HungerGamesController.isHungerGamesRunning())
-		{
-			MessageBuilder builder = new MessageBuilder();
-			builder.append("> Non puoi usare questo comando mentre è in corso un HungerGames.");
-			channel.sendMessage(builder.build()).queue();
-		}
-		
-		return !HungerGamesController.isHungerGamesRunning();
 	}
 }
