@@ -13,6 +13,7 @@ public class Command
 	private String id; //ID of the command, used to identify unequivocally a command.
 	private int maxArgumentNumber; //Max number of argument of the command.
 	private int minArgumentNumber; //Min number of argument of the command.
+	private boolean joinArguments; //Whether or not arguments are joined together before checking them.
 	private String help; //String that describe the command.
 	private String argumentsDescription; //String that describe arguments of the command.
 	private String modulePrefix; //Prefix of the module that owns this command.
@@ -51,12 +52,33 @@ public class Command
 	 * 		Author of the message.
 	 * @param args
 	 * 		Arguments passed to the command.
-	 *
-	 * @return
 	 */
 	public boolean doAction(Guild guild, MessageChannel channel, Message message, User author, String[] args)
 	{
-		return (this.action != null && this.action.doAction(guild, channel, message, author, args));
+		if (this.action != null)
+		{
+			return this.action.doAction(guild, channel, message, author, args);
+		}
+		
+		System.err.println("Action not set for command: " + this.getId());
+		
+		return false;
+	}
+	
+	public static CommandData getCommandDataFromString(String commandPrefix, String str)
+	{
+		String commandID = str.substring(commandPrefix.length()).strip().split(" ")[0]; //Get the command id.
+		String[] arguments = str.substring(commandPrefix.length() + commandID.length() + 1).strip().split(" "); //Get the arguments.
+		
+		CommandData data = new CommandData(commandID, arguments);
+		
+		if (arguments.length == 1 && arguments[0].isBlank())
+		{
+			//If there are no arguments set them to null instead of empty string.
+			data.arguments = null;
+		}
+		
+		return data;
 	}
 	
 	/**
@@ -75,6 +97,16 @@ public class Command
 	public void setMaxArgumentNumber(int maxArgumentNumber)
 	{
 		this.maxArgumentNumber = maxArgumentNumber;
+	}
+	
+	public boolean doJoinArguments()
+	{
+		return this.joinArguments;
+	}
+	
+	public void setJoinArguments(boolean joinArguments)
+	{
+		this.joinArguments = joinArguments;
 	}
 	
 	public String getHelp()
@@ -105,22 +137,6 @@ public class Command
 	public void setMinArgumentNumber(int minArgumentNumber)
 	{
 		this.minArgumentNumber = minArgumentNumber;
-	}
-	
-	public static CommandData getCommandDataFromString(String commandPrefix, String str)
-	{
-		String commandID = str.substring(commandPrefix.length()).strip().split(" ")[0]; //Get the command id.
-		String[] arguments = str.substring(commandPrefix.length() + commandID.length() + 1).strip().split(" "); //Get the arguments.
-		
-		CommandData data = new CommandData(commandID, arguments);
-		
-		if (arguments.length == 1 && arguments[0].isBlank())
-		{
-			//If there are no arguments set them to null instead of empty string.
-			data.arguments = null;
-		}
-		
-		return data;
 	}
 	
 	public String getModulePrefix()

@@ -38,6 +38,7 @@ public class HungerGamesListener extends BotListener
 			return true;
 		});
 		command.setMinArgumentNumber(0);
+		command.setJoinArguments(true);
 		command.setHelp("Invia alla chat la card delle statistiche del personaggio.");
 		this.addCommand(command);
 		

@@ -64,10 +64,18 @@ public class BotListener extends ListenerAdapter
 			Command command = this.getCommand(data.commandID);
 			String[] arguments = data.arguments;
 			
-			if (command == null) //Command was not found.
+			//Check if the command exists.
+			if (command == null)
 			{
 				channel.sendMessage("> Il comando `" + data.commandID + "` non esiste.").queue();
 				return;
+			}
+			
+			//If the command wants the arguments to be joined together instead of be splitted by " ".
+			if (command.doJoinArguments() && arguments != null)
+			{
+				arguments = new String[1];
+				arguments[0] = String.join(" ", data.arguments);
 			}
 			
 			//Number of arguments sent with the message.
@@ -76,16 +84,18 @@ public class BotListener extends ListenerAdapter
 			//Check if the number of arguments is correct.
 			if (argNum >= command.getMinArgumentNumber() && argNum <= command.getMaxArgumentNumber())
 			{
-				if (BotMain.deleteCommandMessages)
+				//Do command action.
+				boolean deleteMessage = command.doAction(guild, channel, event.getMessage(), author, arguments); //Run the command.
+				
+				//Delete command message if the command was successfully ran.
+				if (BotMain.deleteCommandMessages && deleteMessage)
 				{
 					channel.deleteMessageById(event.getMessageId()).queue();
 				}
-				
-				command.doAction(guild, channel, event.getMessage(), author, arguments); //Run the command.
 			}
 			else
 			{
-				channel.sendMessage("> Errore, numero argomenti errato.").queue();
+				channel.sendMessage("> Numero argomenti errato.").queue();
 			}
 		}
 		else if (task != null && task.getChannel().equals(channel))
