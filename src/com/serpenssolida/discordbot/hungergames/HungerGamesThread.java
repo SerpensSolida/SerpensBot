@@ -182,11 +182,11 @@ public class HungerGamesThread extends Thread
 		{
 			//Choose a random number of local events and execute them.
 			int eventNum = 6 + RandomChoice.random.nextInt(4);
+			int tries = 8; //Number of tries.
 			
 			for (int i = 0; i < eventNum && this.isHungerGamesRunning() && !this.isInterrupted(); i++)
 			{
 				EventResult eventResult; //Result of the event.
-				int tries = 5; //Number of tries.
 				
 				do
 				{

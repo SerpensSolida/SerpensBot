@@ -863,7 +863,7 @@
       "chance": 20,
       "type": "Ability",
       "name": "giavellotto",
-      "useMessage": "user fa un lancio da 150m e colpisce receiver in pieno causandogli damageHP di danno.",
+      "useMessage": "user fa un lancio da 150m col weapon e colpisce receiver in pieno causandogli damageHP di danno.",
       "consumable": false
     },
     {

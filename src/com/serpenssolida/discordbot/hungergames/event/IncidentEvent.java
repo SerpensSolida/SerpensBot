@@ -30,6 +30,7 @@ public class IncidentEvent extends HungerGamesEvent
 		//List of player that did not have an incident this turn.
 		HashSet<Player> noIncidentPlayers = new HashSet<>(alivePlayers);
 		noIncidentPlayers.removeAll(incidentPlayers);
+		noIncidentPlayers.removeAll(involvedPlayers);
 		
 		if (noIncidentPlayers.isEmpty())
 			return new EventResult("", EventResult.State.Failed); //Quit the event.
