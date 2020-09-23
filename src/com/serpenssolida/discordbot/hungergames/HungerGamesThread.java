@@ -32,6 +32,7 @@ import javax.imageio.ImageIO;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.utils.AttachmentOption;
 
 public class HungerGamesThread extends Thread
 {
@@ -204,17 +205,19 @@ public class HungerGamesThread extends Thread
 			}
 		}
 		
-		//Send the status image to the chat.
+		//Set the status image of the message.
 		ByteArrayOutputStream statusImage = this.generateStatusImage();
-		this.channel.sendFile(statusImage.toByteArray(), "status.png", new net.dv8tion.jda.api.utils.AttachmentOption[0]).queue();
 		
 		//Send the turn description.
 		embedBuilder.setTitle("Hunger Games - " + this.hg.getDay() + "° giorno.")
-				.setDescription(stringBuilder.toString())
-				.setFooter("Giocatori ancora in vita: " + this.hg.getAlivePlayers().size());
+					.setDescription(stringBuilder.toString())
+					.setFooter("Giocatori ancora in vita: " + this.hg.getAlivePlayers().size())
+					.setImage("attachment://status.png");
 		messageBuilder.setEmbed(embedBuilder.build());
 		
-		this.channel.sendMessage(messageBuilder.build()).queue();
+		this.channel.sendMessage(messageBuilder.build())
+				.addFile(statusImage.toByteArray(), "status.png", new AttachmentOption[0])
+				.queue();
 		
 		//Clear all lists used by events.
 		this.hg.getInvolvedPlayers().clear();
