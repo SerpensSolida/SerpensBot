@@ -47,6 +47,9 @@ public class SurpriseAttack extends HungerGamesEvent
 		//Get a random player from the chosen category.
 		Player player2 = (Player) RandomChoice.getRandom(targetSet.toArray());
 		
+		if (player1.getFriends().contains(player2))
+			builder.append("L'alleanza tra **" + player1 + "** e **" + player2 + "** è rotta.\n");
+		
 		String message = (String) RandomChoice.getRandom(this.messages);
 		message = message.replaceAll("user", "**" + player1 + "**");
 		message = message.replaceAll("receiver", "**" + player2 + "**");
@@ -56,9 +59,6 @@ public class SurpriseAttack extends HungerGamesEvent
 		combatPlayers.add(player1);
 		involvedPlayers.add(player2);
 		combatPlayers.add(player2);
-		
-		if (player1.getFriends().contains(player2))
-			builder.append("L'alleanza tra **" + player1 + "** e **" + player2 + "** è rotta.\n");
 		
 		//Make them enemies.
 		player1.getFriends().remove(player2);
