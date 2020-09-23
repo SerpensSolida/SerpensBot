@@ -2,28 +2,25 @@ package com.serpenssolida.discordbot;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.serpenssolida.discordbot.hungergames.HungerGamesController;
-import com.serpenssolida.discordbot.hungergames.HungerGamesListener;
+import com.serpenssolida.discordbot.module.BotListener;
+import com.serpenssolida.discordbot.module.hungergames.HungerGamesController;
+import com.serpenssolida.discordbot.module.hungergames.HungerGamesListener;
 
 import javax.security.auth.login.LoginException;
 
-import com.serpenssolida.discordbot.hungergames.io.CharacterData;
+import com.serpenssolida.discordbot.module.settings.SettingsData;
+import com.serpenssolida.discordbot.module.settings.SettingsListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 import java.io.*;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.function.Predicate;
 
 public class BotMain
 {
