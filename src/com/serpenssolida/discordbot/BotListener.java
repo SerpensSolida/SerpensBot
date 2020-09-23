@@ -161,11 +161,14 @@ public class BotListener extends ListenerAdapter
 	
 	private void sendHelp(MessageChannel channel, User author, String[] args)
 	{
-		StringBuilder stringBuilder = new StringBuilder();
 		EmbedBuilder embedBuilder = new EmbedBuilder();
+		
+		//Add footer
+		embedBuilder.setFooter("Richiesto da " + author.getName());
 		
 		if (args == null)
 		{
+			//Send list of commands.
 			embedBuilder.setTitle("Lista comandi modulo " + this.getModuleName());
 			
 			for (Command command : this.commands.values())
@@ -177,6 +180,7 @@ public class BotListener extends ListenerAdapter
 		}
 		else
 		{
+			//Send command info.
 			String commandID = args[0];
 			Command command = this.getCommand(commandID);
 			
@@ -185,6 +189,7 @@ public class BotListener extends ListenerAdapter
 				embedBuilder.setTitle(String.format("Descrizione comando *%s*", command.getId()));
 				embedBuilder.appendDescription(String.format("Utilizzo: `%s`\n", command.getArgumentsDescription()))
 						.appendDescription(command.getHelp());
+				//TODO: Add long help.
 			}
 			else
 			{
