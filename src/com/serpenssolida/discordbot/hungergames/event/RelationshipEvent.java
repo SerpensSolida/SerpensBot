@@ -37,6 +37,7 @@ public class RelationshipEvent extends HungerGamesEvent
 	{
 		StringBuilder builder = new StringBuilder();
 		HashSet<Player> alivePlayers = hg.getAlivePlayers();
+		HashSet<Player> involvedPlayers = hg.getInvolvedPlayers();
 		HashSet<Player> availablePlayers = new HashSet<>(alivePlayers);
 		
 		if (availablePlayers.isEmpty())
@@ -74,6 +75,9 @@ public class RelationshipEvent extends HungerGamesEvent
 			
 			message = (String) RandomChoice.getRandom(this.enemyMessages);
 		}
+		
+		involvedPlayers.add(player1);
+		involvedPlayers.add(player2);
 		
 		message = message.replaceAll("user", "**" + player1 + "**");
 		message = message.replaceAll("receiver", "**" + player2 + "**");
