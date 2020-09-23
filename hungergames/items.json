@@ -686,7 +686,7 @@
       "damage": 77,
       "chance": 20,
       "type": "Strength",
-      "name": "sberla alla schiena di Cannavacciuolo",
+      "name": "sberla di Cannavacciuolo alla schiena",
       "useMessage": "user chiede aiuto a Cannavacciuolo, receiver prende weapon e perde damageHP.",
       "consumable": false
     },
