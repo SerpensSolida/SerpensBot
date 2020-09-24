@@ -114,7 +114,7 @@ public class SettingsListener extends BotListener
 		else if (args.length == 1)
 		{
 			moduleID = args[0];
-			BotListener listener = this.getListenerById(moduleID);
+			BotListener listener = BotMain.getListenerById(moduleID);
 			
 			if (listener != null)
 			{
@@ -129,7 +129,7 @@ public class SettingsListener extends BotListener
 		{
 			moduleID = args[0];
 			modulePrefix = args[1];
-			BotListener listener = this.getListenerById(moduleID);
+			BotListener listener = BotMain.getListenerById(moduleID);
 			
 			if (!this.isAdmin(authorMember) && !authorMember.isOwner())
 			{
@@ -151,25 +151,6 @@ public class SettingsListener extends BotListener
 		}
 		
 		channel.sendMessage(messageBuilder.build()).queue();
-	}
-	
-	private BotListener getListenerById(String moduleID)
-	{
-		//Get the module with the correct id and send its module prefix.
-		for (Object registeredListener : BotMain.api.getEventManager().getRegisteredListeners())
-		{
-			if (registeredListener instanceof BotListener)
-			{
-				BotListener listener = (BotListener) registeredListener;
-				
-				if (listener.getInternalID().equals(moduleID))
-				{
-					return listener;
-				}
-			}
-		}
-		
-		return null;
 	}
 	
 	private void setBotCommandSymbol(Guild guild, MessageChannel channel, User author, String[] args)

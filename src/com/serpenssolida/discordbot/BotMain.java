@@ -3,6 +3,7 @@ package com.serpenssolida.discordbot;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.serpenssolida.discordbot.module.BotListener;
+import com.serpenssolida.discordbot.module.base.BaseListener;
 import com.serpenssolida.discordbot.module.hungergames.HungerGamesController;
 import com.serpenssolida.discordbot.module.hungergames.HungerGamesListener;
 
@@ -58,6 +59,7 @@ public class BotMain
 		
 		api.addEventListener(new SettingsListener());
 		api.addEventListener(new HungerGamesListener());
+		api.addEventListener(new BaseListener());
 		
 		BotMain.loadSettings();
 	}
@@ -96,6 +98,25 @@ public class BotMain
 		}
 		
 		return "";
+	}
+	
+	public static BotListener getListenerById(String moduleID)
+	{
+		//Get the module with the correct id and send its module prefix.
+		for (Object registeredListener : BotMain.api.getEventManager().getRegisteredListeners())
+		{
+			if (registeredListener instanceof BotListener)
+			{
+				BotListener listener = (BotListener) registeredListener;
+				
+				if (listener.getInternalID().equals(moduleID))
+				{
+					return listener;
+				}
+			}
+		}
+		
+		return null;
 	}
 	
 	public static void loadSettings()
