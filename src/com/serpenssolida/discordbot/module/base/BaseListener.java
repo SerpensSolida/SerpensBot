@@ -7,6 +7,7 @@ import com.serpenssolida.discordbot.module.Task;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -19,6 +20,7 @@ public class BaseListener extends BotListener
 	{
 		super("base");
 		this.setModuleName("Base");
+		this.setModulePrefix("");
 		
 		//Module has no tasks and cannot get help.
 		this.removeCommand("help");
@@ -36,12 +38,40 @@ public class BaseListener extends BotListener
 		//If the author of the message is the bot, ignore the message.
 		if (BotMain.api.getSelfUser().getId().equals(author.getId())) return;
 		
+		//Parse special commands.
 		if ((BotMain.commandSymbol + "help").equals(message))
 		{
 			this.sendModuleHelp(channel, author);
 		}
+		else if ("!!reset symbol".equals(message))
+		{
+			this.resetCommandSymbol(guild, channel, author);
+		}
 	}
 	
+	/**
+	 * Reset the command symbol, if something bad happens while setting command symbol this will reset it to default.
+	 */
+	private void resetCommandSymbol(Guild guild, MessageChannel channel, User author)
+	{
+		Member authorMember = guild.retrieveMember(author).complete();
+		
+		//Check in the user has permission to run this command.
+		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
+		{
+			channel.sendMessage("> Devi essere il proprietario o moderatore del server per resettare il simbolo dei comandi.").queue();
+			return;
+		}
+		
+		BotMain.commandSymbol = "!";
+		BotMain.saveSettings();
+		
+		channel.sendMessage("> Simbolo per i comandi impostato a `!`.").queue();
+	}
+	
+	/**
+	 * Send a message containing all help commands of the modules.
+	 */
 	private void sendModuleHelp(MessageChannel channel, User author)
 	{
 		MessageBuilder messageBuilder = new MessageBuilder();

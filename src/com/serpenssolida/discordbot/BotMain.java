@@ -13,8 +13,10 @@ import com.serpenssolida.discordbot.module.settings.SettingsData;
 import com.serpenssolida.discordbot.module.settings.SettingsListener;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
@@ -72,6 +74,21 @@ public class BotMain
 		users.addAll(guild.getMembersByNickname(userName, true));
 		
 		return new ArrayList<>(users);
+	}
+	
+	public static boolean isAdmin(Member member)
+	{
+		if (member == null) return false;
+		
+		for (Role role : member.getRoles())
+		{
+			if (role.hasPermission(Permission.MANAGE_SERVER))
+			{
+				return true;
+			}
+		}
+		
+		return false;
 	}
 	
 	private static String getBotToken()

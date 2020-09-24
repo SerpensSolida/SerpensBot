@@ -56,7 +56,8 @@ public class SettingsListener extends BotListener
 		Member authorMember = guild.retrieveMember(author).complete();
 		StringBuilder builder = new StringBuilder();
 		
-		if (!this.isAdmin(authorMember) && !authorMember.isOwner())
+		//Check in the user has permission to run this command.
+		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
 		{
 			channel.sendMessage("> Devi essere il proprietario o moderatore del server per modificare il prefisso di un modulo.").queue();
 			return;
@@ -105,7 +106,7 @@ public class SettingsListener extends BotListener
 				{
 					BotListener listener = (BotListener) registeredListener;
 					
-					embedBuilder.addField("Modulo " + listener.getModuleName(), String.format("ID modulo: `%s`\nPrefisso: `%s`", listener.getInternalID(), listener.getModulePrefix()), true);
+					embedBuilder.addField("Modulo " + listener.getModuleName(), String.format("ID modulo: `%s`\nPrefisso: `%s`", listener.getInternalID(), listener.getModulePrefix().isBlank() ? " " : listener.getModulePrefix()), true);
 				}
 			}
 			
@@ -131,7 +132,8 @@ public class SettingsListener extends BotListener
 			modulePrefix = args[1];
 			BotListener listener = BotMain.getListenerById(moduleID);
 			
-			if (!this.isAdmin(authorMember) && !authorMember.isOwner())
+			//Check in the user has permission to run this command.
+			if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
 			{
 				channel.sendMessage("> Devi essere il proprietario o moderatore del server per modificare il prefisso di un modulo.").queue();
 				return;
@@ -158,29 +160,17 @@ public class SettingsListener extends BotListener
 		String symbol = args[0];
 		Member authorMember = guild.retrieveMember(author).complete();
 		
-		if (!this.isAdmin(authorMember) && !authorMember.isOwner())
+		//Check in the user has permission to run this command.
+		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
 		{
-			channel.sendMessage("> Devi essere il proprietario o moderatore del server per modificare il prefisso di un modulo.").queue();
+			channel.sendMessage("> Devi essere il proprietario o moderatore del server per resettare il simbolo dei comandi.").queue();
 			return;
 		}
 		
 		BotMain.commandSymbol = symbol;
 		BotMain.saveSettings();
-	}
-	
-	private boolean isAdmin(Member member)
-	{
-		if (member == null) return false;
 		
-		for (Role role : member.getRoles())
-		{
-			if (role.hasPermission(Permission.MANAGE_SERVER))
-			{
-				return true;
-			}
-		}
-		
-		return false;
+		channel.sendMessage("> Simbolo per i comandi impostato a `" + symbol + "`.").queue();
 	}
 	
 }
