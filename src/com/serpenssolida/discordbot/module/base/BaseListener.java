@@ -67,10 +67,10 @@ public class BaseListener extends BotListener
 			return;
 		}
 		
-		BotMain.commandSymbol = "!";
+		BotMain.commandSymbol = "/";
 		BotMain.saveSettings();
 		
-		channel.sendMessage("> Simbolo per i comandi impostato a `!`.").queue();
+		channel.sendMessage("> Simbolo per i comandi impostato a `/`.").queue();
 	}
 	
 	/**

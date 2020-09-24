@@ -28,7 +28,7 @@ import java.util.HashSet;
 public class BotMain
 {
 	public static JDA api;
-	public static String commandSymbol = "!";
+	public static String commandSymbol = "/";
 	public static boolean deleteCommandMessages;
 	
 	public static void main(String[] args)
