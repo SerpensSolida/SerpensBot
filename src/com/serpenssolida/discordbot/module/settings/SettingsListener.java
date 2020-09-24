@@ -7,6 +7,9 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class SettingsListener extends BotListener
 {
 	public SettingsListener()
@@ -160,6 +163,7 @@ public class SettingsListener extends BotListener
 	{
 		String symbol = args[0];
 		Member authorMember = guild.retrieveMember(author).complete();
+		Pattern pattern = Pattern.compile("[_*`~>]"); //Regex containing illegal characters.
 		
 		//Check in the user has permission to run this command.
 		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
@@ -168,8 +172,9 @@ public class SettingsListener extends BotListener
 			return;
 		}
 		
+		
 		//Check if the command symbol is suitable
-		if (symbol.length() > 6)
+		if (symbol.length() > 6 && !pattern.matcher(symbol).matches())
 		{
 			channel.sendMessage("> Il simbolo dei comandi non può superare i 6 caratteri.").queue();
 			return;
