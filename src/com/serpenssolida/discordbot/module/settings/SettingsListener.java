@@ -163,7 +163,7 @@ public class SettingsListener extends BotListener
 	{
 		String symbol = args[0];
 		Member authorMember = guild.retrieveMember(author).complete();
-		Pattern pattern = Pattern.compile("[_*`~>]"); //Regex containing illegal characters.
+		Pattern pattern = Pattern.compile("[_*~>`@]"); //Regex containing illegal characters.
 		
 		//Check in the user has permission to run this command.
 		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
@@ -173,7 +173,7 @@ public class SettingsListener extends BotListener
 		}
 		
 		//Check if the command symbol is suitable
-		if (symbol.length() > 6 || pattern.matcher(symbol).matches())
+		if (symbol.length() > 6 || pattern.matcher(symbol).find())
 		{
 			channel.sendMessage("> Il simbolo dei comandi non può superare i 6 caratteri e non può contenere i caratteri di markdown.").queue();
 			return;
