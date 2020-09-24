@@ -133,6 +133,13 @@ public class SettingsListener extends BotListener
 				return;
 			}
 			
+			//Check if the module prefix to set is suitable.
+			if (!modulePrefix.chars().allMatch(Character::isLetterOrDigit) || modulePrefix.length() > 16)
+			{
+				channel.sendMessage("> Il prefisso deve essere alpha numerico e non può superare i 16 caratteri.").queue();
+				return;
+			}
+			
 			if (listener != null)
 			{
 				listener.setModulePrefix(modulePrefix);
@@ -158,6 +165,13 @@ public class SettingsListener extends BotListener
 		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
 		{
 			channel.sendMessage("> Devi essere il proprietario o moderatore del server per resettare il simbolo dei comandi.").queue();
+			return;
+		}
+		
+		//Check if the command symbol is suitable
+		if (symbol.length() > 6)
+		{
+			channel.sendMessage("> Il simbolo dei comandi non può superare i 6 caratteri.").queue();
 			return;
 		}
 		
