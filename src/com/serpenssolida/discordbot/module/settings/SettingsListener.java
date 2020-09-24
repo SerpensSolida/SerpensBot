@@ -175,7 +175,7 @@ public class SettingsListener extends BotListener
 		//Check if the command symbol is suitable
 		if (symbol.length() > 6 || pattern.matcher(symbol).matches())
 		{
-			channel.sendMessage("> Il simbolo dei comandi non può superare i 6 caratteri.").queue();
+			channel.sendMessage("> Il simbolo dei comandi non può superare i 6 caratteri e non può contenere i caratteri di markdown.").queue();
 			return;
 		}
 		
