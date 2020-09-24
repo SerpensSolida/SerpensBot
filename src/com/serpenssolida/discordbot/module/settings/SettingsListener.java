@@ -163,8 +163,9 @@ public class SettingsListener extends BotListener
 	{
 		String symbol = args[0];
 		Member authorMember = guild.retrieveMember(author).complete();
+
 		Pattern pattern = Pattern.compile("[_*~>`@]"); //Regex containing illegal characters.
-		
+
 		//Check in the user has permission to run this command.
 		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
 		{
