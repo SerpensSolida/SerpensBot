@@ -117,19 +117,37 @@ public class BotMain
 		return "";
 	}
 	
-	public static BotListener getListenerById(String moduleID)
+	/**
+	 * @return The list of modules of the bot.
+	 */
+	public static ArrayList<BotListener> getModules()
 	{
-		//Get the module with the correct id and send its module prefix.
-		for (Object registeredListener : BotMain.api.getEventManager().getRegisteredListeners())
+		ArrayList<BotListener> modules = new ArrayList<>();
+		
+		for (Object registeredListener : BotMain.api.getRegisteredListeners())
 		{
 			if (registeredListener instanceof BotListener)
 			{
-				BotListener listener = (BotListener) registeredListener;
-				
-				if (listener.getInternalID().equals(moduleID))
-				{
-					return listener;
-				}
+				modules.add((BotListener) registeredListener);
+			}
+		}
+		
+		return modules;
+	}
+	
+	/**
+	 * Get the module with the given id.
+	 * @param moduleID The id of the module to get.
+	 * @return The module with the passed id.
+	 */
+	public static BotListener getModuleById(String moduleID)
+	{
+		//Get the module with the correct id and get its module prefix.
+		for (BotListener listener : BotMain.getModules())
+		{
+			if (listener.getInternalID().equals(moduleID))
+			{
+				return listener;
 			}
 		}
 		
@@ -150,16 +168,11 @@ public class BotMain
 			BotMain.deleteCommandMessages = settingsData.getDeleteCommandMessages();
 			HashMap<String, String> modulePrefixes = settingsData.getModulePrefixes();
 			
-			for (Object registeredListener : api.getEventManager().getRegisteredListeners())
+			for (BotListener listener : BotMain.getModules())
 			{
-				if (registeredListener instanceof BotListener)
+				if (modulePrefixes.containsKey(listener.getInternalID()))
 				{
-					BotListener listener = (BotListener) registeredListener;
-					
-					if (modulePrefixes.containsKey(listener.getInternalID()))
-					{
-						listener.setModulePrefix(modulePrefixes.get(listener.getInternalID()));
-					}
+					listener.setModulePrefix(modulePrefixes.get(listener.getInternalID()));
 				}
 			}
 		}
@@ -188,15 +201,9 @@ public class BotMain
 			settingsData.setCommandSymbol(BotMain.commandSymbol);
 			
 			//Add list of prefixes
-			for (Object registeredListener : api.getEventManager().getRegisteredListeners())
+			for (BotListener listener : BotMain.getModules())
 			{
-				if (registeredListener instanceof BotListener)
-				{
-					BotListener listener = (BotListener) registeredListener;
-					
-					modulePrefixes.put(listener.getInternalID(), listener.getModulePrefix());
-
-				}
+				modulePrefixes.put(listener.getInternalID(), listener.getModulePrefix());
 			}
 			
 			settingsData.setModulePrefixes(modulePrefixes);

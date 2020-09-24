@@ -47,6 +47,10 @@ public class BaseListener extends BotListener
 		{
 			this.resetCommandSymbol(guild, channel, author);
 		}
+		else if ("!!reset prefixes".equals(message))
+		{
+			this.resetPrefixes(guild, channel, author);
+		}
 	}
 	
 	/**
@@ -70,6 +74,30 @@ public class BaseListener extends BotListener
 	}
 	
 	/**
+	 * Reset the command symbol, if something bad happens while setting command symbol this will reset it to default.
+	 */
+	private void resetPrefixes(Guild guild, MessageChannel channel, User author)
+	{
+		Member authorMember = guild.retrieveMember(author).complete();
+		
+		//Check in the user has permission to run this command.
+		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
+		{
+			channel.sendMessage("> Devi essere il proprietario o moderatore del server per resettare i prefissi.").queue();
+			return;
+		}
+		
+		for (BotListener listener : BotMain.getModules())
+		{
+			listener.setModulePrefix(listener.getInternalID());
+		}
+		
+		BotMain.saveSettings();
+		
+		channel.sendMessage("> Prefisso dei moduli resettato correttamente.").queue();
+	}
+	
+	/**
 	 * Send a message containing all help commands of the modules.
 	 */
 	private void sendModuleHelp(MessageChannel channel, User author)
@@ -86,19 +114,14 @@ public class BaseListener extends BotListener
 		embedBuilder.setAuthor(BotMain.api.getSelfUser().getName(), "https://github.com/SerpensSolida/SerpensBot", BotMain.api.getSelfUser().getAvatarUrl());
 		
 		//Add module list to the embed.
-		for (Object registeredListener : BotMain.api.getEventManager().getRegisteredListeners())
+		for (BotListener listener : BotMain.getModules())
 		{
-			if (registeredListener instanceof BotListener)
-			{
-				BotListener listener = (BotListener) registeredListener;
-				
-				//Don't add this listener to the list.
-				if (listener instanceof BaseListener) continue;
-				
-				//Add listener to the list.
-				builderList.append("Modulo " + listener.getModuleName() + "\n");
-				builderCommands.append("`" + BotMain.commandSymbol + listener.getModulePrefix() + " help`\n");
-			}
+			//Don't add this listener to the list.
+			if (listener instanceof BaseListener) continue;
+			
+			//Add listener to the list.
+			builderList.append("Modulo " + listener.getModuleName() + "\n");
+			builderCommands.append("`" + BotMain.commandSymbol + listener.getModulePrefix() + " help`\n");
 		}
 		
 		embedBuilder.addField("Moduli", builderList.toString(), true);
@@ -106,5 +129,11 @@ public class BaseListener extends BotListener
 		
 		messageBuilder.setEmbed(embedBuilder.build());
 		channel.sendMessage(messageBuilder.build()).queue();
+	}
+	
+	@Override
+	public void setModulePrefix(String modulePrefix)
+	{
+		super.setModulePrefix("");
 	}
 }

@@ -5,7 +5,6 @@ import com.serpenssolida.discordbot.BotMain;
 import com.serpenssolida.discordbot.module.Command;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 
 public class SettingsListener extends BotListener
@@ -100,14 +99,9 @@ public class SettingsListener extends BotListener
 			//Send the list of modules and their prefixes.
 			embedBuilder.setTitle("Lista dei moduli e dei loro prefissi");
 			
-			for (Object registeredListener : BotMain.api.getEventManager().getRegisteredListeners())
+			for (BotListener listener : BotMain.getModules())
 			{
-				if (registeredListener instanceof BotListener)
-				{
-					BotListener listener = (BotListener) registeredListener;
-					
-					embedBuilder.addField("Modulo " + listener.getModuleName(), String.format("ID modulo: `%s`\nPrefisso: `%s`", listener.getInternalID(), listener.getModulePrefix().isBlank() ? " " : listener.getModulePrefix()), true);
-				}
+				embedBuilder.addField("Modulo " + listener.getModuleName(), String.format("ID modulo: `%s`\nPrefisso: `%s`", listener.getInternalID(), listener.getModulePrefix().isBlank() ? " " : listener.getModulePrefix()), true);
 			}
 			
 			messageBuilder.setEmbed(embedBuilder.build());
@@ -115,7 +109,7 @@ public class SettingsListener extends BotListener
 		else if (args.length == 1)
 		{
 			moduleID = args[0];
-			BotListener listener = BotMain.getListenerById(moduleID);
+			BotListener listener = BotMain.getModuleById(moduleID);
 			
 			if (listener != null)
 			{
@@ -130,7 +124,7 @@ public class SettingsListener extends BotListener
 		{
 			moduleID = args[0];
 			modulePrefix = args[1];
-			BotListener listener = BotMain.getListenerById(moduleID);
+			BotListener listener = BotMain.getModuleById(moduleID);
 			
 			//Check in the user has permission to run this command.
 			if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
