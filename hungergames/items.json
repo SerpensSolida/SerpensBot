@@ -894,7 +894,7 @@
       "damage": 95,
       "chance": 20,
       "type": "Ability",
-      "name": "*Parry",
+      "name": "Parry",
       "useMessage": "receiver ha provato a toccare Teo ma all'improvviso si sente un suono di weapon! user: \"Non toccare Teo.\" e receiver perde damageHP",
       "consumable": false
     }
