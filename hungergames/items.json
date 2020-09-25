@@ -15,7 +15,7 @@
     {
       "hpRestored": 60.0,
       "name": "pizza con le patatine",
-      "useMessage": "user ordina una food, user si riempie il pancino guadagnando  amountHP..",
+      "useMessage": "user ordina una food, user si riempie il pancino guadagnando  amountHP.",
       "consumable": true
     },
     {

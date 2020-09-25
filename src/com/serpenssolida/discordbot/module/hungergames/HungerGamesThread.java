@@ -87,15 +87,22 @@ public class HungerGamesThread extends Thread
 		}
 		
 		//Send a message with the list of player and their status.
+		int c = 1;
 		for (Player player : alivePlayers)
 		{
-			stringBuilder.append("**" + player + "**\n")
-					.append("HP:" + player.getMaxHealth() + "\n")
-					.append(player.getInventory())
-					.append("\n\n");
+			//Player field.
+			embedBuilder.addField(player.toString(), "HP:" + player.getMaxHealth() + "\n" + player.getInventory(), true);
+			c++;
+			
+			//Add a blank field in the third column.
+			if (c % 3 == 0)
+			{
+				embedBuilder.addBlankField(true);
+				c++;
+			}
 		}
 		
-		embedBuilder.setDescription(stringBuilder.toString())
+		embedBuilder//.setDescription(stringBuilder.toString())
 				.setTitle("**Partecipanti alla " + (HungerGamesController.getCount() + 1) + "° edizione degli Hunger Games!**");
 		messageBuilder.setEmbed(embedBuilder.build());
 		
