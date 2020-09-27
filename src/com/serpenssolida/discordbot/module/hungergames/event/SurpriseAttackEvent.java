@@ -4,7 +4,10 @@ import com.serpenssolida.discordbot.RandomChoice;
 import com.serpenssolida.discordbot.module.hungergames.AttackResult;
 import com.serpenssolida.discordbot.module.hungergames.HungerGames;
 import com.serpenssolida.discordbot.module.hungergames.Player;
+import com.serpenssolida.discordbot.module.hungergames.inventory.Inventory;
+import com.serpenssolida.discordbot.module.hungergames.inventory.Item;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 public class SurpriseAttackEvent extends HungerGamesEvent
@@ -84,6 +87,18 @@ public class SurpriseAttackEvent extends HungerGamesEvent
 				player1.getCharacter().incrementKills();
 				
 				builder.append("**" + player2 + "** è morto.\n");
+				
+				if (RandomChoice.randomChance(10))
+				{
+					Item stolenItem = this.getRandomItemFromInventory(player2.getInventory());
+					
+					if (stolenItem != null)
+					{
+						player1.getInventory().addItem(stolenItem, 1);
+						
+						builder.append(String.format("**%s** ha trovato *%s* nel corpo di **%s**.\n", player1, stolenItem, player2));
+					}
+				}
 			}
 		}
 		
@@ -130,5 +145,18 @@ public class SurpriseAttackEvent extends HungerGamesEvent
 		}
 		
 		return chosenCategory;
+	}
+	
+	private Item getRandomItemFromInventory(Inventory inventory)
+	{
+		ArrayList<Item> items = inventory.getItems();
+		Item item = null;
+		
+		if (!items.isEmpty())
+		{
+			item = (Item) RandomChoice.getRandom(items.toArray());
+		}
+		
+		return item;
 	}
 }

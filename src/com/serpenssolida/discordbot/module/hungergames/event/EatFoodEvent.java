@@ -132,8 +132,6 @@ public class EatFoodEvent extends HungerGamesEvent
 	{
 		String useMessage = food.getUseMessage();
 		
-		System.out.println(player);
-		
 		useMessage = useMessage.replaceAll("user", "**" + player + "**");
 		useMessage = useMessage.replaceAll("food", "*" + food.getName() + "*");
 		useMessage = useMessage.replaceAll("amount", "" + (int) hpHealed);

@@ -201,7 +201,7 @@
     {
       "hpRestored": 14.0,
       "name": "cibo per criceti",
-      "useMessage": "user mangiucchia una mangiata di food recuperando amountHP.",
+      "useMessage": "user mangiucchia una manciata di food recuperando amountHP.",
       "consumable": true
     },
     {

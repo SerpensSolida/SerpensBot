@@ -58,4 +58,9 @@ public class RandomChoice
 		Random random = new Random();
 		return data[random.nextInt(data.length)];
 	}
+	
+	public static boolean randomChance(float probability)
+	{
+		return random.nextFloat() * 100 < probability;
+	}
 }

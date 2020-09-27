@@ -180,10 +180,10 @@ public class HungerGamesThread extends Thread
 		StringBuilder stringBuilder = new StringBuilder();
 		EmbedBuilder embedBuilder = new EmbedBuilder();
 		
-		if (RandomChoice.random.nextInt(100) == 1 && this.isHungerGamesRunning() && !this.isInterrupted())
+		if (RandomChoice.randomChance(1) && this.isHungerGamesRunning() && !this.isInterrupted())
 		{
 			//Global event.
-			EventResult eventResult = (new GlobalDamageEvent()).doEvent(this.hg);
+			EventResult eventResult = new GlobalDamageEvent().doEvent(this.hg);
 			stringBuilder.append("" + eventResult + "\n");
 		}
 		else

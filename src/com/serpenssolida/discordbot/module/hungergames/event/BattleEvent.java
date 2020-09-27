@@ -4,13 +4,18 @@ import com.serpenssolida.discordbot.RandomChoice;
 import com.serpenssolida.discordbot.module.hungergames.AttackResult;
 import com.serpenssolida.discordbot.module.hungergames.HungerGames;
 import com.serpenssolida.discordbot.module.hungergames.Player;
+import com.serpenssolida.discordbot.module.hungergames.inventory.Inventory;
+import com.serpenssolida.discordbot.module.hungergames.inventory.Item;
+import com.serpenssolida.discordbot.module.hungergames.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
 public class BattleEvent extends HungerGamesEvent
 {
 	public EventResult doEvent(HungerGames hg)
 	{
+		
 		StringBuilder builder = new StringBuilder();
 		HashSet<Player> alivePlayers = hg.getAlivePlayers();
 		HashSet<Player> deadPlayers = hg.getDeadPlayers();
@@ -81,6 +86,19 @@ public class BattleEvent extends HungerGamesEvent
 			player1.getCharacter().incrementKills();
 			
 			builder.append("**" + player2 + "** è morto.\n");
+			
+			if (RandomChoice.randomChance(10))
+			{
+				Item stolenItem = this.getRandomItemFromInventory(player2.getInventory());
+				
+				if (stolenItem != null)
+				{
+					player1.getInventory().addItem(stolenItem, 1);
+					
+					builder.append(String.format("**%s** ha trovato *%s* nel corpo di **%s**.\n", player1, stolenItem, player2));
+				}
+			}
+			
 			return new EventResult(builder.toString(), EventResult.State.Successful);
 		}
 		
@@ -96,6 +114,18 @@ public class BattleEvent extends HungerGamesEvent
 			player2.getCharacter().incrementKills();
 			
 			builder.append("**" + player1 + "** è morto.\n");
+			
+			if (RandomChoice.randomChance(10))
+			{
+				Item stolenItem = this.getRandomItemFromInventory(player1.getInventory());
+				
+				if (stolenItem != null)
+				{
+					player2.getInventory().addItem(stolenItem, 1);
+					
+					builder.append(String.format("**%s** ha trovato *%s* nel corpo di **%s**.\n", player2, stolenItem, player1));
+				}
+			}
 		}
 		
 		return new EventResult(builder.toString(), EventResult.State.Successful);
@@ -141,5 +171,18 @@ public class BattleEvent extends HungerGamesEvent
 		}
 		
 		return chosenCategory;
+	}
+	
+	private Item getRandomItemFromInventory(Inventory inventory)
+	{
+		ArrayList<Item> items = inventory.getItems();
+		Item item = null;
+		
+		if (!items.isEmpty())
+		{
+			item = (Item) RandomChoice.getRandom(items.toArray());
+		}
+		
+		return item;
 	}
 }

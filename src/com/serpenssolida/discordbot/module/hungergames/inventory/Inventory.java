@@ -1,13 +1,15 @@
 package com.serpenssolida.discordbot.module.hungergames.inventory;
 
+import jdk.nashorn.api.tree.SimpleTreeVisitorES5_1;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class Inventory
 {
 	private HashMap<Food, ItemStack<Food>> foods = new HashMap<>();
-	
 	private HashMap<Weapon, ItemStack<Weapon>> weapons = new HashMap<>();
 	
 	public void removeItem(Item item, int num)
@@ -74,6 +76,16 @@ public class Inventory
 	public ArrayList<Weapon> getWeapons()
 	{
 		return new ArrayList<>(this.weapons.keySet());
+	}
+	
+	public ArrayList<Item> getItems()
+	{
+		ArrayList<Item> items = new ArrayList<>();
+		
+		items.addAll(this.foods.keySet());
+		items.addAll(this.weapons.keySet());
+		
+		return items;
 	}
 	
 	public String toString()
