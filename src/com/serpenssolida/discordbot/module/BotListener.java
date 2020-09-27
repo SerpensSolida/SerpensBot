@@ -118,20 +118,22 @@ public class BotListener extends ListenerAdapter
 		MessageReaction messageReaction = event.getReaction(); //Reaction added to the message.
 		User author = event.getUser(); //The user that added the reaction.
 		
-		if (author == null) return;
+		if (author == null)
+			return;
 		
 		//Ignore bot reaction.
-		if (BotMain.api.getSelfUser().getId().equals(author.getId())) return;
+		if (BotMain.api.getSelfUser().getId().equals(author.getId()))
+			return;
+		
+		//Pass the reaction and the author to the task the user is running.
+		Task task = this.getTask(author);
+		
+		if (task == null)
+			return;
 		
 		//Get the message the reaction was added to.
-		event.getChannel().retrieveMessageById(event.getMessageId()).queue(message ->
+		event.retrieveMessage().queue(message ->
 		{
-			//Pass the reaction and the author to the task the user is running.
-			Task task = this.getTask(author);
-			
-			if (task == null)
-				return;
-			
 			Task.TaskResult result = task.consumeReaction(message, messageReaction.getReactionEmote().getName());
 			
 			//Remove the task if it finished.
