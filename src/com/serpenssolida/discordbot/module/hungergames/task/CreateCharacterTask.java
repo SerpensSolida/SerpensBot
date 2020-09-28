@@ -4,6 +4,7 @@ import com.serpenssolida.discordbot.module.Task;
 import com.serpenssolida.discordbot.module.hungergames.Character;
 import com.serpenssolida.discordbot.module.hungergames.HungerGamesController;
 import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -21,12 +22,12 @@ public class CreateCharacterTask extends Task
 		FINISHED
 	}
 	
-	public CreateCharacterTask(User user, MessageChannel channel)
+	public CreateCharacterTask(Guild guild, User user, MessageChannel channel)
 	{
-		super(user, channel);
+		super(guild, user, channel);
 		
 		//Abort task if there is an HungerGames running.
-		if (HungerGamesController.isHungerGamesRunning())
+		if (HungerGamesController.isHungerGamesRunning(this.getGuild().getId()))
 		{
 			MessageBuilder builder = new MessageBuilder()
 					.append("> Non puoi usare questo comando perchè è in corso un HungerGames.");
@@ -50,7 +51,7 @@ public class CreateCharacterTask extends Task
 			return Task.TaskResult.NotFinished;
 		
 		//Abort task if there is an HungerGames running.
-		if (HungerGamesController.isHungerGamesRunning())
+		if (HungerGamesController.isHungerGamesRunning(this.getGuild().getId()))
 		{
 			MessageBuilder builder = new MessageBuilder()
 					.append("> Non puoi completare la procedura perchè è in corso un HungerGames.");
@@ -80,7 +81,7 @@ public class CreateCharacterTask extends Task
 	public Task.TaskResult reactionAdded(Message message, String reaction)
 	{
 		//Abort task if there is an HungerGames running.
-		if (HungerGamesController.isHungerGamesRunning())
+		if (HungerGamesController.isHungerGamesRunning(this.getGuild().getId()))
 		{
 			MessageBuilder builder = new MessageBuilder()
 					.append("> Non puoi completare la procedura perchè è in corso un HungerGames.");
@@ -174,7 +175,7 @@ public class CreateCharacterTask extends Task
 		
 		this.character.setStats(abilities);
 		
-		HungerGamesController.addCharacter(this.character);
+		HungerGamesController.addCharacter(this.getGuild().getId(), this.character);
 		MessageBuilder builder = new MessageBuilder()
 				.append("> Creazione personaggio completata!");
 		

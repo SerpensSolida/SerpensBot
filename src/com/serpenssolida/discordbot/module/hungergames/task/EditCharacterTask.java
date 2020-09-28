@@ -4,6 +4,7 @@ import com.serpenssolida.discordbot.module.Task;
 import com.serpenssolida.discordbot.module.hungergames.Character;
 import com.serpenssolida.discordbot.module.hungergames.HungerGamesController;
 import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -26,12 +27,12 @@ public class EditCharacterTask extends Task
 		FINISHED
 	}
 	
-	public EditCharacterTask(User user, MessageChannel channel)
+	public EditCharacterTask(Guild guild, User user, MessageChannel channel)
 	{
-		super(user, channel);
+		super(guild, user, channel);
 		
 		//Abort task if there is an HungerGames running.
-		if (HungerGamesController.isHungerGamesRunning())
+		if (HungerGamesController.isHungerGamesRunning(this.getGuild().getId()))
 		{
 			MessageBuilder builder = new MessageBuilder()
 					.append("> Non puoi usare questo comando mentre è in corso un HungerGames.");
@@ -42,7 +43,7 @@ public class EditCharacterTask extends Task
 		
 		//Initialize task.
 		this.state = State.MENU;
-		this.character = HungerGamesController.getCharacter(user.getId());
+		this.character = HungerGamesController.getCharacter(this.getGuild().getId(), user.getId());
 		
 		if (this.character == null)
 		{
@@ -63,7 +64,7 @@ public class EditCharacterTask extends Task
 			return Task.TaskResult.NotFinished;
 		
 		//Abort task if there is an HungerGames running.
-		if (HungerGamesController.isHungerGamesRunning())
+		if (HungerGamesController.isHungerGamesRunning(this.getGuild().getId()))
 		{
 			MessageBuilder builder = new MessageBuilder()
 					.append("> Non puoi completare la procedura perchè è in corso un HungerGames.");
@@ -97,7 +98,7 @@ public class EditCharacterTask extends Task
 		MessageBuilder builder = new MessageBuilder();
 		
 		//Abort task if there is an HungerGames running.
-		if (HungerGamesController.isHungerGamesRunning())
+		if (HungerGamesController.isHungerGamesRunning(this.getGuild().getId()))
 		{
 			builder = new MessageBuilder()
 					.append("> Non puoi completare la procedura perchè è in corso un HungerGames.");
@@ -165,7 +166,7 @@ public class EditCharacterTask extends Task
 		
 		//Set the name of the character.
 		this.character.setName(name);
-		HungerGamesController.save();
+		HungerGamesController.save(this.getGuild().getId());
 		
 		this.state = State.MENU; //Back to menu.
 		
@@ -232,7 +233,7 @@ public class EditCharacterTask extends Task
 		
 		//Set character stats.
 		this.character.setStats(abilities);
-		HungerGamesController.save();
+		HungerGamesController.save(this.getGuild().getId());
 		
 		MessageBuilder builder = new MessageBuilder()
 				.append("> Caratteristiche impostate correttamente.");

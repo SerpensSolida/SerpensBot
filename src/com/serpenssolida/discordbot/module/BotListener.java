@@ -1,8 +1,5 @@
 package com.serpenssolida.discordbot.module;
 
-import java.util.HashMap;
-import javax.annotation.Nonnull;
-
 import com.serpenssolida.discordbot.BotMain;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
@@ -14,22 +11,25 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+import javax.annotation.Nonnull;
+import java.util.HashMap;
+
 public class BotListener extends ListenerAdapter
 {
-	private String modulePrefix = ""; //Prefix of the module, used for commands.
+	private HashMap<String, String> modulePrefix = new HashMap<>(); //Prefix of the module, used for commands.
 	private String internalID = ""; //Internal id used for retrieving listeners from the list.
 	private String moduleName = ""; //Readable name of the module.
-	private HashMap<User, Task> tasks = new HashMap<>(); //List of task currently running. //TODO: Make task unique per player and not per module.
+	private HashMap<String, HashMap<User, Task>> tasks = new HashMap<>(); //List of task currently running. //TODO: Make task linked to servers.
 	private HashMap<String, Command> commands = new HashMap<>(); //List of commands of the module.
 	
 	public BotListener(String modulePrefix)
 	{
-		this.modulePrefix = modulePrefix;
-		this.internalID = this.modulePrefix;
+		//this.modulePrefix = modulePrefix;
+		this.internalID = modulePrefix;
 		
 		Command command = new Command("cancel", 0).setCommandListener((guild, channel, message, author, args) ->
 		{
-			this.cancelTask(channel, author);
+			this.cancelTask(guild, channel, author);
 			return true;
 		});
 		command.setHelp("Cancella la procedura corrente.");
@@ -37,7 +37,7 @@ public class BotListener extends ListenerAdapter
 		
 		command = new Command("help", 1).setCommandListener((guild, channel, message, author, args) ->
 		{
-			this.sendHelp(channel, author, args);
+			this.sendHelp(guild, channel, author, args);
 			return true;
 		});
 		command.setMinArgumentNumber(0);
@@ -52,10 +52,10 @@ public class BotListener extends ListenerAdapter
 		Guild guild = event.getGuild();
 		User author = event.getAuthor(); //Author of the message.
 		MessageChannel channel = event.getChannel(); //Channel where the message was sent.
-		String commandPrefix = BotMain.commandSymbol + this.modulePrefix; //Command prefix of the module.
+		String commandPrefix = BotMain.getCommandSymbol(guild.getId()) + this.getModulePrefix(guild.getId()); //Command prefix of the module.
 		
 		//Get the task the author is currently running.
-		Task task = this.getTask(author);
+		Task task = this.getTask(guild.getId(), author);
 		
 		//If the author of the message is the bot, ignore the message.
 		if (BotMain.api.getSelfUser().getId().equals(author.getId())) return;
@@ -90,7 +90,7 @@ public class BotListener extends ListenerAdapter
 				boolean deleteMessage = command.doAction(guild, channel, event.getMessage(), author, arguments); //Run the command.
 				
 				//Delete command message if the command was successfully ran.
-				if (BotMain.deleteCommandMessages && deleteMessage)
+				if (BotMain.getDeleteCommandMessages(guild.getId()) && deleteMessage)
 				{
 					channel.deleteMessageById(event.getMessageId()).queue();
 				}
@@ -108,7 +108,7 @@ public class BotListener extends ListenerAdapter
 			//Remove the task if it finished.
 			if (result == Task.TaskResult.Finished)
 			{
-				this.removeTask(task);
+				this.removeTask(guild.getId(), task);
 			}
 		}
 	}
@@ -117,6 +117,7 @@ public class BotListener extends ListenerAdapter
 	{
 		MessageReaction messageReaction = event.getReaction(); //Reaction added to the message.
 		User author = event.getUser(); //The user that added the reaction.
+		Guild guild = event.getGuild(); //The user that added the reaction.
 		
 		if (author == null)
 			return;
@@ -126,7 +127,7 @@ public class BotListener extends ListenerAdapter
 			return;
 		
 		//Pass the reaction and the author to the task the user is running.
-		Task task = this.getTask(author);
+		Task task = this.getTask(guild.getId(), author);
 		
 		if (task == null)
 			return;
@@ -139,18 +140,18 @@ public class BotListener extends ListenerAdapter
 			//Remove the task if it finished.
 			if (result == Task.TaskResult.Finished)
 			{
-				this.removeTask(task);
+				this.removeTask(guild.getId(), task);
 			}
 		});
 	}
 	
-	private void cancelTask(MessageChannel channel, User author)
+	private void cancelTask(Guild guild, MessageChannel channel, User author)
 	{
 		MessageBuilder builder = new MessageBuilder();
 		
-		if (this.getTask(author) != null)
+		if (this.getTask(guild.getId(), author) != null)
 		{
-			this.removeTask(this.getTask(author));
+			this.removeTask(guild.getId(), this.getTask(guild.getId(), author));
 			builder.append("> La procedura corrente è stata annullata.");
 		}
 		else
@@ -161,7 +162,7 @@ public class BotListener extends ListenerAdapter
 		channel.sendMessage(builder.build()).queue();
 	}
 	
-	private void sendHelp(MessageChannel channel, User author, String[] args)
+	private void sendHelp(Guild guild, MessageChannel channel, User author, String[] args)
 	{
 		EmbedBuilder embedBuilder = new EmbedBuilder();
 		
@@ -176,7 +177,7 @@ public class BotListener extends ListenerAdapter
 			
 			for (Command command : this.commands.values())
 			{
-				embedBuilder.appendDescription("`" + command.getArgumentsDescription() + "`")
+				embedBuilder.appendDescription("`" + command.getArgumentsDescription(guild.getId()) + "`")
 						.appendDescription(" " + command.getHelp() + "\n");
 			}
 			
@@ -190,7 +191,7 @@ public class BotListener extends ListenerAdapter
 			if (command != null)
 			{
 				embedBuilder.setTitle(String.format("Descrizione comando *%s*", command.getId()));
-				embedBuilder.appendDescription(String.format("Utilizzo: `%s`\n", command.getArgumentsDescription()))
+				embedBuilder.appendDescription(String.format("Utilizzo: `%s`\n", command.getArgumentsDescription(guild.getId())))
 						.appendDescription(command.getHelp());
 				//TODO: Add long help.
 			}
@@ -203,19 +204,24 @@ public class BotListener extends ListenerAdapter
 		channel.sendMessage(new MessageBuilder().setEmbed(embedBuilder.build()).build()).queue();
 	}
 	
-	public void setModulePrefix(String modulePrefix)
+	public void setModulePrefix(String guildID, String modulePrefix)
 	{
 		for (Command command : this.commands.values())
 		{
-			command.setModulePrefix(modulePrefix);
+			command.setModulePrefix(guildID, modulePrefix);
 		}
 		
-		this.modulePrefix = modulePrefix;
+		this.modulePrefix.put(guildID, modulePrefix);
 	}
 	
-	public String getModulePrefix()
+	public String getModulePrefix(String guildID)
 	{
-		return this.modulePrefix;
+		if (!this.modulePrefix.containsKey(guildID))
+		{
+			this.modulePrefix.put(guildID, this.internalID);
+		}
+		
+		return this.modulePrefix.get(guildID);
 	}
 	
 	public String getInternalID()
@@ -232,7 +238,7 @@ public class BotListener extends ListenerAdapter
 	{
 		if (command != null)
 		{
-			command.setModulePrefix(this.modulePrefix);
+			command.setDefaultPrefix(this.internalID);
 			this.commands.put(command.getId(), command);
 		}
 	}
@@ -247,12 +253,17 @@ public class BotListener extends ListenerAdapter
 		return this.commands.get(id);
 	}
 	
-	public Task getTask(User user)
+	public Task getTask(String guildID, User user)
 	{
-		return this.tasks.get(user);
+		if (!this.tasks.containsKey(guildID))
+		{
+			this.tasks.put(guildID, new HashMap<>());
+		}
+		
+		return this.tasks.get(guildID).get(user);
 	}
 	
-	public void addTask(Task task)
+	public void addTask(String guildID, Task task)
 	{
 		if (task.isInterrupted())
 		{
@@ -260,21 +271,32 @@ public class BotListener extends ListenerAdapter
 		}
 		
 		User user = task.getUser();
-		Task currentUserTask = this.getTask(user);
+		Task currentUserTask = this.getTask(guildID, user);
 		
 		//Replace the current task (if there is one) with the new one.
 		if (currentUserTask != null)
 		{
 			System.out.println("L'utente ha già una task, annullamento task corrente.");
-			this.removeTask(currentUserTask);
+			this.removeTask(guildID, currentUserTask);
 		}
 		
-		this.tasks.put(user, task);
+		if (!this.tasks.containsKey(guildID))
+		{
+			this.tasks.put(guildID, new HashMap<>());
+		}
+		
+		
+		this.tasks.get(guildID).put(user, task);
 	}
 	
-	public void removeTask(Task task)
+	public void removeTask(String guildID, Task task)
 	{
-		this.tasks.remove(task.getUser());
+		if (!this.tasks.containsKey(guildID))
+		{
+			this.tasks.put(guildID, new HashMap<>());
+		}
+		
+		this.tasks.get(guildID).remove(task.getUser());
 	}
 	
 	public String getModuleName()

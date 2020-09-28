@@ -1,6 +1,7 @@
 package com.serpenssolida.discordbot.module;
 
 import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
@@ -13,6 +14,7 @@ public abstract class Task
 	private User user; //The user doing this task.
 	private MessageChannel channel; //The channel the task is running on.
 	private Message lastMessage; //Last message sent by the task.
+	private Guild guild;
 	private boolean interrupted; //If the task was cancelled or not.
 	
 	public enum TaskResult
@@ -21,8 +23,9 @@ public abstract class Task
 		Finished
 	}
 	
-	public Task(User user, MessageChannel channel)
+	public Task(Guild guild, User user, MessageChannel channel)
 	{
+		this.guild = guild;
 		this.user = user;
 		this.channel = channel;
 		this.interrupted = false;
@@ -106,6 +109,14 @@ public abstract class Task
 			this.lastMessage = sentMessage;
 			sentMessage.addReaction("❌").queue();
 		});
+	}
+	
+	/**
+	 * @return The guild the task is running on.
+	 */
+	public Guild getGuild()
+	{
+		return this.guild;
 	}
 	
 	/**

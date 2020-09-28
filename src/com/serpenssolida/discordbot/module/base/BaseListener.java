@@ -2,8 +2,6 @@ package com.serpenssolida.discordbot.module.base;
 
 import com.serpenssolida.discordbot.BotMain;
 import com.serpenssolida.discordbot.module.BotListener;
-import com.serpenssolida.discordbot.module.Command;
-import com.serpenssolida.discordbot.module.Task;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -20,7 +18,7 @@ public class BaseListener extends BotListener
 	{
 		super("base");
 		this.setModuleName("Base");
-		this.setModulePrefix("");
+		//this.setModulePrefix(guildID, "");
 		
 		//Module has no tasks and cannot get help.
 		this.removeCommand("help");
@@ -39,9 +37,9 @@ public class BaseListener extends BotListener
 		if (BotMain.api.getSelfUser().getId().equals(author.getId())) return;
 		
 		//Parse special commands.
-		if ((BotMain.commandSymbol + "help").equals(message))
+		if ((BotMain.getCommandSymbol(guild.getId()) + "help").equals(message))
 		{
-			this.sendModuleHelp(channel, author);
+			this.sendModuleHelp(guild, channel, author);
 		}
 		else if ("!!reset symbol".equals(message))
 		{
@@ -67,8 +65,8 @@ public class BaseListener extends BotListener
 			return;
 		}
 		
-		BotMain.commandSymbol = "/";
-		BotMain.saveSettings();
+		BotMain.commandSymbol.put(guild.getId(), "/");
+		BotMain.saveSettings(guild.getId());
 		
 		channel.sendMessage("> Simbolo per i comandi impostato a `/`.").queue();
 	}
@@ -89,10 +87,10 @@ public class BaseListener extends BotListener
 		
 		for (BotListener listener : BotMain.getModules())
 		{
-			listener.setModulePrefix(listener.getInternalID());
+			listener.setModulePrefix(guild.getId(), listener.getInternalID());
 		}
 		
-		BotMain.saveSettings();
+		BotMain.saveSettings(guild.getId());
 		
 		channel.sendMessage("> Prefisso dei moduli resettato correttamente.").queue();
 	}
@@ -100,7 +98,7 @@ public class BaseListener extends BotListener
 	/**
 	 * Send a message containing all help commands of the modules.
 	 */
-	private void sendModuleHelp(MessageChannel channel, User author)
+	private void sendModuleHelp(Guild guild, MessageChannel channel, User author)
 	{
 		MessageBuilder messageBuilder = new MessageBuilder();
 		EmbedBuilder embedBuilder = new EmbedBuilder();
@@ -121,7 +119,7 @@ public class BaseListener extends BotListener
 			
 			//Add listener to the list.
 			builderList.append("Modulo " + listener.getModuleName() + "\n");
-			builderCommands.append("`" + BotMain.commandSymbol + listener.getModulePrefix() + " help`\n");
+			builderCommands.append("`" + BotMain.getCommandSymbol(guild.getId()) + listener.getModulePrefix(guild.getId()) + " help`\n");
 		}
 		
 		embedBuilder.addField("Moduli", builderList.toString(), true);
@@ -132,8 +130,14 @@ public class BaseListener extends BotListener
 	}
 	
 	@Override
-	public void setModulePrefix(String modulePrefix)
+	public void setModulePrefix(String guildID, String modulePrefix)
 	{
-		super.setModulePrefix("");
+		super.setModulePrefix(guildID, "");
+	}
+	
+	@Override
+	public String getModulePrefix(String guildID)
+	{
+		return "";
 	}
 }

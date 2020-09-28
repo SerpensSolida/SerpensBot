@@ -36,6 +36,7 @@ import net.dv8tion.jda.api.utils.AttachmentOption;
 
 public class HungerGamesThread extends Thread
 {
+	private String guildID;
 	private MessageChannel channel;
 	private HungerGames hg;
 	
@@ -50,11 +51,12 @@ public class HungerGamesThread extends Thread
 			new RelationshipEvent()
 	};
 	
-	public HungerGamesThread(MessageChannel channel)
+	public HungerGamesThread(String guildID, MessageChannel channel)
 	{
 		RandomChoice.resetRandom();
+		this.guildID = guildID;
 		this.channel = channel;
-		this.hg = new HungerGames(this.loadItems());
+		this.hg = new HungerGames(this.guildID, this.loadItems());
 	}
 	
 	public void run()
@@ -82,7 +84,7 @@ public class HungerGamesThread extends Thread
 		{
 			messageBuilder.append("> Numero giocatori insufficenti. Chiedi a qualcuno di creare o abilitare il suo personaggio.");
 			this.channel.sendMessage(messageBuilder.build()).queue();
-			HungerGamesController.setRunning(false);
+			HungerGamesController.setRunning(this.guildID,false);
 			return;
 		}
 		
@@ -103,7 +105,7 @@ public class HungerGamesThread extends Thread
 		}
 		
 		embedBuilder//.setDescription(stringBuilder.toString())
-				.setTitle("**Partecipanti alla " + (HungerGamesController.getCount() + 1) + "° edizione degli Hunger Games!**");
+				.setTitle("**Partecipanti alla " + (HungerGamesController.getCount(this.guildID) + 1) + "° edizione degli Hunger Games!**");
 		messageBuilder.setEmbed(embedBuilder.build());
 		
 		this.channel.sendMessage(messageBuilder.build()).queue();
@@ -114,7 +116,7 @@ public class HungerGamesThread extends Thread
 			//Chose a random number of turns for the day.
 			int turnsNum = 4 + RandomChoice.random.nextInt(4);
 			
-			Thread.sleep(HungerGamesController.getMessageSpeed());
+			Thread.sleep(HungerGamesController.getMessageSpeed(this.guildID));
 			
 			embedBuilder = new EmbedBuilder()
 					.setTitle("Alba del " + this.hg.getDay() + "° giorno.");
@@ -125,7 +127,7 @@ public class HungerGamesThread extends Thread
 			for (int i = 0; i < turnsNum && this.isHungerGamesRunning(); i++)
 			{
 				this.doTurnCycle();
-				Thread.sleep(HungerGamesController.getMessageSpeed());
+				Thread.sleep(HungerGamesController.getMessageSpeed(this.guildID));
 			}
 			
 			//Send a message containing the relashionships between players.
@@ -150,7 +152,7 @@ public class HungerGamesThread extends Thread
 				
 				//Update player statistics.
 				winner.getCharacter().incrementWins();
-				HungerGamesController.getWinners().add(winner.getOwner().getId());
+				HungerGamesController.getWinners(this.guildID).add(winner.getOwner().getId());
 			}
 			else
 			{
@@ -162,15 +164,15 @@ public class HungerGamesThread extends Thread
 				embedBuilder.setDescription("Sono morti tutti i giocatori.");
 				
 				messageBuilder.setEmbed(embedBuilder.build());
-				HungerGamesController.getWinners().add(null);
+				HungerGamesController.getWinners(this.guildID).add(null);
 			}
 			
 			this.channel.sendMessage(messageBuilder.build()).queue();
 			
 			//Update HungerGames statistics.
-			HungerGamesController.setCount(HungerGamesController.getCount() + 1);
-			HungerGamesController.setRunning(false);
-			HungerGamesController.save();
+			HungerGamesController.setCount(this.guildID, HungerGamesController.getCount(this.guildID) + 1);
+			HungerGamesController.setRunning(this.guildID, false);
+			HungerGamesController.save(this.guildID);
 		}
 	}
 	
@@ -250,7 +252,7 @@ public class HungerGamesThread extends Thread
 	 */
 	public ItemData loadItems()
 	{
-		File file = new File(HungerGamesController.folder + "items.json");
+		File file = new File(HungerGamesController.folder + "/items.json");
 		Gson gson = (new GsonBuilder()).setPrettyPrinting().enableComplexMapKeySerialization().create();
 		ItemData data = new ItemData();
 		try
@@ -357,7 +359,7 @@ public class HungerGamesThread extends Thread
 	
 	private BufferedImage getTombImage()
 	{
-		File tombFile = new File(HungerGamesController.folder + "tombstone.png");
+		File tombFile = new File(HungerGamesController.folder + "/tombstone.png");
 		
 		try
 		{

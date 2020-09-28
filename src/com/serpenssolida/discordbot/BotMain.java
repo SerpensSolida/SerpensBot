@@ -4,11 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.serpenssolida.discordbot.module.BotListener;
 import com.serpenssolida.discordbot.module.base.BaseListener;
-import com.serpenssolida.discordbot.module.hungergames.HungerGamesController;
 import com.serpenssolida.discordbot.module.hungergames.HungerGamesListener;
-
-import javax.security.auth.login.LoginException;
-
 import com.serpenssolida.discordbot.module.settings.SettingsData;
 import com.serpenssolida.discordbot.module.settings.SettingsListener;
 import net.dv8tion.jda.api.JDA;
@@ -20,7 +16,9 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
+import javax.security.auth.login.LoginException;
 import java.io.*;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,8 +26,10 @@ import java.util.HashSet;
 public class BotMain
 {
 	public static JDA api;
-	public static String commandSymbol = "/";
-	public static boolean deleteCommandMessages;
+	public static HashMap<String, String> commandSymbol = new HashMap<>();
+	public static HashMap<String, Boolean> deleteCommandMessages = new HashMap<>();
+	
+	public static String settingsFolder = "settings";
 	
 	public static void main(String[] args)
 	{
@@ -62,8 +62,6 @@ public class BotMain
 		api.addEventListener(new SettingsListener());
 		api.addEventListener(new HungerGamesListener());
 		api.addEventListener(new BaseListener());
-		
-		BotMain.loadSettings();
 	}
 	
 	public static ArrayList<Member> findUsersByName(Guild guild, String userName)
@@ -137,7 +135,10 @@ public class BotMain
 	
 	/**
 	 * Get the module with the given id.
-	 * @param moduleID The id of the module to get.
+	 *
+	 * @param moduleID
+	 * 		The id of the module to get.
+	 *
 	 * @return The module with the passed id.
 	 */
 	public static BotListener getModuleById(String moduleID)
@@ -154,43 +155,49 @@ public class BotMain
 		return null;
 	}
 	
-	public static void loadSettings()
+	public static void loadSettings(String guildID)
 	{
-		File settingsFile = new File("settings.json");
+		File settingsFile = new File(Paths.get("server_data", guildID, BotMain.settingsFolder, "settings.json").toString());
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		System.out.println("Caricamento impostazioni.");
+		System.out.println("Caricamento impostazioni per server con id: " + guildID + ".");
 		
 		try (BufferedReader reader = new BufferedReader(new FileReader(settingsFile)))
 		{
 			SettingsData settingsData = gson.fromJson(reader, SettingsData.class);
 			
-			BotMain.commandSymbol = settingsData.getCommandSymbol();
-			BotMain.deleteCommandMessages = settingsData.getDeleteCommandMessages();
+			BotMain.commandSymbol.put(guildID, settingsData.getCommandSymbol());
+			BotMain.deleteCommandMessages.put(guildID, settingsData.getDeleteCommandMessages());
 			HashMap<String, String> modulePrefixes = settingsData.getModulePrefixes();
 			
 			for (BotListener listener : BotMain.getModules())
 			{
 				if (modulePrefixes.containsKey(listener.getInternalID()))
 				{
-					listener.setModulePrefix(modulePrefixes.get(listener.getInternalID()));
+					listener.setModulePrefix(guildID, modulePrefixes.get(listener.getInternalID()));
 				}
 			}
 		}
 		catch (FileNotFoundException e)
 		{
 			System.out.println("Nessun file dei impostazioni da caricare.");
+			System.out.println("Creazione impostazioni di default.");
+			
+			BotMain.commandSymbol.put(guildID, "/");
+			BotMain.deleteCommandMessages.put(guildID, false);
+			
+			BotMain.saveSettings(guildID);
 		}
 		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
+		
 	}
 	
-	public static void saveSettings()
+	public static void saveSettings(String guildID)
 	{
-		File settingsFile = new File( "settings.json");
+		File settingsFile = new File(Paths.get("server_data", guildID, BotMain.settingsFolder, "settings.json").toString());
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		System.out.println("Salvataggio impostazioni.");
 		
 		try (PrintWriter writer = new PrintWriter(new FileWriter(settingsFile)))
 		{
@@ -198,27 +205,32 @@ public class BotMain
 			HashMap<String, String> modulePrefixes = new HashMap<>();
 			
 			//Add command symbol.
-			settingsData.setCommandSymbol(BotMain.commandSymbol);
+			settingsData.setCommandSymbol(BotMain.getCommandSymbol(guildID));
 			
 			//Add list of prefixes
 			for (BotListener listener : BotMain.getModules())
 			{
-				modulePrefixes.put(listener.getInternalID(), listener.getModulePrefix());
+				modulePrefixes.put(listener.getInternalID(), listener.getModulePrefix(guildID));
 			}
 			
 			settingsData.setModulePrefixes(modulePrefixes);
 			
 			//Add delete command messages flag.
-			settingsData.setDeleteCommandMessages(BotMain.deleteCommandMessages);
+			settingsData.setDeleteCommandMessages(BotMain.getDeleteCommandMessages(guildID));
 			
+			System.out.println("Salvataggio impostazioni.");
 			writer.println(gson.toJson(settingsData));
 		}
 		catch (FileNotFoundException e)
 		{
+			System.out.println("Nessun file impostazioni del server con id: " + guildID + ".");
+			
 			try
 			{
+				settingsFile.getParentFile().mkdirs();
+				
 				if (settingsFile.createNewFile())
-					HungerGamesController.saveSettings();
+					BotMain.saveSettings(guildID);
 			}
 			catch (IOException ex)
 			{
@@ -230,5 +242,49 @@ public class BotMain
 			e.printStackTrace();
 		}
 		
+	}
+	
+	public static void setCommandSymbol(String guildID, String symbol)
+	{
+		//If key is not found the settings are not loaded or are not created.
+		if (!BotMain.commandSymbol.containsKey(guildID))
+		{
+			BotMain.loadSettings(guildID);
+		}
+		
+		BotMain.commandSymbol.put(guildID, symbol);
+	}
+	
+	public static String getCommandSymbol(String guildID)
+	{
+		//If key is not found the settings are not loaded or are not created.
+		if (!BotMain.commandSymbol.containsKey(guildID))
+		{
+			BotMain.loadSettings(guildID);
+		}
+		
+		return BotMain.commandSymbol.get(guildID);
+	}
+	
+	public static void setDeleteCommandMessages(String guildID, boolean value)
+	{
+		//If key is not found the settings are not loaded or are not created.
+		if (!BotMain.deleteCommandMessages.containsKey(guildID))
+		{
+			BotMain.loadSettings(guildID);
+		}
+		
+		BotMain.deleteCommandMessages.put(guildID, value);
+	}
+	
+	public static boolean getDeleteCommandMessages(String guildID)
+	{
+		//If key is not found the settings are not loaded or are not created.
+		if (!BotMain.deleteCommandMessages.containsKey(guildID))
+		{
+			BotMain.loadSettings(guildID);
+		}
+		
+		return BotMain.deleteCommandMessages.get(guildID);
 	}
 }

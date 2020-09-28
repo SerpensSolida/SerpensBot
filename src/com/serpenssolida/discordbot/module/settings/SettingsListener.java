@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
 
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SettingsListener extends BotListener
@@ -68,12 +67,12 @@ public class SettingsListener extends BotListener
 		switch (argument)
 		{
 			case "true":
-				BotMain.deleteCommandMessages = true;
+				BotMain.deleteCommandMessages.put(guild.getId(), true);
 				builder.append("> Cancellerò i comandi che sono stati inviati in chat.");
 				break;
 				
 			case "false":
-				BotMain.deleteCommandMessages = false;
+				BotMain.deleteCommandMessages.put(guild.getId(), false);
 				builder.append("> Lascierò i comandi che sono stati inviati in chat.");
 				break;
 				
@@ -82,7 +81,7 @@ public class SettingsListener extends BotListener
 		}
 		
 		channel.sendMessage(builder.toString()).queue();
-		BotMain.saveSettings();
+		BotMain.saveSettings(guild.getId());
 	}
 	
 	private void modulePrefixCommand(Guild guild, MessageChannel channel, User author, String[] args)
@@ -104,7 +103,7 @@ public class SettingsListener extends BotListener
 			
 			for (BotListener listener : BotMain.getModules())
 			{
-				embedBuilder.addField("Modulo " + listener.getModuleName(), String.format("ID modulo: `%s`\nPrefisso: `%s`", listener.getInternalID(), listener.getModulePrefix().isBlank() ? " " : listener.getModulePrefix()), true);
+				embedBuilder.addField("Modulo " + listener.getModuleName(), String.format("ID modulo: `%s`\nPrefisso: `%s`", listener.getInternalID(), listener.getModulePrefix(guild.getId()).isBlank() ? " " : listener.getModulePrefix(guild.getId())), true);
 			}
 			
 			messageBuilder.setEmbed(embedBuilder.build());
@@ -116,7 +115,7 @@ public class SettingsListener extends BotListener
 			
 			if (listener != null)
 			{
-				messageBuilder.appendFormat("> Il prefisso del modulo `%s` è `%s`.", listener.getInternalID(), listener.getModulePrefix());
+				messageBuilder.appendFormat("> Il prefisso del modulo `%s` è `%s`.", listener.getInternalID(), listener.getModulePrefix(guild.getId()));
 			}
 			else
 			{
@@ -145,10 +144,10 @@ public class SettingsListener extends BotListener
 			
 			if (listener != null)
 			{
-				listener.setModulePrefix(modulePrefix);
-				BotMain.saveSettings();
+				listener.setModulePrefix(guild.getId(), modulePrefix);
+				BotMain.saveSettings(guild.getId());
 				
-				messageBuilder.appendFormat("> Prefisso del modulo `%s` è stato impostato a `%s`", listener.getInternalID(), listener.getModulePrefix());
+				messageBuilder.appendFormat("> Prefisso del modulo `%s` è stato impostato a `%s`", listener.getInternalID(), listener.getModulePrefix(guild.getId()));
 			}
 			else
 			{
@@ -180,8 +179,8 @@ public class SettingsListener extends BotListener
 			return;
 		}
 		
-		BotMain.commandSymbol = symbol;
-		BotMain.saveSettings();
+		BotMain.commandSymbol.put(guild.getId(), symbol);
+		BotMain.saveSettings(guild.getId());
 		
 		channel.sendMessage("> Simbolo per i comandi impostato a `" + symbol + "`.").queue();
 	}

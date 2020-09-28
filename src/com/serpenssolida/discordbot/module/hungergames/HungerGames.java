@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 public class HungerGames
 {
 	private MessageChannel channel; //Channel where the HungerGames is running.
+	private String guildID;
 	private ItemData itemData; //Collection of items of the HungerGames.
 	private HashSet<Weapon> weaponPool; //Pool of weapons that can be found during the HungerGames.
 	private int day; //Current day of the HungerGames.
@@ -26,8 +27,9 @@ public class HungerGames
 	private HashSet<Player> incidentPlayers = new HashSet<>(); //List of players that had an incident during the turm.
 	private HashSet<Player> sleepPlayers = new HashSet<>(); //List of players that slept during the turn.
 	
-	public HungerGames(ItemData itemData)
+	public HungerGames(String guildID, ItemData itemData)
 	{
+		this.guildID = guildID;
 		this.itemData = itemData;
 		this.weaponPool = new HashSet<>(this.itemData.getWeapons());
 		this.alivePlayers = this.generatePlayers();
@@ -43,7 +45,7 @@ public class HungerGames
 	{
 		HashSet<Player> players = new HashSet<>();
 		
-		for (Map.Entry<String, Character> characterEntry : HungerGamesController.getCharacters().entrySet())
+		for (Map.Entry<String, Character> characterEntry : HungerGamesController.getCharacters(this.guildID).entrySet())
 		{
 			Character character = characterEntry.getValue();
 			
@@ -241,5 +243,10 @@ public class HungerGames
 	public void setSleepPlayers(HashSet<Player> sleepPlayers)
 	{
 		this.sleepPlayers = sleepPlayers;
+	}
+	
+	public String getGuildID()
+	{
+		return guildID;
 	}
 }

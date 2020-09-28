@@ -62,6 +62,7 @@ public class AvatarCache
 		
 		if (!file.exists())
 		{
+			file.getParentFile().mkdirs();
 			file.createNewFile();
 		}
 		
@@ -110,6 +111,7 @@ public class AvatarCache
 		}
 		catch (FileNotFoundException e)
 		{
+			file.getParentFile().mkdirs();
 			if (file.createNewFile())
 				saveCache(data);
 		}

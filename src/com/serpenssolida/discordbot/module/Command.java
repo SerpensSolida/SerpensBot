@@ -6,6 +6,8 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 
+import java.util.HashMap;
+
 /**
  * Represents a command that can be sent to the chat.
  */
@@ -17,8 +19,9 @@ public class Command
 	private boolean joinArguments; //Whether or not arguments are joined together before checking them.
 	private String help; //String that describe the command.
 	private String argumentsDescription; //String that describe arguments of the command.
-	private String modulePrefix; //Prefix of the module that owns this command.
+	private HashMap<String, String> modulePrefix = new HashMap<>(); //Prefix of the module that owns this command.
 	private CommandAction action; //Callback that is called when the command is sent to the chat.
+	private String defaultModulePrefix; //Default module prefix.
 	
 	public Command(String id, int maxArgumentNumber)
 	{
@@ -120,9 +123,9 @@ public class Command
 		this.help = help;
 	}
 	
-	public String getArgumentsDescription()
+	public String getArgumentsDescription(String guildID)
 	{
-		return (BotMain.commandSymbol + this.modulePrefix + " " + this.id + " " + this.argumentsDescription).strip();
+		return (BotMain.getCommandSymbol(guildID) + this.getModulePrefix(guildID) + " " + this.id + " " + this.argumentsDescription).strip();
 	}
 	
 	public void setArgumentsDescription(String argumentsDescription)
@@ -140,14 +143,34 @@ public class Command
 		this.minArgumentNumber = minArgumentNumber;
 	}
 	
-	public String getModulePrefix()
+	public String getModulePrefix(String guildID)
 	{
-		return this.modulePrefix;
+		if (!this.modulePrefix.containsKey(guildID))
+		{
+			this.modulePrefix.put(guildID, this.defaultModulePrefix);
+		}
+		
+		return this.modulePrefix.get(guildID);
 	}
 	
-	public void setModulePrefix(String modulePrefix)
+	public void setModulePrefix(String guildID, String modulePrefix)
 	{
-		this.modulePrefix = modulePrefix;
+		this.modulePrefix.put(guildID, modulePrefix);
+	}
+	
+	public void setDefaultPrefix(String defaultModulePrefix)
+	{
+		this.defaultModulePrefix = defaultModulePrefix;
+	}
+	
+	public String getDefaultModulePrefix()
+	{
+		return this.defaultModulePrefix;
+	}
+	
+	public void setDefaultModulePrefix(String defaultModulePrefix)
+	{
+		this.defaultModulePrefix = defaultModulePrefix;
 	}
 	
 	public static class CommandData
