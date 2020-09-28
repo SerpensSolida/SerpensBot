@@ -67,12 +67,12 @@ public class SettingsListener extends BotListener
 		switch (argument)
 		{
 			case "true":
-				BotMain.deleteCommandMessages.put(guild.getId(), true);
+				BotMain.setDeleteCommandMessages(guild.getId(), true);
 				builder.append("> Cancellerò i comandi che sono stati inviati in chat.");
 				break;
 				
 			case "false":
-				BotMain.deleteCommandMessages.put(guild.getId(), false);
+				BotMain.setDeleteCommandMessages(guild.getId(), false);
 				builder.append("> Lascierò i comandi che sono stati inviati in chat.");
 				break;
 				
@@ -179,7 +179,7 @@ public class SettingsListener extends BotListener
 			return;
 		}
 		
-		BotMain.commandSymbol.put(guild.getId(), symbol);
+		BotMain.setCommandSymbol(guild.getId(), symbol);
 		BotMain.saveSettings(guild.getId());
 		
 		channel.sendMessage("> Simbolo per i comandi impostato a `" + symbol + "`.").queue();

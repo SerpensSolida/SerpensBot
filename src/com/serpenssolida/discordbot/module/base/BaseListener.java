@@ -65,7 +65,7 @@ public class BaseListener extends BotListener
 			return;
 		}
 		
-		BotMain.commandSymbol.put(guild.getId(), "/");
+		BotMain.setCommandSymbol(guild.getId(), "/");
 		BotMain.saveSettings(guild.getId());
 		
 		channel.sendMessage("> Simbolo per i comandi impostato a `/`.").queue();
