@@ -1,16 +1,22 @@
 package com.serpenssolida.discordbot.module.hungergames;
 
 import com.serpenssolida.discordbot.BotMain;
+import com.serpenssolida.discordbot.module.BotCommand;
 import com.serpenssolida.discordbot.module.BotListener;
-import com.serpenssolida.discordbot.module.UnlistedBotCommand;
 import com.serpenssolida.discordbot.module.hungergames.task.CreateCharacterTask;
 import com.serpenssolida.discordbot.module.hungergames.task.EditCharacterTask;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.interactions.commands.Command;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class HungerGamesListener extends BotListener
 {
@@ -20,98 +26,108 @@ public class HungerGamesListener extends BotListener
 		this.setModuleName("HungerGames");
 		
 		//Command for creating a character.
-		UnlistedBotCommand command = new UnlistedBotCommand("create", 0).setCommandListener((guild, channel, message, author, args) ->
+		BotCommand command = new BotCommand("create", "Fa partire la procedura per la creazione di un personaggio.");
+		command.setCommandListener((event, guild, channel, author) ->
 		{
+			event.reply("> E' stata iniziata una nuova procedura!").queue();
 			this.addTask(guild.getId(), new CreateCharacterTask(guild, author, channel));
 			return true;
 		});
-		command.setHelp("Fa partire la procedura per la creazione di un personaggio.");
-		this.addUnlistedBotCommand(command);
+		this.addBotCommand(command);
 		
 		//Command for displaying character info.
-		command = new UnlistedBotCommand("character", 1).setCommandListener((guild, channel, message, author, args) ->
+		command = new BotCommand("character", "Invia alla chat la card delle statistiche del personaggio.");
+		command.setCommandListener((event, guild, channel, author) ->
 		{
-			this.sendCharacterCard(guild, channel, message, author, args);
+			this.sendCharacterCard(event, guild, channel, author);
 			return true;
 		});
-		command.setMinArgumentNumber(0);
-		command.setJoinArguments(true);
-		command.setArgumentsDescription("[nome_utente|nickname_utente|tag_utente]");
-		command.setHelp("Invia alla chat la card delle statistiche del personaggio.");
-		this.addUnlistedBotCommand(command);
+		command.getSubcommand()
+				.addOption(OptionType.USER, "tag", "L'utente di cui visualizzare le statistiche.", false);
+		this.addBotCommand(command);
 		
 		//Command for editing a character.
-		command = new UnlistedBotCommand("edit", 0).setCommandListener((guild, channel, message, author, args) ->
+		command = new BotCommand("edit", "Fa partire la procedura di modifica del personaggio.");
+		command.setCommandListener((event, guild, channel, author) ->
 		{
+			event.reply("> E' stata iniziata una nuova procedura!").queue();
 			this.addTask(guild.getId(), new EditCharacterTask(guild, author, channel));
 			return true;
 		});
-		command.setHelp("Fa partire la procedura di modifica del personaggio.");
-		this.addUnlistedBotCommand(command);
+		this.addBotCommand(command);
 		
 		//Command for enabling or disabling a character.
-		command = new UnlistedBotCommand("enable", 1).setCommandListener((guild, channel, message, author, args) ->
+		command = new BotCommand("enable", "Abilita/Disabilita il personaggio. Un personaggio disabilitato non parteciperà agli HungerGames.");
+		command.setCommandListener((event, guild, channel, author) ->
 		{
-			this.setCharacterEnabled(guild, channel, author, args);
+			this.setCharacterEnabled(event, guild, channel, author);
 			return true;
 		});
-		command.setHelp("Abilita/Disabilita il personaggio. Un personaggio disabilitato non parteciperà agli HungerGames.");
-		command.setArgumentsDescription("(true|false)");
-		this.addUnlistedBotCommand(command);
+		command.getSubcommand()
+				.addOption(OptionType.BOOLEAN, "value", "True per abilitare il personaggio, false per disabilitarlo.", true);
+		this.addBotCommand(command);
 		
 		//Command for starting a new HungerGames.
-		command = new UnlistedBotCommand("start", 0).setCommandListener((guild, channel, message, author, args) ->
+		command = new BotCommand("start", "Inizia un edizione degli Hunger Games!");
+		command.setCommandListener((event, guild, channel, author) ->
 		{
+			event.reply("> L'hunger games sta partendo!").queue();
 			HungerGamesController.startHungerGames(guild.getId(), channel);
 			return true;
 		});
-		command.setHelp("Inizia un edizione degli Hunger Games!");
-		this.addUnlistedBotCommand(command);
+		this.addBotCommand(command);
 		
 		//Command for editing playback speed of the HungerGames.
-		command = new UnlistedBotCommand("speed", 1).setCommandListener((guild, channel, message, author, args) ->
+		command = new BotCommand("speed", "Modifica la velocità di riproduzione degli Hunger Games (velocità minima 1 secondo).");
+		command.setCommandListener((event, guild, channel, author) ->
 		{
-			this.setPlaybackSpeed(guild, channel, args);
+			this.setPlaybackSpeed(event, guild, channel, author);
 			return true;
 		});
-		command.setHelp("Modifica la velocità di riproduzione degli Hunger Games (velocità minima 1 secondo).");
-		command.setArgumentsDescription("secondi");
-		this.addUnlistedBotCommand(command);
+		command.getSubcommand()
+				.addOption(OptionType.INTEGER, "seconds", "Numero di secondi tra un messaggio e l'altro (min 1). ");
+		this.addBotCommand(command);
 		
 		//Command for displaying leaderboards of the Hunger Games.
-		command = new UnlistedBotCommand("leaderboard", 1).setCommandListener((guild, channel, message, author, args) ->
+		command = new BotCommand("leaderboard", "Visualizza le classifiche degli HungerGames.");
+		command.setCommandListener((event, guild, channel, author) ->
 		{
-			this.sendLeaderboard(guild, channel, args);
+			this.sendLeaderboard(event, guild, channel, author);
 			return true;
 		});
-		command.setHelp("Visualizza le classifiche degli HungerGames.");
-		command.setArgumentsDescription("(wins|kills)");
-		this.addUnlistedBotCommand(command);
+		command.getSubcommand()
+				.addOptions(
+						new OptionData(OptionType.STRING, "type", "Il tipo di leaderboard da mostrare.", true)
+								.addChoices(new Command.Choice("wins", "wins"), new Command.Choice("kills", "kills"))
+				);
+		this.addBotCommand(command);
 		
 		//Command for displaying leaderboards of the Hunger Games.
-		command = new UnlistedBotCommand("stop", 0).setCommandListener((guild, channel, message, author, args) ->
+		command = new BotCommand("stop", "Interrompe l'esecuzione degli HungerGames.");
+		command.setCommandListener((event, guild, channel, author) ->
 		{
-			this.stopHungerGames(guild, channel, author);
+			this.stopHungerGames(event, guild, channel, author);
 			return true;
 		});
-		command.setHelp("Interrompe l'esecuzione degli HungerGames.");
-		this.addUnlistedBotCommand(command);
+		this.addBotCommand(command);
 	}
 	
-	private void sendCharacterCard(Guild guild, MessageChannel channel, Message message, User author, String[] args)
+	private void sendCharacterCard(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		Character character = null;
+		OptionMapping tagArg = event.getOption("tag");
 		
-		if (args == null)
+		if (tagArg == null)
 		{
 			character = HungerGamesController.getCharacter(guild.getId(), author.getId());
 		}
 		else
 		{
-			ArrayList<Member> members = BotMain.findUsersByName(guild, args[0]);
-			List<User> taggedUsers = message.getMentionedUsers();
-			
-			if (members.isEmpty())
+			//ArrayList<Member> members = BotMain.findUsersByName(guild, args[0]);
+			//List<User> taggedUsers = message.getMentionedUsers();
+			User user = tagArg.getAsUser();
+			character = HungerGamesController.getCharacter(guild.getId(), user.getId());
+			/*if (members.isEmpty())
 			{
 				//Try using tag.
 				if (taggedUsers.isEmpty())
@@ -139,7 +155,7 @@ public class HungerGamesListener extends BotListener
 			else
 			{
 				character = HungerGamesController.getCharacter(guild.getId(), members.get(0).getId());
-			}
+			}*/
 		}
 		
 		if (character != null)
@@ -193,80 +209,76 @@ public class HungerGamesListener extends BotListener
 			embedBuilder.setThumbnail((owner != null) ? owner.getEffectiveAvatarUrl() : null);
 			embedBuilder.setFooter("Creato da " + ownerName);
 			
-			channel.sendMessage((new MessageBuilder()).setEmbed(embedBuilder.build()).build()).queue();
+			event.reply((new MessageBuilder()).setEmbed(embedBuilder.build()).build()).setEphemeral(false).queue();
 		}
 		else
 		{
-			channel.sendMessage("> L'utente non ha creato nessun personaggio.").queue();
+			event.reply("> L'utente non ha creato nessun personaggio.").setEphemeral(false).queue();
 		}
 	}
 	
-	private void setCharacterEnabled(Guild guild, MessageChannel channel, User author, String[] args)
+	private void setCharacterEnabled(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		Character character = HungerGamesController.getCharacter(guild.getId(), author.getId());
 		MessageBuilder builder = new MessageBuilder();
-		
+		OptionMapping valueArg = event.getOption("value");
 		//This command cannot be used while HungerGames is running.
 		if (HungerGamesController.isHungerGamesRunning(guild.getId()))
 		{
 			builder = new MessageBuilder();
 			builder.append("> Non puoi usare questo comando mentre è in corso un HungerGames.");
-			channel.sendMessage(builder.build()).queue();
+			event.reply(builder.build()).queue();
 			return;
 		}
 		
 		if (character != null)
 		{
-			boolean enable;
 			
-			switch (args[0])
+			if (valueArg != null)
 			{
-				case "true":
-					enable = true;
-					break;
-				case "false":
-					enable = false;
-					break;
-				default:
-					builder.append("> L'argomento deve essere (true|false).");
-					channel.sendMessage(builder.build()).queue();
-					return;
+				boolean enable = valueArg.getAsBoolean();
+				
+				builder.appendFormat("> **%s** è stato %s.", character.getDisplayName(), enable ? "abilitato" : "disabilitato");
+				character.setEnabled(enable);
+				HungerGamesController.save(guild.getId());
 			}
-			
-			builder.appendFormat("> **%s** è stato %s.", character.getDisplayName(), enable ? "abilitato" : "disabilitato");
-			character.setEnabled(enable);
-			HungerGamesController.save(guild.getId());
+			else
+			{
+				builder.append("> L'argomento deve essere (true|false).");
+			}
 		}
 		else
 		{
-			builder.append("> Non hai creato nessun personaggio. Crea il tuo personaggio prima.");
+			builder.append("> Nessun personaggio trovato, crea il tuo personaggio.");
 		}
 		
-		channel.sendMessage(builder.build()).queue();
+		event.reply(builder.build()).setEphemeral(character == null || valueArg == null ).queue();
 	}
 	
-	private void setPlaybackSpeed(Guild guild, MessageChannel channel, String[] args)
+	private void setPlaybackSpeed(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		StringBuilder builder = new StringBuilder();
-		float playbackSpeed = Float.parseFloat(args[0]);
+		OptionMapping secondsArg = event.getOption("seconds");
 		
-		if (playbackSpeed <= 1.0f)
+		if (secondsArg != null && secondsArg.getAsLong() > 1.0f)
 		{
-			builder.append("> Il valore di speed deve essere > 1");
-		}
-		else
-		{
+			float playbackSpeed = secondsArg.getAsLong();
+			
 			HungerGamesController.setMessageSpeed(guild.getId(), playbackSpeed * 1000);
 			HungerGamesController.saveSettings(guild.getId());
 			builder.append("> Velocità di riproduzione degli HungerGames settata a " + playbackSpeed + " secondi.");
 		}
+		else
+		{
+			builder.append("> L'argomento seconds non è stato inviato oppure il suo valore è minore di 1 secondo.");
+		}
 		
-		channel.sendMessage(builder.toString()).queue();
+		event.reply(builder.toString()).setEphemeral(secondsArg == null || secondsArg.getAsLong() < 1.0f).queue();
 	}
 	
-	private void sendLeaderboard(Guild guild, MessageChannel channel, String[] args)
+	private void sendLeaderboard(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
-		String fieldName;
+		String fieldName = "Bug";
 		
 		EmbedBuilder embedBuilder = new EmbedBuilder();
 		MessageBuilder messageBuilder = new MessageBuilder();
@@ -274,37 +286,42 @@ public class HungerGamesListener extends BotListener
 		StringBuilder values = new StringBuilder();
 		
 		ArrayList<Character> leaderboard = new ArrayList<>(HungerGamesController.getCharacters(guild.getId()).values());
+		OptionMapping typeArg = event.getOption("type");
 		
-		switch (args[0])
+		if (typeArg != null)
 		{
-			case "wins":
-				embedBuilder.setTitle("Classifica vittorie Hunger Games");
-				leaderboard.sort((character1, character2) -> character2.getWins() - character1.getWins());
+			switch (typeArg.getAsString())
+			{
+				case "wins":
+					embedBuilder.setTitle("Classifica vittorie Hunger Games");
+					leaderboard.sort((character1, character2) -> character2.getWins() - character1.getWins());
+					
+					for (Character character : leaderboard)
+					{
+						values.append("" + character.getWins() + "\n");
+					}
+					
+					fieldName = "Vittorie";
+					break;
 				
-				for (Character character : leaderboard)
-				{
-					values.append("" + character.getWins() + "\n");
-				}
-				
-				fieldName = "Vittorie";
-				break;
-			
-			case "kills":
-				embedBuilder.setTitle("Classifica uccisioni Hunger Games");
-				leaderboard.sort((character1, character2) -> character2.getKills() - character1.getKills());
-				
-				for (Character character : leaderboard)
-				{
-					values.append("" + character.getKills() + "\n");
-				}
-				
-				fieldName = "Uccisioni";
-				break;
-			
-			default:
-				messageBuilder.append("> L'argomento deve essere (wins|kills).");
-				channel.sendMessage(messageBuilder.build()).queue();
-				return;
+				case "kills":
+					embedBuilder.setTitle("Classifica uccisioni Hunger Games");
+					leaderboard.sort((character1, character2) -> character2.getKills() - character1.getKills());
+					
+					for (Character character : leaderboard)
+					{
+						values.append("" + character.getKills() + "\n");
+					}
+					
+					fieldName = "Uccisioni";
+					break;
+			}
+		}
+		else
+		{
+			messageBuilder.append("> L'argomento deve essere (wins|kills).");
+			event.reply(messageBuilder.build()).setEphemeral(false).queue();
+			return;
 		}
 		
 		for (Character character : leaderboard)
@@ -316,14 +333,15 @@ public class HungerGamesListener extends BotListener
 		embedBuilder.addField(fieldName, values.toString(), true);
 		messageBuilder.setEmbed(embedBuilder.build());
 		
-		channel.sendMessage(messageBuilder.build()).queue();
+		event.reply(messageBuilder.build()).setEphemeral(true).queue();
 	}
 	
-	private void stopHungerGames(Guild guild, MessageChannel channel, User author)
+	private void stopHungerGames(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		MessageBuilder builder = new MessageBuilder();
+		boolean isRunning = HungerGamesController.isHungerGamesRunning(guild.getId());
 		
-		if (HungerGamesController.isHungerGamesRunning(guild.getId()))
+		if (isRunning)
 		{
 			HungerGamesController.stopHungerGames(guild.getId());
 			
@@ -334,6 +352,6 @@ public class HungerGamesListener extends BotListener
 			builder.appendFormat("> Nessun HungerGames in esecuzione.");
 		}
 		
-		channel.sendMessage(builder.build()).queue();
+		event.reply(builder.build()).setEphemeral(!isRunning).queue();
 	}
 }
