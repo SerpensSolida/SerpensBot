@@ -11,7 +11,7 @@ import java.util.HashMap;
 /**
  * Represents a command that can be sent to the chat.
  */
-public class Command
+public class UnlistedBotCommand
 {
 	private String id; //ID of the command, used to identify unequivocally a command.
 	private int maxArgumentNumber; //Max number of argument of the command.
@@ -20,10 +20,10 @@ public class Command
 	private String help; //String that describe the command.
 	private String argumentsDescription; //String that describe arguments of the command.
 	private HashMap<String, String> modulePrefix = new HashMap<>(); //Prefix of the module that owns this command.
-	private CommandAction action; //Callback that is called when the command is sent to the chat.
+	private UnlistedBotCommandAction action; //Callback that is called when the command is sent to the chat.
 	private String defaultModulePrefix; //Default module prefix.
 	
-	public Command(String id, int maxArgumentNumber)
+	public UnlistedBotCommand(String id, int maxArgumentNumber)
 	{
 		this.id = id;
 		this.maxArgumentNumber = maxArgumentNumber;
@@ -39,7 +39,7 @@ public class Command
 	 *
 	 * @return The command.
 	 */
-	public Command setCommandListener(CommandAction action)
+	public UnlistedBotCommand setCommandListener(UnlistedBotCommandAction action)
 	{
 		this.action = action;
 		return this;
@@ -78,8 +78,8 @@ public class Command
 		
 		if (arguments.length == 1 && arguments[0].isBlank())
 		{
-			//If there are no arguments set them to null instead of empty string.
-			data.arguments = null;
+			//If there are no arguments return null.
+			return null;
 		}
 		
 		return data;

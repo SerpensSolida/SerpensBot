@@ -7,11 +7,15 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class BotListener extends ListenerAdapter
@@ -20,30 +24,30 @@ public class BotListener extends ListenerAdapter
 	private String internalID = ""; //Internal id used for retrieving listeners from the list.
 	private String moduleName = ""; //Readable name of the module.
 	private HashMap<String, HashMap<User, Task>> tasks = new HashMap<>(); //List of task currently running. //TODO: Make task linked to servers.
-	private HashMap<String, Command> commands = new HashMap<>(); //List of commands of the module.
+	private HashMap<String, UnlistedBotCommand> unlistedBotCommands = new HashMap<>(); //List of commands of the module.
+	public HashMap<String, BotCommand> botCommands = new HashMap<>(); //List of commands of the module that are displayed in the client command list. //TODO: Encapsulate.
 	
 	public BotListener(String modulePrefix)
 	{
 		//this.modulePrefix = modulePrefix;
 		this.internalID = modulePrefix;
 		
-		Command command = new Command("cancel", 0).setCommandListener((guild, channel, message, author, args) ->
+		BotCommand command = new BotCommand("cancel", "Cancella la procedura corrente.");
+		command.setCommandListener((event, guild, channel, author) ->
 		{
-			this.cancelTask(guild, channel, author);
+			this.cancelTask(event, guild, channel, author);
 			return true;
 		});
-		command.setHelp("Cancella la procedura corrente.");
-		this.addCommand(command);
+		this.addBotCommand(command);
 		
-		command = new Command("help", 1).setCommandListener((guild, channel, message, author, args) ->
+		command = new BotCommand("help", "Mostra questo messaggio oppure le info su come usare il comando dato.");
+		command.setCommandListener((event, guild, channel, author) ->
 		{
-			this.sendHelp(guild, channel, author, args);
+			this.sendHelp(event, guild, channel, author);
 			return true;
 		});
-		command.setMinArgumentNumber(0);
-		command.setHelp("Mostra questo messaggio oppure le info su come usare il comando dato.");
-		command.setArgumentsDescription("[nome_comando]");
-		this.addCommand(command);
+		this.addBotCommand(command);
+		
 	}
 	
 	public void onMessageReceived(@Nonnull MessageReceivedEvent event)
@@ -62,8 +66,8 @@ public class BotListener extends ListenerAdapter
 		
 		if (message.startsWith(commandPrefix) && !commandPrefix.equals(message.strip())) //The message is a command.
 		{
-			Command.CommandData data = Command.getCommandDataFromString(commandPrefix, message);
-			Command command = this.getCommand(data.commandID);
+			UnlistedBotCommand.CommandData data = UnlistedBotCommand.getCommandDataFromString(commandPrefix, message);
+			UnlistedBotCommand command = this.getUnlistedBotCommand(data.commandID);
 			String[] arguments = data.arguments;
 			
 			//Check if the command exists.
@@ -145,7 +149,46 @@ public class BotListener extends ListenerAdapter
 		});
 	}
 	
-	private void cancelTask(Guild guild, MessageChannel channel, User author)
+	@Override
+	public void onSlashCommand(@Nonnull SlashCommandEvent event)
+	{
+		Guild guild = event.getGuild();
+		
+		if (guild == null)
+			return;
+		
+		if (!event.getName().equals(this.getModulePrefix(guild.getId())))
+			return;
+		
+		BotCommand command = this.getBotCommand(event.getSubcommandName());
+		command.doAction(event);
+		
+	}
+	
+	public ArrayList<CommandData> generateCommands(Guild guild)
+	{
+		ArrayList<CommandData> commandList = new ArrayList<>();
+		
+		if (this.getModulePrefix(guild.getId()).isEmpty())
+			return commandList;
+		
+		CommandData mainCommand = new CommandData(this.getModulePrefix(guild.getId()) , "Main module command");
+		for (BotCommand botCommand : this.botCommands.values())
+		{
+			mainCommand.addSubcommands(botCommand.getSubcommand());
+		}
+		
+		commandList.add(mainCommand);
+		return commandList;
+	}
+	
+	/*@Override
+	public void onGenericGuild(@Nonnull GenericGuildEvent event)
+	{
+		BotMain.loadSettings(event.getGuild().getId());
+	}*/
+	
+	private void cancelTask(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		MessageBuilder builder = new MessageBuilder();
 		
@@ -162,7 +205,7 @@ public class BotListener extends ListenerAdapter
 		channel.sendMessage(builder.build()).queue();
 	}
 	
-	private void sendHelp(Guild guild, MessageChannel channel, User author, String[] args)
+	private void sendHelp(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		EmbedBuilder embedBuilder = new EmbedBuilder();
 		
@@ -170,23 +213,44 @@ public class BotListener extends ListenerAdapter
 		embedBuilder.setFooter("Richiesto da " + author.getName(), author.getAvatarUrl());
 		embedBuilder.setAuthor(BotMain.api.getSelfUser().getName(), "https://github.com/SerpensSolida/SerpensBot", BotMain.api.getSelfUser().getAvatarUrl());
 		
-		if (args == null)
+		OptionMapping commandName = event.getOption("nomecomando");
+		if (commandName == null)
 		{
 			//Send list of commands.
 			embedBuilder.setTitle("Lista comandi modulo " + this.getModuleName());
 			
-			for (Command command : this.commands.values())
+			if (!this.botCommands.isEmpty())
 			{
-				embedBuilder.appendDescription("`" + command.getArgumentsDescription(guild.getId()) + "`")
-						.appendDescription(" " + command.getHelp() + "\n");
+				StringBuilder commandField = new StringBuilder();
+				for (BotCommand command : this.botCommands.values())
+				{
+					commandField
+							.append("`/" + this.getModulePrefix(guild.getId()) + " " + command.getSubcommand().getName() + "`")
+							.append(" " + command.getSubcommand().getDescription() + "\n");
+				}
+				
+				embedBuilder.addField("**Comandi listati**", commandField.toString(), false);
+			}
+			
+			if (!this.unlistedBotCommands.isEmpty())
+			{
+				StringBuilder commandField = new StringBuilder();
+				for (UnlistedBotCommand command : this.unlistedBotCommands.values())
+				{
+					commandField
+							.append("`" + command.getArgumentsDescription(guild.getId()) + "`")
+							.append(" " + command.getHelp() + "\n");
+				}
+				
+				embedBuilder.addField("**Comandi non listati**", commandField.toString(), false);
 			}
 			
 		}
 		else
 		{
 			//Send command info.
-			String commandID = args[0];
-			Command command = this.getCommand(commandID);
+			String commandID = commandName.getAsString();
+			UnlistedBotCommand command = this.getUnlistedBotCommand(commandID);
 			
 			if (command != null)
 			{
@@ -201,12 +265,14 @@ public class BotListener extends ListenerAdapter
 			}
 		}
 		
-		channel.sendMessage(new MessageBuilder().setEmbed(embedBuilder.build()).build()).queue();
+		//channel.sendMessage(new MessageBuilder().setEmbed(embedBuilder.build()).build()).queue();
+		event.reply(new MessageBuilder().setEmbed(embedBuilder.build()).build()).setEphemeral(false).queue();
 	}
 	
 	public void setModulePrefix(String guildID, String modulePrefix)
 	{
-		for (Command command : this.commands.values())
+		//Change unlisted command prefix.
+		for (UnlistedBotCommand command : this.unlistedBotCommands.values())
 		{
 			command.setModulePrefix(guildID, modulePrefix);
 		}
@@ -234,23 +300,42 @@ public class BotListener extends ListenerAdapter
 		this.internalID = internalID;
 	}
 	
-	public void addCommand(Command command)
+	public void addBotCommand(BotCommand command)
+	{
+		if (command != null)
+		{
+			//command.setDefaultPrefix(this.internalID);
+			this.botCommands.put(command.getId(), command);
+		}
+	}
+	
+	public void removeBotCommand(String id)
+	{
+		this.botCommands.remove(id);
+	}
+	
+	public BotCommand getBotCommand(String id)
+	{
+		return this.botCommands.get(id);
+	}
+	
+	public void addUnlistedBotCommand(UnlistedBotCommand command)
 	{
 		if (command != null)
 		{
 			command.setDefaultPrefix(this.internalID);
-			this.commands.put(command.getId(), command);
+			this.unlistedBotCommands.put(command.getId(), command);
 		}
 	}
 	
-	public void removeCommand(String id)
+	public void removeUnlistedBotCommand(String id)
 	{
-		this.commands.remove(id);
+		this.unlistedBotCommands.remove(id);
 	}
 	
-	public Command getCommand(String id)
+	public UnlistedBotCommand getUnlistedBotCommand(String id)
 	{
-		return this.commands.get(id);
+		return this.unlistedBotCommands.get(id);
 	}
 	
 	public Task getTask(String guildID, User user)

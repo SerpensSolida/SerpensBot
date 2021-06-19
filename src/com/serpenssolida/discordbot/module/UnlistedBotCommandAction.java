@@ -6,9 +6,9 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 
 /**
- * Used by {@link Command} as callback when the command is used in a chat.
+ * Used by {@link UnlistedBotCommand} as callback when the command is used in a chat.
  */
-public interface CommandAction
+public interface UnlistedBotCommandAction
 {
 	/**
 	 * Called when the command is sent to the chat.

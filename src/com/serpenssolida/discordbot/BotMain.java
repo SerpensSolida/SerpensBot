@@ -13,7 +13,9 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 import javax.security.auth.login.LoginException;
@@ -46,8 +48,6 @@ public class BotMain
 					.enableIntents(GatewayIntent.GUILD_MEMBERS)
 					.build();
 			api.awaitReady();
-			
-			System.out.println("Bot ready!");
 		}
 		catch (LoginException e)
 		{
@@ -62,6 +62,35 @@ public class BotMain
 		api.addEventListener(new SettingsListener());
 		api.addEventListener(new HungerGamesListener());
 		api.addEventListener(new BaseListener());
+		
+		System.out.println("Bot ready!");
+	}
+	
+	public static void updateAllGuildsCommands()
+	{
+		for (Guild guild : api.getGuilds())
+		{
+			BotMain.updateGuildCommands(guild);
+		}
+	}
+	
+	public static void updateGuildCommands(Guild guild)
+	{
+		CommandListUpdateAction commands = guild.updateCommands();
+		for (Object registeredListener : BotMain.api.getRegisteredListeners())
+		{
+			if (registeredListener instanceof BotListener)
+			{
+				BotListener listener = (BotListener) registeredListener;
+				
+				for (CommandData commandData : listener.generateCommands(guild))
+				{
+					commands.addCommands(commandData);
+				}
+			}
+		}
+		
+		commands.queue(a -> System.out.println("Comandi per la guild \"" + guild.getName() + "\" cambiati correttamente."));
 	}
 	
 	public static ArrayList<Member> findUsersByName(Guild guild, String userName)
@@ -175,6 +204,12 @@ public class BotMain
 				{
 					listener.setModulePrefix(guildID, modulePrefixes.get(listener.getInternalID()));
 				}
+			}
+			
+			Guild guild = BotMain.api.getGuildById(guildID);
+			if (guild != null)
+			{
+				BotMain.updateGuildCommands(guild);
 			}
 		}
 		catch (FileNotFoundException e)

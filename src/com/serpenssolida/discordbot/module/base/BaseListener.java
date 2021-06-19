@@ -8,9 +8,12 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 
 import javax.annotation.Nonnull;
+import java.util.ArrayList;
 
 public class BaseListener extends BotListener
 {
@@ -21,8 +24,17 @@ public class BaseListener extends BotListener
 		//this.setModulePrefix(guildID, "");
 		
 		//Module has no tasks and cannot get help.
-		this.removeCommand("help");
-		this.removeCommand("cancel");
+		this.botCommands.clear();
+	}
+	
+	@Override
+	public ArrayList<CommandData> generateCommands(Guild guild)
+	{
+		ArrayList<CommandData> commandList = new ArrayList<>();
+		CommandData mainCommand = new CommandData("help" , "Mostra la lista di moduli disponibili.");
+		
+		commandList.add(mainCommand);
+		return commandList;
 	}
 	
 	@Override
@@ -37,11 +49,7 @@ public class BaseListener extends BotListener
 		if (BotMain.api.getSelfUser().getId().equals(author.getId())) return;
 		
 		//Parse special commands.
-		if ((BotMain.getCommandSymbol(guild.getId()) + "help").equals(message))
-		{
-			this.sendModuleHelp(guild, channel, author);
-		}
-		else if ("!!reset symbol".equals(message))
+		if ("!!reset symbol".equals(message))
 		{
 			this.resetCommandSymbol(guild, channel, author);
 		}
@@ -49,6 +57,15 @@ public class BaseListener extends BotListener
 		{
 			this.resetPrefixes(guild, channel, author);
 		}
+	}
+	
+	@Override
+	public void onSlashCommand(@Nonnull SlashCommandEvent event)
+	{
+		if (!"help".equals(event.getName()))
+			return;
+		
+		this.sendModuleHelp(event, event.getGuild(), event.getChannel(), event.getUser());
 	}
 	
 	/**
@@ -90,6 +107,7 @@ public class BaseListener extends BotListener
 			listener.setModulePrefix(guild.getId(), listener.getInternalID());
 		}
 		
+		BotMain.updateGuildCommands(guild);
 		BotMain.saveSettings(guild.getId());
 		
 		channel.sendMessage("> Prefisso dei moduli resettato correttamente.").queue();
@@ -98,7 +116,7 @@ public class BaseListener extends BotListener
 	/**
 	 * Send a message containing all help commands of the modules.
 	 */
-	private void sendModuleHelp(Guild guild, MessageChannel channel, User author)
+	private void sendModuleHelp(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		MessageBuilder messageBuilder = new MessageBuilder();
 		EmbedBuilder embedBuilder = new EmbedBuilder();
@@ -126,7 +144,7 @@ public class BaseListener extends BotListener
 		embedBuilder.addField("Comando help", builderCommands.toString(), true);
 		
 		messageBuilder.setEmbed(embedBuilder.build());
-		channel.sendMessage(messageBuilder.build()).queue();
+		event.reply(messageBuilder.build()).setEphemeral(false).queue();
 	}
 	
 	@Override

@@ -2,7 +2,7 @@ package com.serpenssolida.discordbot.module.hungergames;
 
 import com.serpenssolida.discordbot.BotMain;
 import com.serpenssolida.discordbot.module.BotListener;
-import com.serpenssolida.discordbot.module.Command;
+import com.serpenssolida.discordbot.module.UnlistedBotCommand;
 import com.serpenssolida.discordbot.module.hungergames.task.CreateCharacterTask;
 import com.serpenssolida.discordbot.module.hungergames.task.EditCharacterTask;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -20,16 +20,16 @@ public class HungerGamesListener extends BotListener
 		this.setModuleName("HungerGames");
 		
 		//Command for creating a character.
-		Command command = new Command("create", 0).setCommandListener((guild, channel, message, author, args) ->
+		UnlistedBotCommand command = new UnlistedBotCommand("create", 0).setCommandListener((guild, channel, message, author, args) ->
 		{
 			this.addTask(guild.getId(), new CreateCharacterTask(guild, author, channel));
 			return true;
 		});
 		command.setHelp("Fa partire la procedura per la creazione di un personaggio.");
-		this.addCommand(command);
+		this.addUnlistedBotCommand(command);
 		
 		//Command for displaying character info.
-		command = new Command("character", 1).setCommandListener((guild, channel, message, author, args) ->
+		command = new UnlistedBotCommand("character", 1).setCommandListener((guild, channel, message, author, args) ->
 		{
 			this.sendCharacterCard(guild, channel, message, author, args);
 			return true;
@@ -38,64 +38,64 @@ public class HungerGamesListener extends BotListener
 		command.setJoinArguments(true);
 		command.setArgumentsDescription("[nome_utente|nickname_utente|tag_utente]");
 		command.setHelp("Invia alla chat la card delle statistiche del personaggio.");
-		this.addCommand(command);
+		this.addUnlistedBotCommand(command);
 		
 		//Command for editing a character.
-		command = new Command("edit", 0).setCommandListener((guild, channel, message, author, args) ->
+		command = new UnlistedBotCommand("edit", 0).setCommandListener((guild, channel, message, author, args) ->
 		{
 			this.addTask(guild.getId(), new EditCharacterTask(guild, author, channel));
 			return true;
 		});
 		command.setHelp("Fa partire la procedura di modifica del personaggio.");
-		this.addCommand(command);
+		this.addUnlistedBotCommand(command);
 		
 		//Command for enabling or disabling a character.
-		command = new Command("enable", 1).setCommandListener((guild, channel, message, author, args) ->
+		command = new UnlistedBotCommand("enable", 1).setCommandListener((guild, channel, message, author, args) ->
 		{
 			this.setCharacterEnabled(guild, channel, author, args);
 			return true;
 		});
 		command.setHelp("Abilita/Disabilita il personaggio. Un personaggio disabilitato non parteciperà agli HungerGames.");
 		command.setArgumentsDescription("(true|false)");
-		this.addCommand(command);
+		this.addUnlistedBotCommand(command);
 		
 		//Command for starting a new HungerGames.
-		command = new Command("start", 0).setCommandListener((guild, channel, message, author, args) ->
+		command = new UnlistedBotCommand("start", 0).setCommandListener((guild, channel, message, author, args) ->
 		{
 			HungerGamesController.startHungerGames(guild.getId(), channel);
 			return true;
 		});
 		command.setHelp("Inizia un edizione degli Hunger Games!");
-		this.addCommand(command);
+		this.addUnlistedBotCommand(command);
 		
 		//Command for editing playback speed of the HungerGames.
-		command = new Command("speed", 1).setCommandListener((guild, channel, message, author, args) ->
+		command = new UnlistedBotCommand("speed", 1).setCommandListener((guild, channel, message, author, args) ->
 		{
 			this.setPlaybackSpeed(guild, channel, args);
 			return true;
 		});
 		command.setHelp("Modifica la velocità di riproduzione degli Hunger Games (velocità minima 1 secondo).");
 		command.setArgumentsDescription("secondi");
-		this.addCommand(command);
+		this.addUnlistedBotCommand(command);
 		
 		//Command for displaying leaderboards of the Hunger Games.
-		command = new Command("leaderboard", 1).setCommandListener((guild, channel, message, author, args) ->
+		command = new UnlistedBotCommand("leaderboard", 1).setCommandListener((guild, channel, message, author, args) ->
 		{
 			this.sendLeaderboard(guild, channel, args);
 			return true;
 		});
 		command.setHelp("Visualizza le classifiche degli HungerGames.");
 		command.setArgumentsDescription("(wins|kills)");
-		this.addCommand(command);
+		this.addUnlistedBotCommand(command);
 		
 		//Command for displaying leaderboards of the Hunger Games.
-		command = new Command("stop", 0).setCommandListener((guild, channel, message, author, args) ->
+		command = new UnlistedBotCommand("stop", 0).setCommandListener((guild, channel, message, author, args) ->
 		{
 			this.stopHungerGames(guild, channel, author);
 			return true;
 		});
 		command.setHelp("Interrompe l'esecuzione degli HungerGames.");
-		this.addCommand(command);
+		this.addUnlistedBotCommand(command);
 	}
 	
 	private void sendCharacterCard(Guild guild, MessageChannel channel, Message message, User author, String[] args)
