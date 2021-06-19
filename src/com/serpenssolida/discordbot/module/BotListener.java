@@ -284,7 +284,10 @@ public class BotListener extends ListenerAdapter
 	{
 		if (!this.modulePrefix.containsKey(guildID))
 		{
-			this.modulePrefix.put(guildID, this.internalID);
+			BotMain.loadSettings(guildID); //Try loading the settings.
+			
+			if (!this.modulePrefix.containsKey(guildID)) //Settings for this guild not found.
+				this.modulePrefix.put(guildID, this.internalID);
 		}
 		
 		return this.modulePrefix.get(guildID);
