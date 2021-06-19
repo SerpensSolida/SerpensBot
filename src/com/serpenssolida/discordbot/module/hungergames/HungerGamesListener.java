@@ -260,7 +260,7 @@ public class HungerGamesListener extends BotListener
 		StringBuilder builder = new StringBuilder();
 		OptionMapping secondsArg = event.getOption("seconds");
 		
-		if (secondsArg != null && secondsArg.getAsLong() > 1.0f)
+		if (secondsArg != null && secondsArg.getAsLong() >= 1.0f)
 		{
 			float playbackSpeed = secondsArg.getAsLong();
 			
