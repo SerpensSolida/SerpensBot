@@ -1,18 +1,22 @@
 package com.serpenssolida.discordbot.module;
 
 import com.serpenssolida.discordbot.BotMain;
+import com.serpenssolida.discordbot.ButtonGroup;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.components.Button;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
@@ -25,7 +29,8 @@ public class BotListener extends ListenerAdapter
 	private String moduleName = ""; //Readable name of the module.
 	private HashMap<String, HashMap<User, Task>> tasks = new HashMap<>(); //List of task currently running. //TODO: Make task linked to servers.
 	private HashMap<String, UnlistedBotCommand> unlistedBotCommands = new HashMap<>(); //List of commands of the module.
-	public HashMap<String, BotCommand> botCommands = new HashMap<>(); //List of commands of the module that are displayed in the client command list. //TODO: Encapsulate.
+	private HashMap<String, BotCommand> botCommands = new HashMap<>(); //List of commands of the module that are displayed in the client command list. //TODO: Encapsulate.
+	private HashMap<String, HashMap<User, ButtonGroup>> buttonGroups = new HashMap<>();
 	
 	public BotListener(String modulePrefix)
 	{
@@ -33,7 +38,7 @@ public class BotListener extends ListenerAdapter
 		this.internalID = modulePrefix;
 		
 		BotCommand command = new BotCommand("cancel", "Cancella la procedura corrente.");
-		command.setCommandListener((event, guild, channel, author) ->
+		command.setAction((event, guild, channel, author) ->
 		{
 			this.cancelTask(event, guild, channel, author);
 			return true;
@@ -41,13 +46,12 @@ public class BotListener extends ListenerAdapter
 		this.addBotCommand(command);
 		
 		command = new BotCommand("help", "Mostra questo messaggio oppure le info su come usare il comando dato.");
-		command.setCommandListener((event, guild, channel, author) ->
+		command.setAction((event, guild, channel, author) ->
 		{
 			this.sendHelp(event, guild, channel, author);
 			return true;
 		});
 		this.addBotCommand(command);
-		
 	}
 	
 	public void onMessageReceived(@Nonnull MessageReceivedEvent event)
@@ -107,10 +111,11 @@ public class BotListener extends ListenerAdapter
 		else if (task != null && task.getChannel().equals(channel))
 		{
 			//Pass the event to the task.
-			Task.TaskResult result = task.consumeMessage(event.getMessage());
+			task.consumeMessage(event.getMessage());
+			task.deleteButtons();
 			
 			//Remove the task if it finished.
-			if (result == Task.TaskResult.Finished)
+			if (!task.isRunning())
 			{
 				this.removeTask(guild.getId(), task);
 			}
@@ -139,10 +144,10 @@ public class BotListener extends ListenerAdapter
 		//Get the message the reaction was added to.
 		event.retrieveMessage().queue(message ->
 		{
-			Task.TaskResult result = task.consumeReaction(message, messageReaction.getReactionEmote().getName());
+			task.consumeReaction(message, messageReaction.getReactionEmote().getName());
 			
 			//Remove the task if it finished.
-			if (result == Task.TaskResult.Finished)
+			if (!task.isRunning())
 			{
 				this.removeTask(guild.getId(), task);
 			}
@@ -163,6 +168,66 @@ public class BotListener extends ListenerAdapter
 		BotCommand command = this.getBotCommand(event.getSubcommandName());
 		command.doAction(event);
 		
+	}
+	
+	@Override
+	public void onButtonClick(@Nonnull ButtonClickEvent event)
+	{
+		Button button = event.getButton(); //Reaction added to the message.
+		User author = event.getUser(); //The user that added the reaction.
+		Guild guild = event.getGuild(); //The user that added the reaction.
+		MessageChannel channel = event.getChannel(); //Channel where the event occurred.
+		
+		//Ignore bot reaction.
+		if (BotMain.api.getSelfUser().getId().equals(author.getId()))
+			return;
+		
+		//Get the button that the user can press.
+		ButtonGroup buttonGroup = this.getButtonGroup(guild.getId(), author);
+		
+		//Task can have buttons too.
+		Task task = this.getTask(guild.getId(), author);
+		
+		//If no button group are found that means the author can't press this button.
+		if (buttonGroup != null)
+		{
+			ButtonCallback buttonCallback = buttonGroup.getButton(button.getId());
+			event.deferEdit().queue(); //Let discord know we know the button has been clicked.
+			
+			//Do command action.
+			boolean deleteMessage = buttonCallback.doAction(event);
+			
+			//Delete command message if the command was successfully ran.
+			if (BotMain.getDeleteCommandMessages(guild.getId()) && deleteMessage)
+			{
+				channel.deleteMessageById(event.getMessageId()).queue();
+			}
+		}
+		else if (task != null)
+		{
+			buttonGroup = task.getButtonGroup();
+			
+			if (buttonGroup != null)
+			{
+				ButtonCallback buttonCallback = buttonGroup.getButton(button.getId());
+				
+				//Do command action.
+				boolean deleteMessage = buttonCallback.doAction(event);
+				task.deleteButtons();
+				
+				//Delete command message if the command was successfully ran.
+				if (BotMain.getDeleteCommandMessages(guild.getId()) && deleteMessage)
+				{
+					channel.deleteMessageById(event.getMessageId()).queue();
+				}
+				
+				//Remove the task if it finished.
+				if (!task.isRunning())
+				{
+					this.removeTask(guild.getId(), task);
+				}
+			}
+		}
 	}
 	
 	public ArrayList<CommandData> generateCommands(Guild guild)
@@ -191,8 +256,9 @@ public class BotListener extends ListenerAdapter
 	private void cancelTask(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		MessageBuilder builder = new MessageBuilder();
+		Task task = this.getTask(guild.getId(), author);
 		
-		if (this.getTask(guild.getId(), author) != null)
+		if (task != null)
 		{
 			this.removeTask(guild.getId(), this.getTask(guild.getId(), author));
 			builder.append("> La procedura corrente è stata annullata.");
@@ -202,7 +268,7 @@ public class BotListener extends ListenerAdapter
 			builder.append("> Nessuna procedura in corso.");
 		}
 		
-		channel.sendMessage(builder.build()).queue();
+		event.reply(builder.build()).setEphemeral(task == null).queue();
 	}
 	
 	private void sendHelp(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
@@ -351,7 +417,13 @@ public class BotListener extends ListenerAdapter
 		return this.tasks.get(guildID).get(user);
 	}
 	
-	public void addTask(String guildID, Task task)
+	protected void startTask(String guildID, Task task, GenericInteractionCreateEvent event)
+	{
+		this.addTask(guildID, task);
+		task.start(event);
+	}
+	
+	protected void addTask(String guildID, Task task)
 	{
 		if (task.isInterrupted())
 		{
@@ -377,7 +449,7 @@ public class BotListener extends ListenerAdapter
 		this.tasks.get(guildID).put(user, task);
 	}
 	
-	public void removeTask(String guildID, Task task)
+	protected void removeTask(String guildID, Task task)
 	{
 		if (!this.tasks.containsKey(guildID))
 		{
@@ -385,6 +457,24 @@ public class BotListener extends ListenerAdapter
 		}
 		
 		this.tasks.get(guildID).remove(task.getUser());
+	}
+	
+	public void addButtonGroup(String guildID, ButtonGroup buttonGroup)
+	{
+		HashMap<User, ButtonGroup> guildButtonGroups = this.buttonGroups.computeIfAbsent(guildID, k -> new HashMap<>());
+		guildButtonGroups.put(buttonGroup.getUser(), buttonGroup);
+	}
+	
+	public ButtonGroup getButtonGroup(String guildID, User user)
+	{
+		HashMap<User, ButtonGroup> guildButtonGroups = this.buttonGroups.computeIfAbsent(guildID, k -> new HashMap<>());
+		return guildButtonGroups.get(user);
+	}
+	
+	public void removeButtonGroup(String guildID, User user)
+	{
+		HashMap<User, ButtonGroup> guildButtonGroups = this.buttonGroups.computeIfAbsent(guildID, k -> new HashMap<>());
+		guildButtonGroups.remove(user);
 	}
 	
 	public String getModuleName()
@@ -395,5 +485,15 @@ public class BotListener extends ListenerAdapter
 	public void setModuleName(String moduleName)
 	{
 		this.moduleName = moduleName;
+	}
+	
+	public HashMap<String, BotCommand> getBotCommands()
+	{
+		return this.botCommands;
+	}
+	
+	public void setBotCommands(HashMap<String, BotCommand> botCommands)
+	{
+		this.botCommands = botCommands;
 	}
 }

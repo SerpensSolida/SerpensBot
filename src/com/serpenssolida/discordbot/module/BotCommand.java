@@ -17,6 +17,11 @@ public class BotCommand
 	{
 		this.id = id;
 		this.subcommand = new SubcommandData(this.id, description);
+		this.action = (event, guild, channel, author) ->
+		{
+			event.reply("Ops, qualcuno si è scordato di settare una callback per questo comando!").queue();
+			return true;
+		};
 		/*this.maxArgumentNumber = maxArgumentNumber;
 		this.minArgumentNumber = maxArgumentNumber;
 		this.argumentsDescription = "";*/
@@ -30,7 +35,7 @@ public class BotCommand
 	 *
 	 * @return The command.
 	 */
-	public BotCommand setCommandListener(BotCommandAction action)
+	public BotCommand setAction(BotCommandAction action)
 	{
 		this.action = action;
 		return this;

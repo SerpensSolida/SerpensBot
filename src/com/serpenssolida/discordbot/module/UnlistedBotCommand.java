@@ -29,6 +29,11 @@ public class UnlistedBotCommand
 		this.maxArgumentNumber = maxArgumentNumber;
 		this.minArgumentNumber = maxArgumentNumber;
 		this.argumentsDescription = "";
+		this.action = (guild, channel, message, author, args) ->
+		{
+			message.reply("Ops, qualcuno si è scordato di settare una callback per questo comando!").queue();
+			return true;
+		};
 	}
 	
 	/**
@@ -39,7 +44,7 @@ public class UnlistedBotCommand
 	 *
 	 * @return The command.
 	 */
-	public UnlistedBotCommand setCommandListener(UnlistedBotCommandAction action)
+	public UnlistedBotCommand setAction(UnlistedBotCommandAction action)
 	{
 		this.action = action;
 		return this;

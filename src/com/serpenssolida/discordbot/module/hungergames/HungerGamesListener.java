@@ -27,17 +27,16 @@ public class HungerGamesListener extends BotListener
 		
 		//Command for creating a character.
 		BotCommand command = new BotCommand("create", "Fa partire la procedura per la creazione di un personaggio.");
-		command.setCommandListener((event, guild, channel, author) ->
+		command.setAction((event, guild, channel, author) ->
 		{
-			event.reply("> E' stata iniziata una nuova procedura!").queue();
-			this.addTask(guild.getId(), new CreateCharacterTask(guild, author, channel));
+			this.startTask(guild.getId(), new CreateCharacterTask(guild, author, channel), event);
 			return true;
 		});
 		this.addBotCommand(command);
 		
 		//Command for displaying character info.
 		command = new BotCommand("character", "Invia alla chat la card delle statistiche del personaggio.");
-		command.setCommandListener((event, guild, channel, author) ->
+		command.setAction((event, guild, channel, author) ->
 		{
 			this.sendCharacterCard(event, guild, channel, author);
 			return true;
@@ -48,17 +47,16 @@ public class HungerGamesListener extends BotListener
 		
 		//Command for editing a character.
 		command = new BotCommand("edit", "Fa partire la procedura di modifica del personaggio.");
-		command.setCommandListener((event, guild, channel, author) ->
+		command.setAction((event, guild, channel, author) ->
 		{
-			event.reply("> E' stata iniziata una nuova procedura!").queue();
-			this.addTask(guild.getId(), new EditCharacterTask(guild, author, channel));
+			this.startTask(guild.getId(), new EditCharacterTask(guild, author, channel), event);
 			return true;
 		});
 		this.addBotCommand(command);
 		
 		//Command for enabling or disabling a character.
 		command = new BotCommand("enable", "Abilita/Disabilita il personaggio. Un personaggio disabilitato non parteciperà agli HungerGames.");
-		command.setCommandListener((event, guild, channel, author) ->
+		command.setAction((event, guild, channel, author) ->
 		{
 			this.setCharacterEnabled(event, guild, channel, author);
 			return true;
@@ -69,7 +67,7 @@ public class HungerGamesListener extends BotListener
 		
 		//Command for starting a new HungerGames.
 		command = new BotCommand("start", "Inizia un edizione degli Hunger Games!");
-		command.setCommandListener((event, guild, channel, author) ->
+		command.setAction((event, guild, channel, author) ->
 		{
 			event.reply("> L'hunger games sta partendo!").queue();
 			HungerGamesController.startHungerGames(guild.getId(), channel);
@@ -79,7 +77,7 @@ public class HungerGamesListener extends BotListener
 		
 		//Command for editing playback speed of the HungerGames.
 		command = new BotCommand("speed", "Modifica la velocità di riproduzione degli Hunger Games (velocità minima 1 secondo).");
-		command.setCommandListener((event, guild, channel, author) ->
+		command.setAction((event, guild, channel, author) ->
 		{
 			this.setPlaybackSpeed(event, guild, channel, author);
 			return true;
@@ -90,7 +88,7 @@ public class HungerGamesListener extends BotListener
 		
 		//Command for displaying leaderboards of the Hunger Games.
 		command = new BotCommand("leaderboard", "Visualizza le classifiche degli HungerGames.");
-		command.setCommandListener((event, guild, channel, author) ->
+		command.setAction((event, guild, channel, author) ->
 		{
 			this.sendLeaderboard(event, guild, channel, author);
 			return true;
@@ -104,7 +102,7 @@ public class HungerGamesListener extends BotListener
 		
 		//Command for displaying leaderboards of the Hunger Games.
 		command = new BotCommand("stop", "Interrompe l'esecuzione degli HungerGames.");
-		command.setCommandListener((event, guild, channel, author) ->
+		command.setAction((event, guild, channel, author) ->
 		{
 			this.stopHungerGames(event, guild, channel, author);
 			return true;

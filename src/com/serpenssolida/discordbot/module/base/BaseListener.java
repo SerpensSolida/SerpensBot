@@ -24,7 +24,7 @@ public class BaseListener extends BotListener
 		//this.setModulePrefix(guildID, "");
 		
 		//Module has no tasks and cannot get help.
-		this.botCommands.clear();
+		this.getBotCommands().clear();
 	}
 	
 	@Override

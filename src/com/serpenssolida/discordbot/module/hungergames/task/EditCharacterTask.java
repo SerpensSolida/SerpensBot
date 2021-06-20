@@ -1,5 +1,7 @@
 package com.serpenssolida.discordbot.module.hungergames.task;
 
+import com.serpenssolida.discordbot.ButtonGroup;
+import com.serpenssolida.discordbot.module.ButtonCallback;
 import com.serpenssolida.discordbot.module.Task;
 import com.serpenssolida.discordbot.module.hungergames.Character;
 import com.serpenssolida.discordbot.module.hungergames.HungerGamesController;
@@ -8,7 +10,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.Button;
 
 import static com.serpenssolida.discordbot.module.hungergames.HungerGamesController.SUM_STATS;
 
@@ -17,6 +20,11 @@ public class EditCharacterTask extends Task
 	private Character character;
 	private State state;
 	private Message reactionCheckMessage;
+	
+	public EditCharacterTask(Guild guild, User user, MessageChannel channel)
+	{
+		super(guild, user, channel);
+	}
 	
 	private enum State
 	{
@@ -27,41 +35,39 @@ public class EditCharacterTask extends Task
 		FINISHED
 	}
 	
-	public EditCharacterTask(Guild guild, User user, MessageChannel channel)
+	@Override
+	public boolean startMessage(MessageBuilder builder)
 	{
-		super(guild, user, channel);
-		
 		//Abort task if there is an HungerGames running.
 		if (HungerGamesController.isHungerGamesRunning(this.getGuild().getId()))
 		{
-			MessageBuilder builder = new MessageBuilder()
-					.append("> Non puoi usare questo comando mentre è in corso un HungerGames.");
-			channel.sendMessage(builder.build()).queue();
+			builder.append("> Non puoi usare questo comando mentre è in corso un HungerGames.");
+			//this.channel.sendMessage(builder.build()).queue();
 			this.setInterrupted(true);
-			return;
+			return true;
 		}
 		
 		//Initialize task.
 		this.state = State.MENU;
-		this.character = HungerGamesController.getCharacter(this.getGuild().getId(), user.getId());
+		this.character = HungerGamesController.getCharacter(this.getGuild().getId(), this.user.getId());
 		
 		if (this.character == null)
 		{
+			builder.append("> Non è stato trovato nessun personaggio.");
 			this.setInterrupted(true);
-			return;
+			return true;
 		}
 		
 		//Send a message with the menu.
-		this.sendMenu();
+		this.createMenuMessage(builder);
+		return false;
 	}
 	
-	public Task.TaskResult consumeMessage(Message receivedMessage)
+	public void consumeMessage(Message receivedMessage)
 	{
-		Task.TaskResult result;
-		
 		//Check if the user that started the task is the one who sent the message (This check should return ALWAYS true).
 		if (!receivedMessage.getAuthor().equals(this.getUser()))
-			return Task.TaskResult.NotFinished;
+			return;
 		
 		//Abort task if there is an HungerGames running.
 		if (HungerGamesController.isHungerGamesRunning(this.getGuild().getId()))
@@ -70,32 +76,31 @@ public class EditCharacterTask extends Task
 					.append("> Non puoi completare la procedura perchè è in corso un HungerGames.");
 			this.sendMessage(builder.build());
 			
-			return TaskResult.Finished;
+			this.running = false;
+			return;
 		}
 		
 		switch (this.getState())
 		{
 			case MENU: //Waiting for reaction.
-				result = Task.TaskResult.NotFinished;
-				return result;
+				return;
 			case NAME_CHARACTER: //Naming the character.
-				result = this.manageNameCharacterState(receivedMessage);
-				return result;
+				this.manageNameCharacterState(receivedMessage);
+				return;
 			case ASSIGN_STATS: //Assigning stats to the character.
-				result = this.manageAssignStatsState(receivedMessage);
-				return result;
+				this.manageAssignStatsState(receivedMessage);
+				return;
 		}
 		
 		//This state is not possible, you broke my FSM :(
 		receivedMessage.getChannel().sendMessage("Stato illegale, fai schifo con le MSF.").queue();
-		result = TaskResult.Finished;
 		
-		return result;
+		this.running = false;
 	}
 	
-	public Task.TaskResult reactionAdded(Message message, String reaction)
+	public void reactionAdded(Message message, String reaction)
 	{
-		MessageBuilder builder = new MessageBuilder();
+		/*MessageBuilder builder = new MessageBuilder();
 		
 		//Abort task if there is an HungerGames running.
 		if (HungerGamesController.isHungerGamesRunning(this.getGuild().getId()))
@@ -104,14 +109,15 @@ public class EditCharacterTask extends Task
 					.append("> Non puoi completare la procedura perchè è in corso un HungerGames.");
 			this.sendMessage(builder.build());
 			
-			return TaskResult.Finished;
+			this.running = false;
+			return;
 		}
 		
 		//Check if the reaction is added to the menu.
 		if (this.reactionCheckMessage != null && this.reactionCheckMessage.getId().equals(message.getId()))
 		{
 			if (this.getState() != State.MENU)
-				return Task.TaskResult.NotFinished;
+				return;
 			
 			switch (reaction)
 			{
@@ -139,17 +145,17 @@ public class EditCharacterTask extends Task
 					this.getChannel().deleteMessageById(this.reactionCheckMessage.getId()).queue(); //Delete the menu.
 					
 					this.state = State.FINISHED;
-					return Task.TaskResult.Finished;
+					this.running = false;
+					return;
 			}
 			
 			this.getChannel().deleteMessageById(this.reactionCheckMessage.getId()).queue();
 		}
 		
-		this.sendMessageWithAbort(builder.build());
-		return Task.TaskResult.NotFinished;
+		this.sendWithCancelButton(builder);*/
 	}
 	
-	private Task.TaskResult manageNameCharacterState(Message receivedMessage)
+	private void manageNameCharacterState(Message receivedMessage)
 	{
 		String message = receivedMessage.getContentDisplay();
 		String name = message.strip();
@@ -160,8 +166,8 @@ public class EditCharacterTask extends Task
 			MessageBuilder messageBuilder = new MessageBuilder();
 			messageBuilder.appendCodeLine((name.length() <= 0) ? "Devi inserire un nome!" : "Il nome non può essere più lungo di 16 caratteri!");
 			
-			this.sendMessageWithAbort(messageBuilder.build());
-			return Task.TaskResult.NotFinished;
+			this.sendWithCancelButton(messageBuilder);
+			return;
 		}
 		
 		//Set the name of the character.
@@ -174,11 +180,10 @@ public class EditCharacterTask extends Task
 		builder.appendFormat("Nuovo nome del personaggio: %s", this.character.getDisplayName());
 		
 		this.getChannel().sendMessage(builder.build()).queue();
-		this.sendMenu();
-		return Task.TaskResult.NotFinished;
+		this.channel.sendMessage(this.createMenuMessage().build()).queue();
 	}
 	
-	private Task.TaskResult manageAssignStatsState(Message receivedMessage)
+	private void manageAssignStatsState(Message receivedMessage)
 	{
 		String message = receivedMessage.getContentDisplay();
 		String[] abilitiesList = message.strip().replaceAll(" +", " ").split(" ");
@@ -194,8 +199,8 @@ public class EditCharacterTask extends Task
 					.append("Vitalità, Forza, Abilità, Special, Velocità, Resistenza e Gusto.\n")
 					.appendFormat("> La somma dei valori delle caratteristiche deve essere %s punti e ogni caratteristica deve essere compresa tra 0 e 10!", SUM_STATS);
 			
-			this.sendMessageWithAbort(messageBuilder.build());
-			return Task.TaskResult.NotFinished;
+			this.sendWithCancelButton(messageBuilder);
+			return;
 		}
 		
 		//Check abilities format.
@@ -217,8 +222,8 @@ public class EditCharacterTask extends Task
 			MessageBuilder messageBuilder = new MessageBuilder()
 					.append("> Formato delle caratteristiche errato. Inserisci solo numeri tra 0 e 10!");
 			
-			this.sendMessageWithAbort(messageBuilder.build());
-			return Task.TaskResult.NotFinished;
+			this.sendWithCancelButton(messageBuilder);
+			return;
 		}
 		
 		//Sum of ability values must be equal to SUM_STATS.
@@ -227,8 +232,8 @@ public class EditCharacterTask extends Task
 			MessageBuilder messageBuilder = new MessageBuilder()
 					.appendFormat("\n> La somma dei valori delle caratteristiche deve essere %d punti! Somma dei valori inseriti: %s", HungerGamesController.SUM_STATS, sum);
 			
-			this.sendMessageWithAbort(messageBuilder.build());
-			return Task.TaskResult.NotFinished;
+			this.sendWithCancelButton(messageBuilder);
+			return;
 		}
 		
 		//Set character stats.
@@ -242,32 +247,142 @@ public class EditCharacterTask extends Task
 		this.state = State.MENU;
 		
 		//Send the menu.
-		this.sendMenu();
-		
-		return Task.TaskResult.NotFinished;
+		this.channel.sendMessage(this.createMenuMessage().build()).queue();
 	}
 	
 	/**
-	 * Send the menu of the task to the channel, the task will check for this message when a reaction is sent.
+	 * Create a builder that contains the menu of the task to the channel.
 	 */
-	public void sendMenu()
+	public MessageBuilder createMenuMessage()
 	{
 		MessageBuilder builder = new MessageBuilder()
-				.append("> Cosa vuoi modificare del tuo personaggio?\n> \n")
-				.append("> \t:regional_indicator_a: - Nome.\n")
-				.append("> \t:regional_indicator_b: - Statistiche.\n")
-				.append("> \t:x: - Esci.\n");
+				.append("> Seleziona cosa vuoi modificare del tuo personaggio.\n");
+				//.append("> \t:regional_indicator_a: - Nome.\n")
+				//.append("> \t:regional_indicator_b: - Statistiche.\n")
+				//.append("> \t:x: - Esci.\n");
 		
-		MessageAction messageAction = this.getChannel().sendMessage(builder.build());
+		Button editName = Button.primary("edit-name", "Modifica il nome");
+		Button editStats = Button.primary("edit-stats", "Modifica le caratteristiche");
+		Button cancelTask = Button.danger("cancel-task", "Esci");
 		
-		//Add the reaction to the menu.
+		this.buttonGroup = new ButtonGroup(this.user);
+		
+		this.buttonGroup.addButton(new ButtonCallback("edit-name", this.user, this.channel, (event, guild, channel, message, author) ->
+		{
+			this.state = State.NAME_CHARACTER;
+			
+			MessageBuilder b = new MessageBuilder()
+					.append("> Inserisci il nuovo nome del tuo personaggio. (max 15 caratteri)");
+			
+			event.deferEdit().queue();
+			event.getHook().deleteOriginal().queue(); //Remove the original message.
+			
+			this.buttonGroup = null;
+			this.sendWithCancelButton(b);
+			
+			return true;
+		}));
+		
+		this.buttonGroup.addButton(new ButtonCallback("edit-stats", this.user, this.channel, (event, guild, channel, message, author) ->
+		{
+			this.state = State.ASSIGN_STATS;
+			MessageBuilder b = new MessageBuilder();
+			
+			event.deferEdit().queue();
+			event.getHook().deleteOriginal().queue(); //Remove the original message.
+			
+			b.appendFormat("> Stai modificando le caratteristiche di **%s**", this.getCharacter().getDisplayName())
+					.append("\n> Assegna le caratteristiche al personaggio. Invia un messaggio con 7 numeri separati da uno spazio che rappresentano le caratteristiche del tuo personaggio.")
+					.append("\n> Le caratteristiche sono: ")
+					.append("Vitalità, Forza, Abilità, Special, Velocità, Resistenza e Gusto. ")
+					.appendFormat("\n> La somma dei valori delle caratteristiche deve essere %d punti e ogni carateristica deve essere compresa tra 0 e 10.", SUM_STATS);
+			
+			this.buttonGroup = null;
+			this.sendWithCancelButton(b);
+
+			return true;
+		}));
+		
+		this.registerCancelButton();
+		
+		//Add button to the message.
+		builder.setActionRows(ActionRow.of(editName, editStats, cancelTask));
+		//this.getChannel().sendMessage(builder.build()).queue();
+		return builder;
+
+		/*//Add the reaction to the menu.
 		messageAction.queue(message ->
 		{
 			this.reactionCheckMessage = message; //This message is the one used for checking the reaction.
 			message.addReaction("🇦").queue();
 			message.addReaction("🇧").queue();
 			message.addReaction("❌").queue();
-		});
+		});*/
+	}
+	
+	/**
+	 * Create a builder that contains the menu of the task to the channel.
+	 */
+	public void createMenuMessage(MessageBuilder builder)
+	{
+		builder.append("> Seleziona cosa vuoi modificare del tuo personaggio.\n");
+		
+		Button editName = Button.primary("edit-name", "Modifica il nome");
+		Button editStats = Button.primary("edit-stats", "Modifica le caratteristiche");
+		Button cancelTask = Button.danger("cancel-task", "Esci");
+		
+		this.buttonGroup = new ButtonGroup(this.user);
+		
+		this.buttonGroup.addButton(new ButtonCallback("edit-name", this.user, this.channel, (event, guild, channel, message, author) ->
+		{
+			this.state = State.NAME_CHARACTER;
+			
+			MessageBuilder b = new MessageBuilder()
+					.append("> Inserisci il nuovo nome del tuo personaggio. (max 15 caratteri)");
+			
+			event.deferEdit().queue();
+			event.getHook().deleteOriginal().queue(); //Remove the original message.
+			
+			this.buttonGroup = null;
+			this.sendWithCancelButton(b);
+			
+			return true;
+		}));
+		
+		this.buttonGroup.addButton(new ButtonCallback("edit-stats", this.user, this.channel, (event, guild, channel, message, author) ->
+		{
+			this.state = State.ASSIGN_STATS;
+			MessageBuilder b = new MessageBuilder();
+			
+			event.deferEdit().queue();
+			event.getHook().deleteOriginal().queue(); //Remove the original message.
+			
+			b.appendFormat("> Stai modificando le caratteristiche di **%s**", this.getCharacter().getDisplayName())
+					.append("\n> Assegna le caratteristiche al personaggio. Invia un messaggio con 7 numeri separati da uno spazio che rappresentano le caratteristiche del tuo personaggio.")
+					.append("\n> Le caratteristiche sono: ")
+					.append("Vitalità, Forza, Abilità, Special, Velocità, Resistenza e Gusto. ")
+					.appendFormat("\n> La somma dei valori delle caratteristiche deve essere %d punti e ogni carateristica deve essere compresa tra 0 e 10.", SUM_STATS);
+			
+			this.buttonGroup = null;
+			this.sendWithCancelButton(b);
+			
+			return true;
+		}));
+		
+		this.registerCancelButton();
+		
+		//Add button to the message.
+		builder.setActionRows(ActionRow.of(editName, editStats, cancelTask));
+		//this.getChannel().sendMessage(builder.build()).queue();
+
+		/*//Add the reaction to the menu.
+		messageAction.queue(message ->
+		{
+			this.reactionCheckMessage = message; //This message is the one used for checking the reaction.
+			message.addReaction("🇦").queue();
+			message.addReaction("🇧").queue();
+			message.addReaction("❌").queue();
+		});*/
 	}
 	
 	public Character getCharacter()

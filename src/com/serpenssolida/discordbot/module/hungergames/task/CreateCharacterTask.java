@@ -25,30 +25,33 @@ public class CreateCharacterTask extends Task
 	public CreateCharacterTask(Guild guild, User user, MessageChannel channel)
 	{
 		super(guild, user, channel);
-		
+	}
+	
+	@Override
+	public boolean startMessage(MessageBuilder builder)
+	{
 		//Abort task if there is an HungerGames running.
 		if (HungerGamesController.isHungerGamesRunning(this.getGuild().getId()))
 		{
-			MessageBuilder builder = new MessageBuilder()
-					.append("> Non puoi usare questo comando perchè è in corso un HungerGames.");
+			builder.append("> Non puoi usare questo comando perchè è in corso un HungerGames.");
 			this.sendMessage(builder.build());
 			
 			this.setInterrupted(true);
-			return;
+			return true;
 		}
 		
-		MessageBuilder builder = new MessageBuilder()
-				.append("> Stai creando un personaggio! Inserisci il nome del tuo personaggio. (max 16 caratteri)");
-		this.sendMessageWithAbort(builder.build());
+		builder.append("> Stai creando un personaggio! Inserisci il nome del tuo personaggio. (max 16 caratteri)");
+		this.addCancelButton(builder);
 		
 		this.state = State.NAME_CHARACTER;
-		this.character = new Character(user.getId());
+		this.character = new Character(this.user.getId());
+		return false;
 	}
 	
-	public Task.TaskResult consumeMessage(Message receivedMessage)
+	public void consumeMessage(Message receivedMessage)
 	{
 		if (!receivedMessage.getAuthor().equals(this.getUser()))
-			return Task.TaskResult.NotFinished;
+			return;
 		
 		//Abort task if there is an HungerGames running.
 		if (HungerGamesController.isHungerGamesRunning(this.getGuild().getId()))
@@ -57,28 +60,27 @@ public class CreateCharacterTask extends Task
 					.append("> Non puoi completare la procedura perchè è in corso un HungerGames.");
 			this.sendMessage(builder.build());
 			
-			return TaskResult.Finished;
+			this.running = false;
+			return;
 		}
-		
-		Task.TaskResult result;
 		
 		switch (this.getState())
 		{
 			case NAME_CHARACTER: //Naming character.
-				result = this.manageNameCharacterState(receivedMessage);
-				return result;
+				this.manageNameCharacterState(receivedMessage);
+				return;
 			case ASSIGN_STATS: //Assigning stas.
-				result = this.manageAssignStatsState(receivedMessage);
-				return result;
+				this.manageAssignStatsState(receivedMessage);
+				return;
 		}
 		
 		//This state is not possible, you broke my FSM :(
 		receivedMessage.getChannel().sendMessage("Stato illegale, fai schifo con le MSF.").queue();
-		result = TaskResult.Finished;
-		return result;
+		
+		this.running = false;
 	}
 	
-	public Task.TaskResult reactionAdded(Message message, String reaction)
+	public void reactionAdded(Message message, String reaction)
 	{
 		//Abort task if there is an HungerGames running.
 		if (HungerGamesController.isHungerGamesRunning(this.getGuild().getId()))
@@ -87,13 +89,14 @@ public class CreateCharacterTask extends Task
 					.append("> Non puoi completare la procedura perchè è in corso un HungerGames.");
 			this.sendMessage(builder.build());
 			
-			return TaskResult.Finished;
+			this.running = false;
+			return;
 		}
 		
-		return TaskResult.Finished;
+		this.running = false;
 	}
 	
-	private Task.TaskResult manageNameCharacterState(Message receivedMessage)
+	private void manageNameCharacterState(Message receivedMessage)
 	{
 		String message = receivedMessage.getContentDisplay();
 		String name = message.strip();
@@ -101,8 +104,8 @@ public class CreateCharacterTask extends Task
 		if (name.length() <= 0 || name.length() > 16)
 		{
 			MessageBuilder messageBuilder = (new MessageBuilder()).appendCodeLine((name.length() <= 0) ? "Devi inserire un nome!" : "Il nome non può essere più lungo di 15 caratteri!");
-			this.sendMessageWithAbort(messageBuilder.build());
-			return Task.TaskResult.NotFinished;
+			this.sendWithCancelButton(messageBuilder);
+			return;
 		}
 		
 		this.character.setName(name);
@@ -117,11 +120,10 @@ public class CreateCharacterTask extends Task
 				.append("Vitalità, Forza, Abilità, Special, Velocità, Resistenza e Gusto. ")
 				.appendFormat("\n> La somma dei valori delle caratteristiche deve essere %s punti e ogni caratteristica deve essere compresa tra 0 e 10!", HungerGamesController.SUM_STATS);
 		
-		this.sendMessageWithAbort(builder.build());
-		return Task.TaskResult.NotFinished;
+		this.sendWithCancelButton(builder);
 	}
 	
-	private Task.TaskResult manageAssignStatsState(Message receivedMessage)
+	private void manageAssignStatsState(Message receivedMessage)
 	{
 		String message = receivedMessage.getContentDisplay();
 		String[] abilitiesList = message.strip().replaceAll(" +", " ").split(" ");
@@ -137,8 +139,8 @@ public class CreateCharacterTask extends Task
 					.append("Vitalità, Forza, Abilità, Special, Velocità, Resistenza e Gusto. ")
 					.appendFormat("\n> La somma dei valori delle caratteristiche deve essere %s punti e ogni caratteristica deve essere compresa tra 0 e 10!", HungerGamesController.SUM_STATS);
 			
-			this.sendMessageWithAbort(messageBuilder.build());
-			return Task.TaskResult.NotFinished;
+			this.sendWithCancelButton(messageBuilder);
+			return;
 		}
 		
 		//Check abilities format.
@@ -160,8 +162,8 @@ public class CreateCharacterTask extends Task
 			MessageBuilder messageBuilder = new MessageBuilder()
 					.append("> Formato delle caratteristiche errato. Inserisci solo numeri tra 0 e 10!");
 			
-			this.sendMessageWithAbort(messageBuilder.build());
-			return Task.TaskResult.NotFinished;
+			this.sendWithCancelButton(messageBuilder);
+			return;
 		}
 		
 		if (sum != HungerGamesController.SUM_STATS)
@@ -169,8 +171,8 @@ public class CreateCharacterTask extends Task
 			MessageBuilder messageBuilder = new MessageBuilder()
 					.appendFormat("\n> La somma dei valori delle caratteristiche deve essere %d punti! Somma dei valori inseriti: %s", HungerGamesController.SUM_STATS, sum);
 			
-			this.sendMessageWithAbort(messageBuilder.build());
-			return Task.TaskResult.NotFinished;
+			this.sendWithCancelButton(messageBuilder);
+			return;
 		}
 		
 		this.character.setStats(abilities);
@@ -179,10 +181,10 @@ public class CreateCharacterTask extends Task
 		MessageBuilder builder = new MessageBuilder()
 				.append("> Creazione personaggio completata!");
 		
-		this.sendMessageWithAbort(builder.build());
-		this.state = State.FINISHED;
+		this.channel.sendMessage(builder.build()).queue();
 		
-		return Task.TaskResult.Finished;
+		this.state = State.FINISHED;
+		this.running = false;
 	}
 	
 	public Character getCharacter()

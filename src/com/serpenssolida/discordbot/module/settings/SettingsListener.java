@@ -25,7 +25,7 @@ public class SettingsListener extends BotListener
 		
 		//Command for changing the symbol for calling a command.
 		BotCommand command = new BotCommand("symbol", "Imposta il simbolo usato all'inizio dei comandi.");
-		command.setCommandListener((event, guild, channel, author) ->
+		command.setAction((event, guild, channel, author) ->
 		{
 			this.setUnlistedBotCommandSymbol(event, guild, channel, author);
 			return true;
@@ -36,7 +36,7 @@ public class SettingsListener extends BotListener
 		
 		//Command for changing the module prefix of a module.
 		command = new BotCommand("prefix", "Mostra la lista di moduli e i loro prefissi oppure cambia o mostra il prefisso usato da un modulo.");
-		command.setCommandListener((event, guild, channel, author) ->
+		command.setAction((event, guild, channel, author) ->
 		{
 			this.modulePrefixCommand(event, guild, channel, author);
 			return true;
@@ -48,7 +48,7 @@ public class SettingsListener extends BotListener
 		
 		//Command for changing the module prefix of a module.
 		command = new BotCommand("deletecommand", "Imposta se il bot cancellerà i comandi non listati inviati in chat oppure no.");
-		command.setCommandListener((event, guild, channel, author) ->
+		command.setAction((event, guild, channel, author) ->
 		{
 			this.setDeleteCommandMessages(event, guild, channel, author);
 			return true;
