@@ -84,7 +84,8 @@ public class UnlistedBotCommand
 		if (arguments.length == 1 && arguments[0].isBlank())
 		{
 			//If there are no arguments return null.
-			return null;
+			//return null;
+			data.arguments = null;
 		}
 		
 		return data;
