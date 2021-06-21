@@ -180,7 +180,10 @@ public class HungerGamesListener extends BotListener
 		}
 		else
 		{
-			event.reply("> L'utente non ha creato nessun personaggio.").setEphemeral(false).queue();
+			EmbedBuilder embedBuilder = new EmbedBuilder()
+					.setDescription("L'utente non ha creato nessun personaggio.");
+			
+			event.reply(new MessageBuilder().setEmbed(embedBuilder.build()).build()).setEphemeral(false).queue();
 		}
 	}
 	
