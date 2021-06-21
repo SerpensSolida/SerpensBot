@@ -112,7 +112,7 @@ public class HungerGamesListener extends BotListener
 	
 	private void sendCharacterCard(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
-		Character character = null;
+		Character character;
 		OptionMapping tagArg = event.getOption("tag");
 		
 		if (tagArg == null)
@@ -121,39 +121,8 @@ public class HungerGamesListener extends BotListener
 		}
 		else
 		{
-			//ArrayList<Member> members = BotMain.findUsersByName(guild, args[0]);
-			//List<User> taggedUsers = message.getMentionedUsers();
 			User user = tagArg.getAsUser();
 			character = HungerGamesController.getCharacter(guild.getId(), user.getId());
-			/*if (members.isEmpty())
-			{
-				//Try using tag.
-				if (taggedUsers.isEmpty())
-				{
-					MessageBuilder builder = new MessageBuilder()
-							.appendFormat("> L'utente con il nome/nickname `%s` non esiste oppure non è stato salvato dentro la cache, prova a usare il tag.", args[0]);
-					
-					channel.sendMessage(builder.build()).queue();
-					
-					return;
-				}
-				else
-				{
-					character = HungerGamesController.getCharacter(guild.getId(), taggedUsers.get(0).getId());
-				}
-				
-			}
-			else if (members.size() > 1)
-			{
-				MessageBuilder builder = new MessageBuilder()
-						.appendFormat("> L'utente con il nome/nickname %s non esiste oppure non è stato salvato dentro la cache, prova a usare il tag.", args[0]);
-				
-				channel.sendMessage(builder.build()).queue();
-			}
-			else
-			{
-				character = HungerGamesController.getCharacter(guild.getId(), members.get(0).getId());
-			}*/
 		}
 		
 		if (character != null)
@@ -207,7 +176,7 @@ public class HungerGamesListener extends BotListener
 			embedBuilder.setThumbnail((owner != null) ? owner.getEffectiveAvatarUrl() : null);
 			embedBuilder.setFooter("Creato da " + ownerName);
 			
-			event.reply((new MessageBuilder()).setEmbed(embedBuilder.build()).build()).setEphemeral(false).queue();
+			event.reply(new MessageBuilder().setEmbed(embedBuilder.build()).build()).setEphemeral(false).queue();
 		}
 		else
 		{
@@ -218,12 +187,15 @@ public class HungerGamesListener extends BotListener
 	private void setCharacterEnabled(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		Character character = HungerGamesController.getCharacter(guild.getId(), author.getId());
-		MessageBuilder messageBuilder = new MessageBuilder();
 		OptionMapping valueArg = event.getOption("value");
+		
+		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Attivazione/disattivazione personaggio", author);
+		
 		//This command cannot be used while HungerGames is running.
 		if (HungerGamesController.isHungerGamesRunning(guild.getId()))
 		{
-			messageBuilder = new MessageBuilder();
+			MessageBuilder messageBuilder = new MessageBuilder()
+					.setEmbed(embedBuilder.build());
 			messageBuilder.append("> Non puoi usare questo comando mentre è in corso un HungerGames.");
 			event.reply(messageBuilder.build()).queue();
 			return;
@@ -231,32 +203,34 @@ public class HungerGamesListener extends BotListener
 		
 		if (character != null)
 		{
-			
 			if (valueArg != null)
 			{
 				boolean enable = valueArg.getAsBoolean();
 				
-				messageBuilder.appendFormat("> **%s** è stato %s.", character.getDisplayName(), enable ? "abilitato" : "disabilitato");
+				embedBuilder.setDescription("**" + character.getDisplayName() + "** è stato " + (enable ? "abilitato." : "disabilitato."));
 				character.setEnabled(enable);
 				HungerGamesController.save(guild.getId());
 			}
 			else
 			{
-				messageBuilder.append("> L'argomento deve essere (true|false).");
+				embedBuilder.setDescription("L'argomento deve essere (true|false).");
 			}
 		}
 		else
 		{
-			messageBuilder.append("> Nessun personaggio trovato, crea il tuo personaggio.");
+			embedBuilder.setDescription("Nessun personaggio trovato, crea il tuo personaggio.");
 		}
 		
+		MessageBuilder messageBuilder = new MessageBuilder()
+				.setEmbed(embedBuilder.build());
 		event.reply(messageBuilder.build()).setEphemeral(character == null || valueArg == null ).queue();
 	}
 	
 	private void setPlaybackSpeed(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
-		StringBuilder stringBuilder = new StringBuilder();
 		OptionMapping secondsArg = event.getOption("seconds");
+		
+		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Velocità degli Hunger Games", author);
 		
 		if (secondsArg != null && secondsArg.getAsLong() >= 1.0f)
 		{
@@ -264,14 +238,17 @@ public class HungerGamesListener extends BotListener
 			
 			HungerGamesController.setMessageSpeed(guild.getId(), playbackSpeed * 1000);
 			HungerGamesController.saveSettings(guild.getId());
-			stringBuilder.append("> Velocità di riproduzione degli HungerGames settata a " + playbackSpeed + " secondi.");
+			embedBuilder.setDescription("Velocità di riproduzione degli HungerGames settata a " + playbackSpeed + " secondi.");
 		}
 		else
 		{
-			stringBuilder.append("> L'argomento seconds non è stato inviato oppure il suo valore è minore di 1 secondo.");
+			embedBuilder.setDescription("L'argomento seconds non è stato inviato oppure il suo valore è minore di 1 secondo.");
 		}
 		
-		event.reply(stringBuilder.toString()).setEphemeral(secondsArg == null || secondsArg.getAsLong() < 1.0f).queue();
+		MessageBuilder messageBuilder = new MessageBuilder()
+				.setEmbed(embedBuilder.build());
+		
+		event.reply(messageBuilder.build()).setEphemeral(secondsArg == null || secondsArg.getAsLong() < 1.0f).queue();
 	}
 	
 	private void sendLeaderboard(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
@@ -336,19 +313,24 @@ public class HungerGamesListener extends BotListener
 	
 	private void stopHungerGames(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
-		MessageBuilder messageBuilder = new MessageBuilder();
+		//MessageBuilder messageBuilder = new MessageBuilder();
+		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Hunger Games", author);
+		
 		boolean isRunning = HungerGamesController.isHungerGamesRunning(guild.getId());
 		
 		if (isRunning)
 		{
 			HungerGamesController.stopHungerGames(guild.getId());
 			
-			messageBuilder.appendFormat("> Gli HungerGames sono stati fermati da %s.", author.getName());
+			embedBuilder.appendDescription("Gli HungerGames sono stati fermati da " + author.getName() + ".");
 		}
 		else
 		{
-			messageBuilder.appendFormat("> Nessun HungerGames in esecuzione.");
+			embedBuilder.appendDescription("Nessun HungerGames in esecuzione.");
 		}
+		
+		MessageBuilder messageBuilder = new MessageBuilder()
+				.setEmbed(embedBuilder.build());
 		
 		event.reply(messageBuilder.build()).setEphemeral(!isRunning).queue();
 	}

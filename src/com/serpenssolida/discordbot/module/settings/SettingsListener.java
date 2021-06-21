@@ -64,12 +64,17 @@ public class SettingsListener extends BotListener
 	private void setDeleteCommandMessages(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		Member authorMember = guild.retrieveMember(author).complete();
-		StringBuilder stringBuilder = new StringBuilder();
+		
+		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Cancellazione dei messaggi", author);
+		MessageBuilder messageBuilder = new MessageBuilder();
 		
 		//Check in the user has permission to run this command.
 		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
 		{
-			event.reply("> Devi essere il proprietario o moderatore del server per modificare il simbolo per i comandi non listati.").setEphemeral(true).queue();
+			embedBuilder.appendDescription("Devi essere il proprietario o moderatore del server per modificare questa impostazione.");
+			messageBuilder.setEmbed(embedBuilder.build());
+			
+			event.reply(messageBuilder.build()).setEphemeral(true).queue();
 			return;
 		}
 		
@@ -80,14 +85,16 @@ public class SettingsListener extends BotListener
 			boolean value = argument.getAsBoolean();
 			BotMain.setDeleteCommandMessages(guild.getId(), value);
 			BotMain.saveSettings(guild.getId());
-			stringBuilder.append(">" + (value ? "Cancellerò" : "Lascerò") + " i comandi che sono stati inviati in chat.");
+			embedBuilder.setDescription((value ? "Cancellerò" : "Lascerò") + " i comandi che sono stati inviati in chat.");
 		}
 		else
 		{
-			stringBuilder.append("> Devi inserire (true|false) come argomento.");
+			embedBuilder.setDescription("> Devi inserire (true|false) come argomento.");
 		}
 		
-		event.reply(stringBuilder.toString()).setEphemeral(argument == null).queue(); //Set ephemeral if the user didn't put the argument.
+		messageBuilder.setEmbed(embedBuilder.build());
+		
+		event.reply(messageBuilder.build()).setEphemeral(argument == null).queue(); //Set ephemeral if the user didn't put the argument.
 	}
 	
 	private void modulePrefixCommand(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
@@ -96,11 +103,7 @@ public class SettingsListener extends BotListener
 		OptionMapping modulePrefix = event.getOption("new_prefix"); //Module prefix passed to the command.
 		Member authorMember = guild.retrieveMember(author).complete(); //Member that sent the command.
 		MessageBuilder messageBuilder = new MessageBuilder();
-		EmbedBuilder embedBuilder = new EmbedBuilder();
-		
-		//Add footer
-		embedBuilder.setFooter("Richiesto da " + author.getName(), author.getAvatarUrl());
-		embedBuilder.setAuthor(BotMain.api.getSelfUser().getName(), "https://github.com/SerpensSolida/SerpensBot", BotMain.api.getSelfUser().getAvatarUrl());
+		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Prefissi dei comandi", author);
 		
 		int argumentCount = event.getOptions().size();
 		
@@ -124,11 +127,11 @@ public class SettingsListener extends BotListener
 			//Print the result.
 			if (listener != null)
 			{
-				messageBuilder.appendFormat("> Il prefisso del modulo `%s` è `%s`.", listener.getInternalID(), listener.getModulePrefix(guild.getId()));
+				embedBuilder.appendDescription("Il prefisso del modulo `" + listener.getInternalID() + "` è `" + listener.getModulePrefix(guild.getId()) + "`.");
 			}
 			else
 			{
-				messageBuilder.appendFormat("> Modulo con id `%s` non trovato.", moduleID);
+				embedBuilder.appendDescription("Modulo con id `" + moduleID + "` non trovato.");
 			}
 		}
 		else if (argumentCount == 2 && moduleID != null && modulePrefix != null)
@@ -140,14 +143,20 @@ public class SettingsListener extends BotListener
 			//Check in the user has permission to run this command.
 			if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
 			{
-				event.reply("> Devi essere il proprietario o moderatore del server per modificare il prefisso di un modulo.").queue();
+				embedBuilder.setDescription("Devi essere il proprietario o moderatore del server per modificare il prefisso di un modulo.");
+				messageBuilder.setEmbed(embedBuilder.build());
+				
+				event.reply(messageBuilder.build()).queue();
 				return;
 			}
 			
 			//Check if the module prefix to set is suitable.
 			if (!newPrefix.chars().allMatch(Character::isLetterOrDigit) || newPrefix.length() > 16)
 			{
-				event.reply("> Il prefisso deve essere alpha numerico e non può superare i 16 caratteri.").queue();
+				embedBuilder.setDescription("Il prefisso deve essere alfanumerico e non può superare i 16 caratteri.");
+				messageBuilder.setEmbed(embedBuilder.build());
+				
+				event.reply(messageBuilder.build()).queue();
 				return;
 			}
 			
@@ -158,19 +167,22 @@ public class SettingsListener extends BotListener
 				BotMain.updateGuildCommands(guild);
 				BotMain.saveSettings(guild.getId());
 				
-				messageBuilder.appendFormat("> Prefisso del modulo `%s` è stato impostato a `%s`", listener.getInternalID(), listener.getModulePrefix(guild.getId()));
+				embedBuilder.setDescription("Prefisso del modulo `" + listener.getInternalID() + "` è stato impostato a `" + listener.getModulePrefix(guild.getId()) + "`.");
 			}
 			else
 			{
-				messageBuilder.appendFormat("> Modulo con id `%s` non trovato.", moduleID);
+				embedBuilder.setDescription("Modulo con id `" + moduleID + "` non trovato.");
 			}
 		}
 		
+		messageBuilder.setEmbed(embedBuilder.build());
 		event.reply(messageBuilder.build()).setEphemeral(false).queue();
 	}
 	
 	private void setUnlistedBotCommandSymbol(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
+		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Simbolo comandi non listati", author);
+		MessageBuilder messageBuilder = new MessageBuilder();
 		OptionMapping newSymbolOption = event.getOption("value");
 		Member authorMember = guild.retrieveMember(author).complete();
 
@@ -179,13 +191,20 @@ public class SettingsListener extends BotListener
 		//Check in the user has permission to run this command.
 		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
 		{
-			event.reply("> Devi essere il proprietario o moderatore del server per resettare il simbolo dei comandi.").queue();
+			embedBuilder.appendDescription("Devi essere il proprietario o moderatore del server per resettare il simbolo dei comandi.");
+			messageBuilder.setEmbed(embedBuilder.build());
+			
+			event.reply(messageBuilder.build()).setEphemeral(true).queue();
 			return;
 		}
 		
 		if (newSymbolOption == null)
 		{
-			event.reply("> Argomento non fornito.").queue(); //Note: This code should be unreachable.
+			//Note: This code should be unreachable.
+			embedBuilder.appendDescription("Argomento non fornito.");
+			messageBuilder.setEmbed(embedBuilder.build());
+			
+			event.reply(messageBuilder.build()).setEphemeral(true).queue();
 			return;
 		}
 		
@@ -193,14 +212,20 @@ public class SettingsListener extends BotListener
 		String newSymbol = newSymbolOption.getAsString();
 		if (newSymbol.length() > 6 || pattern.matcher(newSymbol).find())
 		{
-			event.reply("> Il simbolo dei comandi non può superare i 6 caratteri e non può contenere i caratteri di markdown.").queue();
+			embedBuilder.appendDescription("Il simbolo dei comandi non può superare i 6 caratteri e non può contenere i caratteri di markdown.");
+			messageBuilder.setEmbed(embedBuilder.build());
+			
+			event.reply(messageBuilder.build()).setEphemeral(true).queue();
 			return;
 		}
 		
 		BotMain.setCommandSymbol(guild.getId(), newSymbol);
 		BotMain.saveSettings(guild.getId());
 		
-		event.reply("> Simbolo per i comandi impostato a `" + newSymbol + "`.").setEphemeral(false).queue();
+		embedBuilder.appendDescription("Simbolo per i comandi impostato a `" + newSymbol + "`.");
+		messageBuilder.setEmbed(embedBuilder.build());
+		
+		event.reply(messageBuilder.build()).setEphemeral(false).queue();
 	}
 	
 }

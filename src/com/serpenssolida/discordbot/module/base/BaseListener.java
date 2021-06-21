@@ -25,6 +25,7 @@ public class BaseListener extends BotListener
 		
 		//Module has no tasks and cannot get help.
 		this.getBotCommands().clear();
+		this.getUnlistedBotCommands().clear();
 	}
 	
 	@Override
@@ -78,14 +79,26 @@ public class BaseListener extends BotListener
 		//Check in the user has permission to run this command.
 		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
 		{
-			channel.sendMessage("> Devi essere il proprietario o moderatore del server per resettare il simbolo dei comandi.").queue();
+			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Reset del simbolo dei comandi", author)
+					.appendDescription("Devi essere il proprietario o moderatore del server per resettare il simbolo per comandi non listati.");
+			
+			MessageBuilder messageBuilder = new MessageBuilder()
+					.setEmbed(embedBuilder.build());
+			
+			channel.sendMessage(messageBuilder.build()).queue();
 			return;
 		}
 		
 		BotMain.setCommandSymbol(guild.getId(), "/");
 		BotMain.saveSettings(guild.getId());
 		
-		channel.sendMessage("> Simbolo per i comandi impostato a `/`.").queue();
+		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Reset del simbolo dei comandi", author)
+				.appendDescription("Simbolo per i comandi non listati impostato a `/`.");
+		
+		MessageBuilder messageBuilder = new MessageBuilder()
+				.setEmbed(embedBuilder.build());
+		
+		channel.sendMessage(messageBuilder.build()).queue();
 	}
 	
 	/**
@@ -98,7 +111,13 @@ public class BaseListener extends BotListener
 		//Check in the user has permission to run this command.
 		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
 		{
-			channel.sendMessage("> Devi essere il proprietario o moderatore del server per resettare i prefissi.").queue();
+			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Reset dei prefissi dei comandi", author)
+					.appendDescription("Devi essere il proprietario o moderatore del server per resettare i prefissi.");
+			
+			MessageBuilder messageBuilder = new MessageBuilder()
+					.setEmbed(embedBuilder.build());
+			
+			channel.sendMessage(messageBuilder.build()).queue();
 			return;
 		}
 		
@@ -110,7 +129,12 @@ public class BaseListener extends BotListener
 		BotMain.updateGuildCommands(guild);
 		BotMain.saveSettings(guild.getId());
 		
-		channel.sendMessage("> Prefisso dei moduli resettato correttamente.").queue();
+		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Reset dei prefissi dei comandi", author)
+				.appendDescription("Prefisso dei moduli resettato correttamente.");
+		
+		MessageBuilder messageBuilder = new MessageBuilder()
+				.setEmbed(embedBuilder.build());
+		channel.sendMessage(messageBuilder.build()).queue();
 	}
 	
 	/**
