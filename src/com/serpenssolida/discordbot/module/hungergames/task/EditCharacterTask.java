@@ -395,7 +395,7 @@ public class EditCharacterTask extends Task
 			this.buttonGroup = null;
 			this.sendWithCancelButton(messageB);
 			
-			return true;
+			return ButtonCallback.LEAVE_MESSAGE;
 		}));
 		
 		this.buttonGroup.addButton(new ButtonCallback("edit-stats", this.user, this.channel, (event, guild, channel, message, author) ->
@@ -419,7 +419,7 @@ public class EditCharacterTask extends Task
 			this.buttonGroup = null;
 			this.sendWithCancelButton(messageB);
 			
-			return true;
+			return ButtonCallback.LEAVE_MESSAGE;
 		}));
 		
 		this.registerCancelButton();

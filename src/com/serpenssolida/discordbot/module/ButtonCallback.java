@@ -11,6 +11,9 @@ public class ButtonCallback
 	private MessageChannel channel;
 	private ButtonAction action;
 	
+	public static boolean DELETE_MESSAGE = true;
+	public static boolean LEAVE_MESSAGE = false;
+	
 	public ButtonCallback(String id, User user, MessageChannel channel, ButtonAction action)
 	{
 		this.id = id;
@@ -20,7 +23,7 @@ public class ButtonCallback
 	}
 	
 	/**
-	 * Calls the callback of the command, if no collback is set the function return false.
+	 * Calls the callback of the button, if no collback is set the function return false.
 	 *
 	 * @param event
 	 * 		The event being performed.

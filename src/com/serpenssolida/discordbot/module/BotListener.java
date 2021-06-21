@@ -193,13 +193,13 @@ public class BotListener extends ListenerAdapter
 			ButtonCallback buttonCallback = buttonGroup.getButton(button.getId());
 			event.deferEdit().queue(); //Let discord know we know the button has been clicked.
 			
-			//Do command action.
+			//Do button action.
 			boolean deleteMessage = buttonCallback.doAction(event);
 			
-			//Delete command message if the command was successfully ran.
+			//Delete message that has the clicked button if it should be deleted.
 			if (BotMain.getDeleteCommandMessages(guild.getId()) && deleteMessage)
 			{
-				channel.deleteMessageById(event.getMessageId()).queue();
+				event.getHook().deleteOriginal().queue();
 			}
 		}
 		else if (task != null)
@@ -210,14 +210,14 @@ public class BotListener extends ListenerAdapter
 			{
 				ButtonCallback buttonCallback = buttonGroup.getButton(button.getId());
 				
-				//Do command action.
+				//Do button action.
 				boolean deleteMessage = buttonCallback.doAction(event);
-				task.deleteButtons();
+				//task.deleteButtons();
 				
-				//Delete command message if the command was successfully ran.
+				//Delete message that has the clicked button if it should be deleted.
 				if (BotMain.getDeleteCommandMessages(guild.getId()) && deleteMessage)
 				{
-					channel.deleteMessageById(event.getMessageId()).queue();
+					event.getHook().deleteOriginal().queue();
 				}
 				
 				//Remove the task if it finished.

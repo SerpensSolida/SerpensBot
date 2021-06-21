@@ -241,6 +241,6 @@ public abstract class Task
 		//event.getHook().editOriginal(b.build()).queue(); //Remove buttons from the original message.
 		
 		this.buttonGroup = null;
-		return true;
+		return ButtonCallback.DELETE_MESSAGE;
 	};
 }
