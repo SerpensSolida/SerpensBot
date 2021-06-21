@@ -54,9 +54,9 @@ public class HungerGamesController
 		//Cannot start a new HungerGames if there is already one running.
 		if (HungerGamesController.isHungerGamesRunning(guildID))
 		{
-			MessageBuilder builder = new MessageBuilder();
-			builder.append("> Non puoi usare questo comando mentre è in corso un HungerGames.");
-			channel.sendMessage(builder.build()).queue();
+			MessageBuilder messageBuilder = new MessageBuilder();
+			messageBuilder.append("> Non puoi usare questo comando mentre è in corso un HungerGames.");
+			channel.sendMessage(messageBuilder.build()).queue();
 			return;
 		}
 		

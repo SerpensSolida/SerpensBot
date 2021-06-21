@@ -38,14 +38,14 @@ public class EditCharacterTask extends Task
 	}
 	
 	@Override
-	public boolean startMessage(MessageBuilder builder)
+	public boolean startMessage(MessageBuilder messageBuilder)
 	{
 		//Abort task if there is an HungerGames running.
 		if (HungerGamesController.isHungerGamesRunning(this.getGuild().getId()))
 		{
 			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Modifica del personaggio", this.getUser())
 					.setDescription("Non puoi usare questo comando perchè è in corso un HungerGames.");
-			builder.setEmbed(embedBuilder.build());
+			messageBuilder.setEmbed(embedBuilder.build());
 			
 			this.setInterrupted(true);
 			this.running = false;
@@ -60,7 +60,7 @@ public class EditCharacterTask extends Task
 		{
 			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Modifica del personaggio", this.getUser())
 					.setDescription("Non è stato trovato nessun personaggio.");
-			builder.setEmbed(embedBuilder.build());
+			messageBuilder.setEmbed(embedBuilder.build());
 
 			this.setInterrupted(true);
 			this.running = false;
@@ -68,7 +68,7 @@ public class EditCharacterTask extends Task
 		}
 		
 		//Send a message with the menu.
-		this.createMenuMessage(builder);
+		this.insertMenu(messageBuilder);
 		return false;
 	}
 	
@@ -85,10 +85,10 @@ public class EditCharacterTask extends Task
 			
 			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Modifica del personaggio", this.getUser())
 					.setDescription("Non puoi completare la procedura perchè è in corso un HungerGames.");
-			MessageBuilder builder = new MessageBuilder()
+			MessageBuilder messageBuilder = new MessageBuilder()
 					.setEmbed(embedBuilder.build());
 			
-			this.channel.sendMessage(builder.build()).queue();
+			this.channel.sendMessage(messageBuilder.build()).queue();
 			
 			this.running = false;
 			return;
@@ -291,15 +291,15 @@ public class EditCharacterTask extends Task
 	}
 	
 	/**
-	 * Create a builder that contains the menu of the task to the channel.
+	 * Create a MessageBuilder that contains the menu of the task to the message.
 	 */
 	public MessageBuilder createMenuMessage()
 	{
-		MessageBuilder builder = new MessageBuilder();
+		MessageBuilder messageBuilder = new MessageBuilder();
 		
-		this.createMenuMessage(builder);
+		this.insertMenu(messageBuilder);
 		
-		return builder;
+		return messageBuilder;
 				//.append("> \t:regional_indicator_a: - Nome.\n")
 				//.append("> \t:regional_indicator_b: - Statistiche.\n")
 				//.append("> \t:x: - Esci.\n");
@@ -349,9 +349,9 @@ public class EditCharacterTask extends Task
 		this.registerCancelButton();
 		
 		//Add button to the message.
-		builder.setActionRows(ActionRow.of(editName, editStats, cancelTask));
-		//this.getChannel().sendMessage(builder.build()).queue();
-		return builder;*/
+		messageBuilder.setActionRows(ActionRow.of(editName, editStats, cancelTask));
+		//this.getChannel().sendMessage(messageBuilder.build()).queue();
+		return messageBuilder;*/
 
 		/*//Add the reaction to the menu.
 		messageAction.queue(message ->
@@ -364,9 +364,9 @@ public class EditCharacterTask extends Task
 	}
 	
 	/**
-	 * Create a builder that contains the menu of the task to the channel.
+	 * Add the menu of the task to the given MessageBuilder.
 	 */
-	public void createMenuMessage(MessageBuilder messageBuilder)
+	public void insertMenu(MessageBuilder messageBuilder)
 	{
 		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Modifica del personaggio", this.getUser())
 				.appendDescription("Seleziona cosa vuoi modificare del tuo personaggio.\n");

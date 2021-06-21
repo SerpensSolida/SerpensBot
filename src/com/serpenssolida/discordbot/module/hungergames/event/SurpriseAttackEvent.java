@@ -24,7 +24,7 @@ public class SurpriseAttackEvent extends HungerGamesEvent
 	
 	public EventResult doEvent(HungerGames hg)
 	{
-		StringBuilder builder = new StringBuilder();
+		StringBuilder stringBuilder = new StringBuilder();
 		HashSet<Player> alivePlayers = hg.getAlivePlayers();
 		HashSet<Player> deadPlayers = hg.getDeadPlayers();
 		HashSet<Player> involvedPlayers = hg.getInvolvedPlayers();
@@ -51,12 +51,12 @@ public class SurpriseAttackEvent extends HungerGamesEvent
 		Player player2 = (Player) RandomChoice.getRandom(targetSet.toArray());
 		
 		if (player1.getFriends().contains(player2))
-			builder.append("L'alleanza tra **" + player1 + "** e **" + player2 + "** è rotta.\n");
+			stringBuilder.append("L'alleanza tra **" + player1 + "** e **" + player2 + "** è rotta.\n");
 		
 		String message = (String) RandomChoice.getRandom(this.messages);
 		message = message.replaceAll("user", "**" + player1 + "**");
 		message = message.replaceAll("receiver", "**" + player2 + "**");
-		builder.append(message);
+		stringBuilder.append(message);
 		
 		involvedPlayers.add(player1);
 		combatPlayers.add(player1);
@@ -71,12 +71,12 @@ public class SurpriseAttackEvent extends HungerGamesEvent
 		
 		if (RandomChoice.random.nextInt(10) < 5)
 		{
-			builder.append(", ma fallisce.\n");
+			stringBuilder.append(", ma fallisce.\n");
 		}
 		else
 		{
 			AttackResult result = player1.attack(player2, 1.5f);
-			builder.append("\n" + result + "\n");
+			stringBuilder.append("\n" + result + "\n");
 			
 			if (player2.isDead())
 			{
@@ -86,7 +86,7 @@ public class SurpriseAttackEvent extends HungerGamesEvent
 				player2.removeRelationships();
 				player1.getCharacter().incrementKills();
 				
-				builder.append("**" + player2 + "** è morto.\n");
+				stringBuilder.append("**" + player2 + "** è morto.\n");
 				
 				if (RandomChoice.randomChance(10))
 				{
@@ -96,13 +96,13 @@ public class SurpriseAttackEvent extends HungerGamesEvent
 					{
 						player1.getInventory().addItem(stolenItem, 1);
 						
-						builder.append(String.format("**%s** ha trovato *%s* nel corpo di **%s**.\n", player1, stolenItem, player2));
+						stringBuilder.append(String.format("**%s** ha trovato *%s* nel corpo di **%s**.\n", player1, stolenItem, player2));
 					}
 				}
 			}
 		}
 		
-		return new EventResult(builder.toString(), EventResult.State.Successful);
+		return new EventResult(stringBuilder.toString(), EventResult.State.Successful);
 	}
 	
 	private HashSet<Player> getRelationshipSet(Player player, HashSet<Player> alivePlayers, HashSet<Player> availablePlayers)

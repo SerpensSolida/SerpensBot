@@ -254,20 +254,20 @@ public class BotListener extends ListenerAdapter
 	
 	private void cancelTask(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
-		MessageBuilder builder = new MessageBuilder();
+		MessageBuilder messageBuilder = new MessageBuilder();
 		Task task = this.getTask(guild.getId(), author);
 		
 		if (task != null)
 		{
 			this.removeTask(guild.getId(), this.getTask(guild.getId(), author));
-			builder.append("> La procedura corrente è stata annullata.");
+			messageBuilder.append("> La procedura corrente è stata annullata.");
 		}
 		else
 		{
-			builder.append("> Nessuna procedura in corso.");
+			messageBuilder.append("> Nessuna procedura in corso.");
 		}
 		
-		event.reply(builder.build()).setEphemeral(task == null).queue();
+		event.reply(messageBuilder.build()).setEphemeral(task == null).queue();
 	}
 	
 	private void sendHelp(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)

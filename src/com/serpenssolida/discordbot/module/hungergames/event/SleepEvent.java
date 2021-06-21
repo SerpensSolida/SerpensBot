@@ -19,7 +19,7 @@ public class SleepEvent extends HungerGamesEvent
 	
 	public EventResult doEvent(HungerGames hg)
 	{
-		StringBuilder builder = new StringBuilder();
+		StringBuilder stringBuilder = new StringBuilder();
 		
 		HashSet<Player> alivePlayers = hg.getAlivePlayers();
 		HashSet<Player> involvedPlayers = hg.getInvolvedPlayers();
@@ -49,7 +49,7 @@ public class SleepEvent extends HungerGamesEvent
 		eventMessage = eventMessage.replaceAll("damage", "" + (int) damage);
 		eventMessage = eventMessage.replaceAll("user", "**" + player + "**");
 		
-		builder.append(eventMessage + "\n");
+		stringBuilder.append(eventMessage + "\n");
 		
 		//The player can't do anything else during this turn.
 		involvedPlayers.add(player);
@@ -58,6 +58,6 @@ public class SleepEvent extends HungerGamesEvent
 		healedPlayers.add(player);
 		sleepPlayers.add(player);
 		
-		return new EventResult(builder.toString(), EventResult.State.Successful);
+		return new EventResult(stringBuilder.toString(), EventResult.State.Successful);
 	}
 }

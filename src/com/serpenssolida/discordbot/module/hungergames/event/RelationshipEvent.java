@@ -35,7 +35,7 @@ public class RelationshipEvent extends HungerGamesEvent
 	
 	public EventResult doEvent(HungerGames hg)
 	{
-		StringBuilder builder = new StringBuilder();
+		StringBuilder stringBuilder = new StringBuilder();
 		HashSet<Player> alivePlayers = hg.getAlivePlayers();
 		HashSet<Player> involvedPlayers = hg.getInvolvedPlayers();
 		HashSet<Player> availablePlayers = new HashSet<>(alivePlayers);
@@ -81,8 +81,8 @@ public class RelationshipEvent extends HungerGamesEvent
 		
 		message = message.replaceAll("user", "**" + player1 + "**");
 		message = message.replaceAll("receiver", "**" + player2 + "**");
-		builder.append(message + "\n");
+		stringBuilder.append(message + "\n");
 		
-		return new EventResult(builder.toString(), EventResult.State.Successful);
+		return new EventResult(stringBuilder.toString(), EventResult.State.Successful);
 	}
 }

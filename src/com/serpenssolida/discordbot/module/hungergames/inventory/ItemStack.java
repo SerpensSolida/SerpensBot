@@ -33,11 +33,11 @@ public class ItemStack<T extends Item>
 	
 	public String toString()
 	{
-		StringBuilder builder = new StringBuilder();
+		StringBuilder stringBuilder = new StringBuilder();
 		if (this.getNum() > 1)
-			builder.append(this.getNum())
+			stringBuilder.append(this.getNum())
 					.append("x ");
-		builder.append(this.getItem().name);
-		return builder.toString();
+		stringBuilder.append(this.getItem().name);
+		return stringBuilder.toString();
 	}
 }

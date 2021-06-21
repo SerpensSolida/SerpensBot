@@ -30,14 +30,14 @@ public class CreateCharacterTask extends Task
 	}
 	
 	@Override
-	public boolean startMessage(MessageBuilder builder)
+	public boolean startMessage(MessageBuilder messageBuilder)
 	{
 		//Abort task if there is an HungerGames running.
 		if (HungerGamesController.isHungerGamesRunning(this.getGuild().getId()))
 		{
 			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Creazione del personaggio", this.getUser())
 					.setDescription("Non puoi usare questo comando perchè è in corso un HungerGames.");
-			builder.setEmbed(embedBuilder.build());
+			messageBuilder.setEmbed(embedBuilder.build());
 
 			//this.sendMessage(builder.build());
 			
@@ -47,9 +47,9 @@ public class CreateCharacterTask extends Task
 		}
 		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Creazione del personaggio", this.getUser())
 				.setDescription("Stai creando un personaggio! Inserisci il nome del tuo personaggio. (max 16 caratteri)");
-		builder.setEmbed(embedBuilder.build());
+		messageBuilder.setEmbed(embedBuilder.build());
 
-		this.addCancelButton(builder);
+		this.addCancelButton(messageBuilder);
 		
 		this.state = State.NAME_CHARACTER;
 		this.character = new Character(this.user.getId());
@@ -69,10 +69,10 @@ public class CreateCharacterTask extends Task
 		{
 			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Creazione del personaggio", this.getUser())
 					.setDescription("Non puoi completare la procedura perchè è in corso un HungerGames.");
-			MessageBuilder builder = new MessageBuilder()
+			MessageBuilder messageBuilder = new MessageBuilder()
 					.setEmbed(embedBuilder.build());
 			
-			this.sendMessage(builder.build());
+			this.sendMessage(messageBuilder.build());
 			
 			this.running = false;
 			return;
@@ -119,10 +119,10 @@ public class CreateCharacterTask extends Task
 		{
 			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Creazione del personaggio", this.getUser())
 					.setDescription((name.length() <= 0) ? "Devi inserire un nome!" : "Il nome non può essere più lungo di 15 caratteri!");
-			MessageBuilder builder = new MessageBuilder()
+			MessageBuilder messageBuilder = new MessageBuilder()
 					.setEmbed(embedBuilder.build());
 			
-			this.sendWithCancelButton(builder);
+			this.sendWithCancelButton(messageBuilder);
 			return;
 		}
 		
@@ -140,9 +140,9 @@ public class CreateCharacterTask extends Task
 				.appendDescription("Vitalità, Forza, Abilità, Special, Velocità, Resistenza e Gusto. ")
 				.appendDescription("\nLa somma dei valori delle caratteristiche deve essere " + HungerGamesController.SUM_STATS + " punti e ogni caratteristica deve essere compresa tra 0 e 10!");
 		
-		MessageBuilder builder = new MessageBuilder()
+		MessageBuilder messageBuilder = new MessageBuilder()
 				.setEmbed(embedBuilder.build());
-		this.sendWithCancelButton(builder);
+		this.sendWithCancelButton(messageBuilder);
 	}
 	
 	private void manageAssignStatsState(Message receivedMessage)
@@ -161,9 +161,9 @@ public class CreateCharacterTask extends Task
 					.appendDescription("Vitalità, Forza, Abilità, Special, Velocità, Resistenza e Gusto. ")
 					.appendDescription("\nLa somma dei valori delle caratteristiche deve essere " + HungerGamesController.SUM_STATS + " punti e ogni caratteristica deve essere compresa tra 0 e 10!");
 			
-			MessageBuilder builder = new MessageBuilder()
+			MessageBuilder messageBuilder = new MessageBuilder()
 					.setEmbed(embedBuilder.build());
-			this.sendWithCancelButton(builder);
+			this.sendWithCancelButton(messageBuilder);
 			return;
 		}
 		

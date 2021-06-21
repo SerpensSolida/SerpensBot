@@ -17,7 +17,7 @@ public class GlobalDamageEvent extends HungerGamesEvent
 	
 	public EventResult doEvent(HungerGames hg)
 	{
-		StringBuilder builder = new StringBuilder();
+		StringBuilder stringBuilder = new StringBuilder();
 		HashSet<Player> alivePlayers = hg.getAlivePlayers();
 		HashSet<Player> deadPlayers = hg.getDeadPlayers();
 		HashSet<Player> involvedPlayers = hg.getInvolvedPlayers();
@@ -26,7 +26,7 @@ public class GlobalDamageEvent extends HungerGamesEvent
 		float damage = (15 + RandomChoice.random.nextInt(30));
 		
 		String eventString = ((String) RandomChoice.getRandom(this.messages)).replaceAll("damage", "" + (int) damage);
-		builder.append(eventString + "\n");
+		stringBuilder.append(eventString + "\n");
 		
 		//Damage all the players.
 		for (Player alivePlayer : alivePlayers)
@@ -38,13 +38,13 @@ public class GlobalDamageEvent extends HungerGamesEvent
 				deadPlayers.add(alivePlayer);
 				alivePlayer.removeRelationships();
 				
-				builder.append("**" + alivePlayer + "** è morto.\n");
+				stringBuilder.append("**" + alivePlayer + "** è morto.\n");
 			}
 		}
 		
 		involvedPlayers.addAll(alivePlayers);
 		alivePlayers.removeAll(deadPlayers);
 		
-		return new EventResult(builder.toString(), EventResult.State.Successful);
+		return new EventResult(stringBuilder.toString(), EventResult.State.Successful);
 	}
 }

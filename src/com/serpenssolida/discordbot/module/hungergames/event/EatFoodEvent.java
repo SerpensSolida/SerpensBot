@@ -31,7 +31,7 @@ public class EatFoodEvent extends HungerGamesEvent
 	
 	public EventResult doEvent(HungerGames hg)
 	{
-		StringBuilder builder = new StringBuilder();
+		StringBuilder stringBuilder = new StringBuilder();
 		HashSet<Player> alivePlayers = hg.getAlivePlayers();
 		HashSet<Player> deadPlayers = hg.getDeadPlayers();
 		HashSet<Player> healedPlayers = hg.getHealedPlayers();
@@ -63,7 +63,7 @@ public class EatFoodEvent extends HungerGamesEvent
 			String message = (String) RandomChoice.getRandom(this.noFoodMessages);
 			message = message.replaceAll("user", "**" + player + "**");
 			message = message.replaceAll("amount", "" + (int) f);
-			builder.append(message + "\n");
+			stringBuilder.append(message + "\n");
 			
 			//Deal damage to the player.
 			player.setHealth(player.getHealth() + f);
@@ -78,10 +78,10 @@ public class EatFoodEvent extends HungerGamesEvent
 				
 				player.removeRelationships();
 				
-				builder.append("**" + player + "** è morto.\n");
+				stringBuilder.append("**" + player + "** è morto.\n");
 			}
 			
-			return new EventResult(builder.toString(), EventResult.State.Successful);
+			return new EventResult(stringBuilder.toString(), EventResult.State.Successful);
 		}
 		
 		if (player.getHealth() >= player.getMaxHealth())
@@ -93,12 +93,12 @@ public class EatFoodEvent extends HungerGamesEvent
 			
 			String message = (String) RandomChoice.getRandom(this.fullhealthMessage);
 			message = message.replaceAll("user", "**" + player + "**");
-			builder.append(message + "\n");
+			stringBuilder.append(message + "\n");
 			
 			healedPlayers.add(player);
 			involvedPlayers.add(player);
 			
-			return new EventResult(builder.toString(), EventResult.State.Successful);
+			return new EventResult(stringBuilder.toString(), EventResult.State.Successful);
 		}
 		
 		//Get a random food and its healing value.
@@ -112,7 +112,7 @@ public class EatFoodEvent extends HungerGamesEvent
 		//Remove the food from the inventory.
 		player.getInventory().removeItem(food, 1);
 		
-		builder.append(this.replace(food, player, hpHealed) + "\n");
+		stringBuilder.append(this.replace(food, player, hpHealed) + "\n");
 		
 		healedPlayers.add(player);
 		involvedPlayers.add(player);
@@ -122,10 +122,10 @@ public class EatFoodEvent extends HungerGamesEvent
 			alivePlayers.remove(player);
 			deadPlayers.add(player);
 			player.removeRelationships();
-			builder.append("**" + player + "** è morto.\n");
+			stringBuilder.append("**" + player + "** è morto.\n");
 		}
 		
-		return new EventResult(builder.toString(), EventResult.State.Successful);
+		return new EventResult(stringBuilder.toString(), EventResult.State.Successful);
 	}
 	
 	private String replace(Food food, Player player, float hpHealed)

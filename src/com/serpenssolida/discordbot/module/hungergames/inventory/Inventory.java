@@ -1,11 +1,8 @@
 package com.serpenssolida.discordbot.module.hungergames.inventory;
 
-import jdk.nashorn.api.tree.SimpleTreeVisitorES5_1;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class Inventory
 {
@@ -90,24 +87,24 @@ public class Inventory
 	
 	public String toString()
 	{
-		StringBuilder builder = new StringBuilder();
-		builder.append("Inventario: ");
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("Inventario: ");
 		if (this.foods.size() <= 0 && this.weapons.size() <= 0)
 		{
-			builder.append("Vuoto.");
-			return builder.toString();
+			stringBuilder.append("Vuoto.");
+			return stringBuilder.toString();
 		}
 		for (Map.Entry<Food, ItemStack<Food>> foodEntry : this.foods.entrySet())
 		{
 			ItemStack<Food> stack = foodEntry.getValue();
-			builder.append("" + stack + ", ");
+			stringBuilder.append("" + stack + ", ");
 		}
 		for (Map.Entry<Weapon, ItemStack<Weapon>> foodEntry : this.weapons.entrySet())
 		{
 			ItemStack<Weapon> stack = foodEntry.getValue();
-			builder.append("" + stack + ", ");
+			stringBuilder.append("" + stack + ", ");
 		}
-		builder.replace(builder.length() - 2, builder.length() - 1, "");
-		return builder.toString();
+		stringBuilder.replace(stringBuilder.length() - 2, stringBuilder.length() - 1, "");
+		return stringBuilder.toString();
 	}
 }

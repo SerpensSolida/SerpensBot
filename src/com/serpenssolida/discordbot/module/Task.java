@@ -31,20 +31,20 @@ public abstract class Task
 	
 	public void start()
 	{
-		MessageBuilder builder = new MessageBuilder();
+		MessageBuilder messageBuilder = new MessageBuilder();
 		
 		//Reply with the starting message.
-		this.channel.sendMessage(builder.build()).queue(this::setLastMessage);
+		this.channel.sendMessage(messageBuilder.build()).queue(this::setLastMessage);
 	}
 	
 	public void start(GenericInteractionCreateEvent event)
 	{
-		MessageBuilder builder = new MessageBuilder();
-		boolean ephemeral = this.startMessage(builder);
+		MessageBuilder messageBuilder = new MessageBuilder();
+		boolean ephemeral = this.startMessage(messageBuilder);
 		
 		//Reply with the starting message.
 		//Refer to this: https://f8n-ipfs-production.imgix.net/QmaWn5w91si1shcFZfssY8yQQ58DpvVwQ4GoHyHnTx4dMA/nft.jpg?fit=fill&q=100&w=2560
-		event.reply(builder.build())
+		event.reply(messageBuilder.build())
 				.setEphemeral(ephemeral)
 				.queue(interactionHook ->
 				{
@@ -55,7 +55,7 @@ public abstract class Task
 	
 	
 	
-	public abstract boolean startMessage(MessageBuilder builder);
+	public abstract boolean startMessage(MessageBuilder messageBuilder);
 	
 	/**
 	 * Consumes the given message and returns whether or not the task has finished.
@@ -88,7 +88,7 @@ public abstract class Task
 	 */
 	public void consumeReaction(Message message, String reaction)
 	{
-		MessageBuilder builder = new MessageBuilder();
+		//MessageBuilder messageBuilder = new MessageBuilder();
 		
 		//TODO: Remove it, may be obsolete now.
 		//Check if the player
@@ -96,8 +96,8 @@ public abstract class Task
 		{
 			if ("❌".equals(reaction))
 			{
-				builder.append("> La procedura è stata annullata.");
-				this.getChannel().sendMessage(builder.build()).queue();
+				messageBuilder.append("> La procedura è stata annullata.");
+				this.getChannel().sendMessage(messageBuilder.build()).queue();
 				this.running = false;
 				return;
 			}
@@ -121,22 +121,22 @@ public abstract class Task
 	 * Send a message in the channel the task is running on and add a reaction tu it.
 	 * The message will also be stored in the variable this.lastMessage.
 	 *
-	 * @param builder
-	 * 		The builder that will be sent with the cancel button.
+	 * @param messageBuilder
+	 * 		The messageBuilder that will be sent with the cancel button.
 	 */
-	public void sendWithCancelButton(MessageBuilder builder)
+	public void sendWithCancelButton(MessageBuilder messageBuilder)
 	{
-		this.addCancelButton(builder);
+		this.addCancelButton(messageBuilder);
 		
-		this.channel.sendMessage(builder.build()).queue(sentMessage ->
+		this.channel.sendMessage(messageBuilder.build()).queue(sentMessage ->
 		{
 			this.lastMessage = sentMessage;
 		});
 	}
 	
-	public void addCancelButton(MessageBuilder builder)
+	public void addCancelButton(MessageBuilder messageBuilder)
 	{
-		builder.setActionRows(ActionRow.of(Button.danger("cancel-task", "Esci dalla procedura")));
+		messageBuilder.setActionRows(ActionRow.of(Button.danger("cancel-task", "Esci dalla procedura")));
 		this.registerCancelButton();
 	}
 	
@@ -152,15 +152,16 @@ public abstract class Task
 	{
 		if (this.lastMessage != null)
 		{
-			MessageBuilder builder = new MessageBuilder()
+			//Copy the last message and edits it without the buttons.
+			MessageBuilder messageBuilder = new MessageBuilder()
 					.append(this.lastMessage.getContentDisplay());
 			
 			for (MessageEmbed embed : this.lastMessage.getEmbeds())
 			{
-				builder.setEmbed(embed);
+				messageBuilder.setEmbed(embed);
 			}
 			
-			this.lastMessage.editMessage(builder.build()).queue();
+			this.lastMessage.editMessage(messageBuilder.build()).queue();
 		}
 	}
 	

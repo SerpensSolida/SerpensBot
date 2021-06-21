@@ -64,7 +64,7 @@ public class SettingsListener extends BotListener
 	private void setDeleteCommandMessages(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		Member authorMember = guild.retrieveMember(author).complete();
-		StringBuilder builder = new StringBuilder();
+		StringBuilder stringBuilder = new StringBuilder();
 		
 		//Check in the user has permission to run this command.
 		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
@@ -80,14 +80,14 @@ public class SettingsListener extends BotListener
 			boolean value = argument.getAsBoolean();
 			BotMain.setDeleteCommandMessages(guild.getId(), value);
 			BotMain.saveSettings(guild.getId());
-			builder.append(">" + (value ? "Cancellerò" : "Lascerò") + " i comandi che sono stati inviati in chat.");
+			stringBuilder.append(">" + (value ? "Cancellerò" : "Lascerò") + " i comandi che sono stati inviati in chat.");
 		}
 		else
 		{
-			builder.append("> Devi inserire (true|false) come argomento.");
+			stringBuilder.append("> Devi inserire (true|false) come argomento.");
 		}
 		
-		event.reply(builder.toString()).setEphemeral(argument == null).queue(); //Set ephemeral if the user didn't put the argument.
+		event.reply(stringBuilder.toString()).setEphemeral(argument == null).queue(); //Set ephemeral if the user didn't put the argument.
 	}
 	
 	private void modulePrefixCommand(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)

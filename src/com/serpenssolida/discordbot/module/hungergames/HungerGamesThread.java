@@ -4,35 +4,19 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.serpenssolida.discordbot.RandomChoice;
 import com.serpenssolida.discordbot.avatar.AvatarCache;
-import com.serpenssolida.discordbot.module.hungergames.event.BattleEvent;
-import com.serpenssolida.discordbot.module.hungergames.event.EatFoodEvent;
-import com.serpenssolida.discordbot.module.hungergames.event.EventResult;
-import com.serpenssolida.discordbot.module.hungergames.event.FoundItemEvent;
-import com.serpenssolida.discordbot.module.hungergames.event.GlobalDamageEvent;
-import com.serpenssolida.discordbot.module.hungergames.event.HungerGamesEvent;
-import com.serpenssolida.discordbot.module.hungergames.event.IncidentEvent;
-import com.serpenssolida.discordbot.module.hungergames.event.RandomEvent;
-import com.serpenssolida.discordbot.module.hungergames.event.RelationshipEvent;
-import com.serpenssolida.discordbot.module.hungergames.event.SleepEvent;
-import com.serpenssolida.discordbot.module.hungergames.event.SurpriseAttackEvent;
+import com.serpenssolida.discordbot.module.hungergames.event.*;
 import com.serpenssolida.discordbot.module.hungergames.inventory.Weapon;
 import com.serpenssolida.discordbot.module.hungergames.io.ItemData;
-
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashSet;
-import javax.imageio.ImageIO;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.utils.AttachmentOption;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.util.HashSet;
 
 public class HungerGamesThread extends Thread
 {
@@ -378,7 +362,7 @@ public class HungerGamesThread extends Thread
 	 */
 	private String getRelationships()
 	{
-		StringBuilder builder = new StringBuilder();
+		StringBuilder stringBuilder = new StringBuilder();
 		
 		for (Player alivePlayer : this.hg.getAlivePlayers())
 		{
@@ -387,53 +371,53 @@ public class HungerGamesThread extends Thread
 			
 			if (!friends.isEmpty() || !enemies.isEmpty())
 			{
-				builder.append("**" + alivePlayer + "** - ");
-				builder.append("Alleati: ");
+				stringBuilder.append("**" + alivePlayer + "** - ");
+				stringBuilder.append("Alleati: ");
 				
 				if (!friends.isEmpty())
 				{
 					for (Player friend : friends)
 					{
-						builder.append("**" + friend + "**, ");
+						stringBuilder.append("**" + friend + "**, ");
 					}
 					
-					builder.deleteCharAt(builder.length() - 1);
-					builder.deleteCharAt(builder.length() - 1);
-					builder.append(". ");
+					stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+					stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+					stringBuilder.append(". ");
 				}
 				else
 				{
-					builder.append("nessuno. ");
+					stringBuilder.append("nessuno. ");
 				}
 				
-				builder.append("Nemici: ");
+				stringBuilder.append("Nemici: ");
 				
 				if (!enemies.isEmpty())
 				{
 					for (Player enemy : enemies)
 					{
-						builder.append("**" + enemy + "**, ");
+						stringBuilder.append("**" + enemy + "**, ");
 					}
 					
-					builder.deleteCharAt(builder.length() - 1);
-					builder.deleteCharAt(builder.length() - 1);
-					builder.append(". ");
+					stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+					stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+					stringBuilder.append(". ");
 				}
 				else
 				{
-					builder.append("nessuno. ");
+					stringBuilder.append("nessuno. ");
 				}
 				
-				builder.append("\n");
+				stringBuilder.append("\n");
 			}
 		}
 		
-		if (builder.toString().isBlank())
+		if (stringBuilder.toString().isBlank())
 		{
-			builder.append("Nessuna amicizia o rivalità.");
+			stringBuilder.append("Nessuna amicizia o rivalità.");
 		}
 		
-		return builder.toString();
+		return stringBuilder.toString();
 	}
 	
 	/**
