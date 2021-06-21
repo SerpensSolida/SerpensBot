@@ -69,7 +69,7 @@ public class SettingsListener extends BotListener
 		//Check in the user has permission to run this command.
 		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
 		{
-			channel.sendMessage("> Devi essere il proprietario o moderatore del server per modificare il prefisso di un modulo.").queue();
+			event.reply("> Devi essere il proprietario o moderatore del server per modificare il simbolo per i comandi non listati.").setEphemeral(true).queue();
 			return;
 		}
 		

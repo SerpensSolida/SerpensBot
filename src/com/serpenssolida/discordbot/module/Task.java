@@ -66,7 +66,7 @@ public abstract class Task
 	 * @param message
 	 * 		The message the task will consume.
 	 *
-	 * @return Whether or not the task has finished and can be removed.
+	 * //@return Whether or not the task has finished and can be removed.
 	 */
 	public abstract void consumeMessage(Message message);
 	

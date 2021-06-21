@@ -112,7 +112,6 @@ public class BotListener extends ListenerAdapter
 		{
 			//Pass the event to the task.
 			task.consumeMessage(event.getMessage());
-			task.deleteButtons();
 			
 			//Remove the task if it finished.
 			if (!task.isRunning())

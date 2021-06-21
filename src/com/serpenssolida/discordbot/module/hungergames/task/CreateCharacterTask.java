@@ -53,6 +53,9 @@ public class CreateCharacterTask extends Task
 		if (!receivedMessage.getAuthor().equals(this.getUser()))
 			return;
 		
+		//Remove buttons from last message.
+		this.deleteButtons();
+		
 		//Abort task if there is an HungerGames running.
 		if (HungerGamesController.isHungerGamesRunning(this.getGuild().getId()))
 		{

@@ -72,9 +72,11 @@ public class EditCharacterTask extends Task
 		//Abort task if there is an HungerGames running.
 		if (HungerGamesController.isHungerGamesRunning(this.getGuild().getId()))
 		{
+			this.deleteButtons();
+			
 			MessageBuilder builder = new MessageBuilder()
 					.append("> Non puoi completare la procedura perchè è in corso un HungerGames.");
-			this.sendMessage(builder.build());
+			this.channel.sendMessage(builder.build()).queue();
 			
 			this.running = false;
 			return;
@@ -93,7 +95,8 @@ public class EditCharacterTask extends Task
 		}
 		
 		//This state is not possible, you broke my FSM :(
-		receivedMessage.getChannel().sendMessage("Stato illegale, fai schifo con le MSF.").queue();
+		this.channel.sendMessage("Stato illegale, fai schifo con le MSF.").queue();
+		this.deleteButtons();
 		
 		this.running = false;
 	}
@@ -160,6 +163,9 @@ public class EditCharacterTask extends Task
 		String message = receivedMessage.getContentDisplay();
 		String name = message.strip();
 		
+		//Remove buttons from last message.
+		this.deleteButtons();
+		
 		//Check if the name is empty or its length is greater than 16.
 		if (name.length() <= 0 || name.length() > 16)
 		{
@@ -189,6 +195,9 @@ public class EditCharacterTask extends Task
 		String[] abilitiesList = message.strip().replaceAll(" +", " ").split(" ");
 		int[] abilities = new int[abilitiesList.length];
 		int sum = 0;
+		
+		//Remove buttons from last message.
+		this.deleteButtons();
 		
 		//Check number of ability sent with the message.
 		if (abilities.length != 7)
@@ -255,13 +264,16 @@ public class EditCharacterTask extends Task
 	 */
 	public MessageBuilder createMenuMessage()
 	{
-		MessageBuilder builder = new MessageBuilder()
-				.append("> Seleziona cosa vuoi modificare del tuo personaggio.\n");
+		MessageBuilder builder = new MessageBuilder();
+		
+		this.createMenuMessage(builder);
+		
+		return builder;
 				//.append("> \t:regional_indicator_a: - Nome.\n")
 				//.append("> \t:regional_indicator_b: - Statistiche.\n")
 				//.append("> \t:x: - Esci.\n");
 		
-		Button editName = Button.primary("edit-name", "Modifica il nome");
+		/*Button editName = Button.primary("edit-name", "Modifica il nome");
 		Button editStats = Button.primary("edit-stats", "Modifica le caratteristiche");
 		Button cancelTask = Button.danger("cancel-task", "Esci");
 		
@@ -308,7 +320,7 @@ public class EditCharacterTask extends Task
 		//Add button to the message.
 		builder.setActionRows(ActionRow.of(editName, editStats, cancelTask));
 		//this.getChannel().sendMessage(builder.build()).queue();
-		return builder;
+		return builder;*/
 
 		/*//Add the reaction to the menu.
 		messageAction.queue(message ->
