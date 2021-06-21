@@ -491,8 +491,8 @@ public class BotListener extends ListenerAdapter
 		return this.botCommands;
 	}
 	
-	public void setBotCommands(HashMap<String, BotCommand> botCommands)
+	public HashMap<String, UnlistedBotCommand> getUnlistedBotCommands()
 	{
-		this.botCommands = botCommands;
+		return this.unlistedBotCommands;
 	}
 }
