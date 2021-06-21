@@ -3,7 +3,6 @@ package com.serpenssolida.discordbot.module.hungergames;
 import com.serpenssolida.discordbot.BotMain;
 import com.serpenssolida.discordbot.module.BotCommand;
 import com.serpenssolida.discordbot.module.BotListener;
-import com.serpenssolida.discordbot.module.UnlistedBotCommand;
 import com.serpenssolida.discordbot.module.hungergames.task.CreateCharacterTask;
 import com.serpenssolida.discordbot.module.hungergames.task.EditCharacterTask;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -25,14 +24,6 @@ public class HungerGamesListener extends BotListener
 	{
 		super("hg");
 		this.setModuleName("HungerGames");
-		
-		UnlistedBotCommand unlistedBotCommand = new UnlistedBotCommand("ping", 0);
-		unlistedBotCommand.setAction((guild, channel, message, author, args) ->
-		{
-			message.reply("pong").queue();
-			return true;
-		});
-		this.addUnlistedBotCommand(unlistedBotCommand);
 		
 		//Command for creating a character.
 		BotCommand command = new BotCommand("create", "Fa partire la procedura per la creazione di un personaggio.");
