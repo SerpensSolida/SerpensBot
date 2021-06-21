@@ -187,7 +187,7 @@ public class BotListener extends ListenerAdapter
 		//Task can have buttons too.
 		Task task = this.getTask(guild.getId(), author);
 		
-		//If no button group are found that means the author can't press this button.
+		//If no button group is found and the user hasn't got any task the user canno press a button.
 		if (buttonGroup != null)
 		{
 			ButtonCallback buttonCallback = buttonGroup.getButton(button.getId());
