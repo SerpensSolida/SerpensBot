@@ -7,12 +7,14 @@ import com.serpenssolida.discordbot.module.base.BaseListener;
 import com.serpenssolida.discordbot.module.hungergames.HungerGamesListener;
 import com.serpenssolida.discordbot.module.settings.SettingsData;
 import com.serpenssolida.discordbot.module.settings.SettingsListener;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -321,5 +323,21 @@ public class BotMain
 		}
 		
 		return BotMain.deleteCommandMessages.get(guildID);
+	}
+	
+	public static EmbedBuilder getDefaultEmbed(String title)
+	{
+		EmbedBuilder embedBuilder = new EmbedBuilder();
+		
+		//Add footer
+		embedBuilder.setTitle(title);
+		embedBuilder.setAuthor(BotMain.api.getSelfUser().getName(), "https://github.com/SerpensSolida/SerpensBot", BotMain.api.getSelfUser().getAvatarUrl());
+		
+		return embedBuilder;
+	}
+	
+	public static EmbedBuilder getDefaultEmbed(String title, User author)
+	{
+		return BotMain.getDefaultEmbed(title).setFooter("Richiesto da " + author.getName(), author.getAvatarUrl());
 	}
 }

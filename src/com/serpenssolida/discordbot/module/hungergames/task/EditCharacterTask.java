@@ -1,10 +1,12 @@
 package com.serpenssolida.discordbot.module.hungergames.task;
 
+import com.serpenssolida.discordbot.BotMain;
 import com.serpenssolida.discordbot.ButtonGroup;
 import com.serpenssolida.discordbot.module.ButtonCallback;
 import com.serpenssolida.discordbot.module.Task;
 import com.serpenssolida.discordbot.module.hungergames.Character;
 import com.serpenssolida.discordbot.module.hungergames.HungerGamesController;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
@@ -41,9 +43,12 @@ public class EditCharacterTask extends Task
 		//Abort task if there is an HungerGames running.
 		if (HungerGamesController.isHungerGamesRunning(this.getGuild().getId()))
 		{
-			builder.append("> Non puoi usare questo comando mentre è in corso un HungerGames.");
-			//this.channel.sendMessage(builder.build()).queue();
+			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Modifica del personaggio", this.getUser())
+					.setDescription("Non puoi usare questo comando perchè è in corso un HungerGames.");
+			builder.setEmbed(embedBuilder.build());
+			
 			this.setInterrupted(true);
+			this.running = false;
 			return true;
 		}
 		
@@ -53,8 +58,12 @@ public class EditCharacterTask extends Task
 		
 		if (this.character == null)
 		{
-			builder.append("> Non è stato trovato nessun personaggio.");
+			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Modifica del personaggio", this.getUser())
+					.setDescription("Non è stato trovato nessun personaggio.");
+			builder.setEmbed(embedBuilder.build());
+
 			this.setInterrupted(true);
+			this.running = false;
 			return true;
 		}
 		
@@ -74,8 +83,11 @@ public class EditCharacterTask extends Task
 		{
 			this.deleteButtons();
 			
+			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Modifica del personaggio", this.getUser())
+					.setDescription("Non puoi completare la procedura perchè è in corso un HungerGames.");
 			MessageBuilder builder = new MessageBuilder()
-					.append("> Non puoi completare la procedura perchè è in corso un HungerGames.");
+					.setEmbed(embedBuilder.build());
+			
 			this.channel.sendMessage(builder.build()).queue();
 			
 			this.running = false;
@@ -169,8 +181,11 @@ public class EditCharacterTask extends Task
 		//Check if the name is empty or its length is greater than 16.
 		if (name.length() <= 0 || name.length() > 16)
 		{
-			MessageBuilder messageBuilder = new MessageBuilder();
-			messageBuilder.appendCodeLine((name.length() <= 0) ? "Devi inserire un nome!" : "Il nome non può essere più lungo di 16 caratteri!");
+			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Modifica nome del personaggio", this.getUser())
+					.appendDescription((name.length() <= 0) ? "Devi inserire un nome!" : "Il nome non può essere più lungo di 16 caratteri!");
+			
+			MessageBuilder messageBuilder = new MessageBuilder()
+					.setEmbed(embedBuilder.build());
 			
 			this.sendWithCancelButton(messageBuilder);
 			return;
@@ -182,10 +197,13 @@ public class EditCharacterTask extends Task
 		
 		this.state = State.MENU; //Back to menu.
 		
-		MessageBuilder builder = new MessageBuilder();
-		builder.appendFormat("Nuovo nome del personaggio: %s", this.character.getDisplayName());
+		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Modifica del personaggio", this.getUser())
+				.appendDescription("Nuovo nome del personaggio: " + this.character.getDisplayName());
 		
-		this.getChannel().sendMessage(builder.build()).queue();
+		MessageBuilder messageBuilder = new MessageBuilder()
+				.setEmbed(embedBuilder.build());
+		
+		this.getChannel().sendMessage(messageBuilder.build()).queue();
 		this.channel.sendMessage(this.createMenuMessage().build()).queue();
 	}
 	
@@ -202,11 +220,15 @@ public class EditCharacterTask extends Task
 		//Check number of ability sent with the message.
 		if (abilities.length != 7)
 		{
+			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Modifica caratteristiche del personaggio", this.getUser())
+					.appendDescription("Inserisci tutte le caratteristiche!\n")
+					.appendDescription("Le caratteristiche sono: ")
+					.appendDescription("Vitalità, Forza, Abilità, Special, Velocità, Resistenza e Gusto.\n")
+					.appendDescription("La somma dei valori delle caratteristiche deve essere " + HungerGamesController.SUM_STATS + " punti e ogni caratteristica deve essere compresa tra 0 e 10!");
+			
+			
 			MessageBuilder messageBuilder = new MessageBuilder()
-					.append("> Inserisci tutte le caratteristiche!\n")
-					.append("> Le caratteristiche sono: ")
-					.append("Vitalità, Forza, Abilità, Special, Velocità, Resistenza e Gusto.\n")
-					.appendFormat("> La somma dei valori delle caratteristiche deve essere %s punti e ogni caratteristica deve essere compresa tra 0 e 10!", SUM_STATS);
+					.setEmbed(embedBuilder.build());
 			
 			this.sendWithCancelButton(messageBuilder);
 			return;
@@ -228,8 +250,11 @@ public class EditCharacterTask extends Task
 		}
 		catch (NumberFormatException e)
 		{
+			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Modifica caratteristiche del personaggio", this.getUser())
+					.appendDescription("Formato delle caratteristiche errato. Inserisci solo numeri tra 0 e 10!");
+			
 			MessageBuilder messageBuilder = new MessageBuilder()
-					.append("> Formato delle caratteristiche errato. Inserisci solo numeri tra 0 e 10!");
+					.setEmbed(embedBuilder.build());
 			
 			this.sendWithCancelButton(messageBuilder);
 			return;
@@ -238,8 +263,11 @@ public class EditCharacterTask extends Task
 		//Sum of ability values must be equal to SUM_STATS.
 		if (sum != SUM_STATS)
 		{
+			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Modifica caratteristiche del personaggio", this.getUser())
+					.appendDescription("La somma dei valori delle caratteristiche deve essere " + HungerGamesController.SUM_STATS + " punti! Somma dei valori inseriti: " + sum);
+			
 			MessageBuilder messageBuilder = new MessageBuilder()
-					.appendFormat("\n> La somma dei valori delle caratteristiche deve essere %d punti! Somma dei valori inseriti: %s", HungerGamesController.SUM_STATS, sum);
+					.setEmbed(embedBuilder.build());
 			
 			this.sendWithCancelButton(messageBuilder);
 			return;
@@ -249,10 +277,13 @@ public class EditCharacterTask extends Task
 		this.character.setStats(abilities);
 		HungerGamesController.save(this.getGuild().getId());
 		
-		MessageBuilder builder = new MessageBuilder()
-				.append("> Caratteristiche impostate correttamente.");
+		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Modifica caratteristiche del personaggio", this.getUser())
+				.appendDescription("Caratteristiche impostate correttamente");
 		
-		this.getChannel().sendMessage(builder.build()).queue();
+		MessageBuilder messageBuilder = new MessageBuilder()
+				.setEmbed(embedBuilder.build());
+		
+		this.getChannel().sendMessage(messageBuilder.build()).queue();
 		this.state = State.MENU;
 		
 		//Send the menu.
@@ -335,9 +366,12 @@ public class EditCharacterTask extends Task
 	/**
 	 * Create a builder that contains the menu of the task to the channel.
 	 */
-	public void createMenuMessage(MessageBuilder builder)
+	public void createMenuMessage(MessageBuilder messageBuilder)
 	{
-		builder.append("> Seleziona cosa vuoi modificare del tuo personaggio.\n");
+		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Modifica del personaggio", this.getUser())
+				.appendDescription("Seleziona cosa vuoi modificare del tuo personaggio.\n");
+		
+		messageBuilder.setEmbed(embedBuilder.build());
 		
 		Button editName = Button.primary("edit-name", "Modifica il nome");
 		Button editStats = Button.primary("edit-stats", "Modifica le caratteristiche");
@@ -349,14 +383,17 @@ public class EditCharacterTask extends Task
 		{
 			this.state = State.NAME_CHARACTER;
 			
-			MessageBuilder b = new MessageBuilder()
-					.append("> Inserisci il nuovo nome del tuo personaggio. (max 15 caratteri)");
+			EmbedBuilder embedB = BotMain.getDefaultEmbed("Modifica nome del personaggio", this.getUser())
+					.appendDescription("Inserisci il nuovo nome del tuo personaggio. (max 15 caratteri)");
+			
+			MessageBuilder messageB = new MessageBuilder()
+					.setEmbed(embedB.build());
 			
 			event.deferEdit().queue();
 			event.getHook().deleteOriginal().queue(); //Remove the original message.
 			
 			this.buttonGroup = null;
-			this.sendWithCancelButton(b);
+			this.sendWithCancelButton(messageB);
 			
 			return true;
 		}));
@@ -369,14 +406,18 @@ public class EditCharacterTask extends Task
 			event.deferEdit().queue();
 			event.getHook().deleteOriginal().queue(); //Remove the original message.
 			
-			b.appendFormat("> Stai modificando le caratteristiche di **%s**", this.getCharacter().getDisplayName())
-					.append("\n> Assegna le caratteristiche al personaggio. Invia un messaggio con 7 numeri separati da uno spazio che rappresentano le caratteristiche del tuo personaggio.")
-					.append("\n> Le caratteristiche sono: ")
-					.append("Vitalità, Forza, Abilità, Special, Velocità, Resistenza e Gusto. ")
-					.appendFormat("\n> La somma dei valori delle caratteristiche deve essere %d punti e ogni carateristica deve essere compresa tra 0 e 10.", SUM_STATS);
+			EmbedBuilder embedB = BotMain.getDefaultEmbed("Modifica caratteristiche del personaggio", this.getUser())
+					.appendDescription("Stai modificando le caratteristiche di **" + this.getCharacter().getDisplayName() + "**")
+					.appendDescription("\n Assegna le caratteristiche al personaggio. Invia un messaggio con 7 numeri separati da uno spazio che rappresentano le caratteristiche del tuo personaggio.")
+					.appendDescription("\nLe caratteristiche sono: ")
+					.appendDescription("Vitalità, Forza, Abilità, Special, Velocità, Resistenza e Gusto. ")
+					.appendDescription("\nLa somma dei valori delle caratteristiche deve essere " + HungerGamesController.SUM_STATS + " punti e ogni carateristica deve essere compresa tra 0 e 10.");
+			
+			MessageBuilder messageB = new MessageBuilder()
+					.setEmbed(embedB.build());
 			
 			this.buttonGroup = null;
-			this.sendWithCancelButton(b);
+			this.sendWithCancelButton(messageB);
 			
 			return true;
 		}));
@@ -384,7 +425,7 @@ public class EditCharacterTask extends Task
 		this.registerCancelButton();
 		
 		//Add button to the message.
-		builder.setActionRows(ActionRow.of(editName, editStats, cancelTask));
+		messageBuilder.setActionRows(ActionRow.of(editName, editStats, cancelTask));
 		//this.getChannel().sendMessage(builder.build()).queue();
 
 		/*//Add the reaction to the menu.

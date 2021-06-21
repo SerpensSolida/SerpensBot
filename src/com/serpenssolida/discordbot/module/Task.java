@@ -2,10 +2,7 @@ package com.serpenssolida.discordbot.module;
 
 import com.serpenssolida.discordbot.ButtonGroup;
 import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
@@ -157,6 +154,12 @@ public abstract class Task
 		{
 			MessageBuilder builder = new MessageBuilder()
 					.append(this.lastMessage.getContentDisplay());
+			
+			for (MessageEmbed embed : this.lastMessage.getEmbeds())
+			{
+				builder.setEmbed(embed);
+			}
+			
 			this.lastMessage.editMessage(builder.build()).queue();
 		}
 	}
