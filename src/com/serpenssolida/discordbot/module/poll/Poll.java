@@ -19,6 +19,7 @@ public class Poll
 	private String messageId;
 	private String question;
 	private boolean finished;
+	private User author;
 	private HashMap<String, PollOption> options = new HashMap<>();
 	private HashSet<User> users = new HashSet<>();
 	
@@ -27,9 +28,10 @@ public class Poll
 		this.messageId = messageId;
 	}*/
 	
-	public Poll(String question)
+	public Poll(String question, User author)
 	{
 		this.question = question;
+		this.author = author;
 	}
 	
 	public ArrayList<PollOption> getWinners()
@@ -62,14 +64,14 @@ public class Poll
 		return winners;
 	}
 	
-	public ByteArrayOutputStream generatePieChart()
+	public ByteArrayOutputStream generatePieChart() //TODO: find a better one.
 	{
 		//Get dataset values.
 		DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
 		
 		for (PollOption option : this.getOptions())
 		{
-			dataset.setValue(option.getText() + "\n" +( this.getPercent(option.getId()) * 100) + "%", this.getPercent(option.getId()));
+			dataset.setValue(option.getText() + "\n" +( this.getPercent(option.getId()) * 100) + "% (voti: " + option.getVotesCount() + ")", this.getPercent(option.getId()));
 		}
 		
 		//Create pie chart image.
@@ -152,6 +154,11 @@ public class Poll
 	public boolean isFinished()
 	{
 		return this.finished;
+	}
+	
+	public User getAuthor()
+	{
+		return this.author;
 	}
 	
 	public static class PollOption
