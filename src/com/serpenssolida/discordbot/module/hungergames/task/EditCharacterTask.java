@@ -377,7 +377,7 @@ public class EditCharacterTask extends Task
 		Button editStats = Button.primary("edit-stats", "Modifica le caratteristiche");
 		Button cancelTask = Button.danger("cancel-task", "Esci");
 		
-		this.buttonGroup = new ButtonGroup(this.user);
+		this.buttonGroup = new ButtonGroup();
 		
 		this.buttonGroup.addButton(new ButtonCallback("edit-name", this.user, this.channel, (event, guild, channel, message, author) ->
 		{

@@ -143,7 +143,7 @@ public abstract class Task
 	public void registerCancelButton()
 	{
 		if (this.buttonGroup == null)
-			this.buttonGroup = new ButtonGroup(this.user);
+			this.buttonGroup = new ButtonGroup();
 		
 		this.buttonGroup.addButton(new ButtonCallback("cancel-task", this.user, this.channel, this.CANCEL_BUTTON));
 	}

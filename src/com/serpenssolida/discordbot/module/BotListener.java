@@ -30,7 +30,7 @@ public class BotListener extends ListenerAdapter
 	private HashMap<String, HashMap<User, Task>> tasks = new HashMap<>(); //List of task currently running. //TODO: Make task linked to servers.
 	private HashMap<String, UnlistedBotCommand> unlistedBotCommands = new HashMap<>(); //List of commands of the module.
 	private HashMap<String, BotCommand> botCommands = new HashMap<>(); //List of commands of the module that are displayed in the client command list. //TODO: Encapsulate.
-	private HashMap<String, HashMap<User, ButtonGroup>> buttonGroups = new HashMap<>();
+	private HashMap<String, HashMap<String, ButtonGroup>> activeGlobalButtons = new HashMap<>();
 	
 	public BotListener(String modulePrefix)
 	{
@@ -177,32 +177,21 @@ public class BotListener extends ListenerAdapter
 		Guild guild = event.getGuild(); //The user that added the reaction.
 		MessageChannel channel = event.getChannel(); //Channel where the event occurred.
 		
+		//If this event is not from a guild ignore it.
+		if (guild == null)
+			return;
+		
 		//Ignore bot reaction.
 		if (BotMain.api.getSelfUser().getId().equals(author.getId()))
 			return;
 		
 		//Get the button that the user can press.
-		ButtonGroup buttonGroup = this.getButtonGroup(guild.getId(), author);
+		ButtonGroup buttonGroup = this.getButtonGroup(guild.getId(), event.getMessageId());
 		
 		//Task can have buttons too.
 		Task task = this.getTask(guild.getId(), author);
 		
-		//If no button group is found and the user hasn't got any task the user canno press a button.
-		if (buttonGroup != null)
-		{
-			ButtonCallback buttonCallback = buttonGroup.getButton(button.getId());
-			event.deferEdit().queue(); //Let discord know we know the button has been clicked.
-			
-			//Do button action.
-			boolean deleteMessage = buttonCallback.doAction(event);
-			
-			//Delete message that has the clicked button if it should be deleted.
-			if (BotMain.getDeleteCommandMessages(guild.getId()) && deleteMessage)
-			{
-				event.getHook().deleteOriginal().queue();
-			}
-		}
-		else if (task != null)
+		if (task != null)
 		{
 			buttonGroup = task.getButtonGroup();
 			
@@ -225,6 +214,20 @@ public class BotListener extends ListenerAdapter
 				{
 					this.removeTask(guild.getId(), task);
 				}
+			}
+		}
+		else if (buttonGroup != null) //If no button group is found and the user hasn't got any task the user cannot press a button.
+		{
+			ButtonCallback buttonCallback = buttonGroup.getButton(button.getId());
+			event.deferEdit().queue(); //Let discord know we know the button has been clicked.
+			
+			//Do button action.
+			boolean deleteMessage = buttonCallback.doAction(event);
+			
+			//Delete message that has the clicked button if it should be deleted.
+			if (BotMain.getDeleteCommandMessages(guild.getId()) && deleteMessage)
+			{
+				event.getHook().deleteOriginal().queue();
 			}
 		}
 	}
@@ -458,22 +461,22 @@ public class BotListener extends ListenerAdapter
 		this.tasks.get(guildID).remove(task.getUser());
 	}
 	
-	public void addButtonGroup(String guildID, ButtonGroup buttonGroup)
+	public void addButtonGroup(String guildID, String messageId, ButtonGroup buttonGroup)
 	{
-		HashMap<User, ButtonGroup> guildButtonGroups = this.buttonGroups.computeIfAbsent(guildID, k -> new HashMap<>());
-		guildButtonGroups.put(buttonGroup.getUser(), buttonGroup);
+		HashMap<String, ButtonGroup> guildButtonGroups = this.activeGlobalButtons.computeIfAbsent(guildID, k -> new HashMap<>());
+		guildButtonGroups.put(messageId, buttonGroup);
 	}
 	
-	public ButtonGroup getButtonGroup(String guildID, User user)
+	public ButtonGroup getButtonGroup(String guildID, String messageId)
 	{
-		HashMap<User, ButtonGroup> guildButtonGroups = this.buttonGroups.computeIfAbsent(guildID, k -> new HashMap<>());
-		return guildButtonGroups.get(user);
+		HashMap<String, ButtonGroup> guildButtonGroups = this.activeGlobalButtons.computeIfAbsent(guildID, k -> new HashMap<>());
+		return guildButtonGroups.get(messageId);
 	}
 	
-	public void removeButtonGroup(String guildID, User user)
+	public void removeButtonGroup(String guildID, String messageId)
 	{
-		HashMap<User, ButtonGroup> guildButtonGroups = this.buttonGroups.computeIfAbsent(guildID, k -> new HashMap<>());
-		guildButtonGroups.remove(user);
+		HashMap<String, ButtonGroup> guildButtonGroups = this.activeGlobalButtons.computeIfAbsent(guildID, k -> new HashMap<>());
+		guildButtonGroups.remove(messageId);
 	}
 	
 	public String getModuleName()

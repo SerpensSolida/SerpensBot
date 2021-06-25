@@ -7,8 +7,8 @@ import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 public class ButtonCallback
 {
 	private String id;
-	private User user;
-	private MessageChannel channel;
+	//private User user;
+	//private MessageChannel channel;
 	private ButtonAction action;
 	
 	public static boolean DELETE_MESSAGE = true;
@@ -17,8 +17,8 @@ public class ButtonCallback
 	public ButtonCallback(String id, User user, MessageChannel channel, ButtonAction action)
 	{
 		this.id = id;
-		this.user = user;
-		this.channel = channel;
+		//this.user = user;
+		//this.channel = channel;
 		this.action = action;
 	}
 	
@@ -50,7 +50,7 @@ public class ButtonCallback
 		this.id = id;
 	}
 	
-	public User getUser()
+	/*public User getUser()
 	{
 		return this.user;
 	}
@@ -58,9 +58,9 @@ public class ButtonCallback
 	public void setUser(User user)
 	{
 		this.user = user;
-	}
+	}*/
 	
-	public MessageChannel getChannel()
+	/*public MessageChannel getChannel()
 	{
 		return this.channel;
 	}
@@ -68,7 +68,7 @@ public class ButtonCallback
 	public void setChannel(MessageChannel channel)
 	{
 		this.channel = channel;
-	}
+	}*/
 	
 	public ButtonAction getAction()
 	{

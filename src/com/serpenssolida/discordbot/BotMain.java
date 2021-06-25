@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.serpenssolida.discordbot.module.BotListener;
 import com.serpenssolida.discordbot.module.base.BaseListener;
 import com.serpenssolida.discordbot.module.hungergames.HungerGamesListener;
+import com.serpenssolida.discordbot.module.poll.PollListener;
 import com.serpenssolida.discordbot.module.settings.SettingsData;
 import com.serpenssolida.discordbot.module.settings.SettingsListener;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -63,6 +64,7 @@ public class BotMain
 		
 		api.addEventListener(new SettingsListener());
 		api.addEventListener(new HungerGamesListener());
+		api.addEventListener(new PollListener());
 		api.addEventListener(new BaseListener());
 		
 		System.out.println("Bot ready!");
@@ -191,6 +193,7 @@ public class BotMain
 		File settingsFile = new File(Paths.get("server_data", guildID, BotMain.settingsFolder, "settings.json").toString());
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		System.out.println("Caricamento impostazioni per server con id: " + guildID + ".");
+		ArrayList<BotListener> loadedListeners = new ArrayList<>();
 		
 		try (BufferedReader reader = new BufferedReader(new FileReader(settingsFile)))
 		{
@@ -206,11 +209,19 @@ public class BotMain
 				{
 					listener.setModulePrefix(guildID, modulePrefixes.get(listener.getInternalID()));
 				}
+				else
+				{
+					listener.setModulePrefix(guildID, listener.getInternalID()); //Reset listener if key is not found.
+				}
 			}
 			
 			Guild guild = BotMain.api.getGuildById(guildID);
 			if (guild != null)
 			{
+				/*for (BotListener loadedListener : loadedListeners)
+				{
+					//BotMain.updateGuildCommands(guild);
+				}*/
 				BotMain.updateGuildCommands(guild);
 			}
 		}

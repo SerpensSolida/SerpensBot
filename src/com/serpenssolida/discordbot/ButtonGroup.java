@@ -1,19 +1,20 @@
 package com.serpenssolida.discordbot;
 
 import com.serpenssolida.discordbot.module.ButtonCallback;
-import net.dv8tion.jda.api.entities.User;
 
 import java.util.HashMap;
 
 public class ButtonGroup
 {
 	private HashMap<String, ButtonCallback> buttons = new HashMap<>();
-	private User user;
+	//private String messageId;
+	//private User user;
 	
-	public ButtonGroup(User user)
+	/*public ButtonGroup(User user)
 	{
 	    this.user = user;
 	}
+	*/
 	
 	public void addButton(ButtonCallback button)
 	{
@@ -30,7 +31,17 @@ public class ButtonGroup
 		this.buttons.remove(id);
 	}
 	
-	public User getUser()
+	/*public String getMessageId()
+	{
+		return messageId;
+	}
+	
+	public void setMessageId(String messageId)
+	{
+		this.messageId = messageId;
+	}*/
+	
+	/*public User getUser()
 	{
 		return this.user;
 	}
@@ -38,5 +49,5 @@ public class ButtonGroup
 	public void setUser(User user)
 	{
 		this.user = user;
-	}
+	}*/
 }
