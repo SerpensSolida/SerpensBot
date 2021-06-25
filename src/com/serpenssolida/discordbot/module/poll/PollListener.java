@@ -7,7 +7,10 @@ import com.serpenssolida.discordbot.module.BotListener;
 import com.serpenssolida.discordbot.module.ButtonCallback;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -15,8 +18,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
-import java.io.ByteArrayOutputStream;
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -48,13 +52,14 @@ public class PollListener extends BotListener
 		{
 			subCommand.addOption(OptionType.STRING, "option" + i, "Opzione del sondaggio", false);
 		}
+		subCommand.addOption(OptionType.INTEGER, "duration", "Durata in minuti del sondaggio.", false);
 		this.addBotCommand(command);
 		
 		//Command for deleting a poll.
 		command = new BotCommand("stop", "Ferma un sondaggio in corso.");
 		command.setAction((event, guild, channel, author) ->
 		{
-			this.stopPoll(event, guild, channel, author);
+			this.removePoll(event, guild, channel, author);
 			return true;
 		});
 		command.getSubcommand()
@@ -63,14 +68,15 @@ public class PollListener extends BotListener
 		this.addBotCommand(command);
 	}
 	
-	private void stopPoll(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private void removePoll(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping pollIdArg = event.getOption("poll-id");
 		
 		if (pollIdArg == null)
 			return;
 		
-		Poll poll = this.polls.remove(pollIdArg.getAsString());
+		//Poll poll = stopPoll(poll, )
+		Poll poll = this.polls.get(pollIdArg.getAsString());
 		
 		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Rimozione sondaggio", author);
 		MessageBuilder messageBuilder = new MessageBuilder();
@@ -81,23 +87,20 @@ public class PollListener extends BotListener
 		}
 		else
 		{
-			Message message = channel.retrieveMessageById(poll.getMessageId()).complete();
-			MessageEmbed embed = message.getEmbeds().get(0);
-			MessageBuilder pollMessage = this.refreshPollMessage(poll, embed);
-			pollMessage.setActionRows();
-			message.editMessage(pollMessage.build()).queue();
+			this.stopPoll(poll, channel);
 			
 			embedBuilder.setDescription("Sondaggio fermato correttamente.");
 		}
 		
 		messageBuilder.setEmbed(embedBuilder.build());
-		event.reply(messageBuilder.build()).setEphemeral(poll == null).queue();
+		event.reply(messageBuilder.build()).setEphemeral(true).queue();
 		
 	}
 	
 	private void createNewPoll(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping questionArg = event.getOption("question");
+		OptionMapping durationArg = event.getOption("duration");
 		
 		//Null check for arguments.
 		if (questionArg == null)
@@ -113,8 +116,13 @@ public class PollListener extends BotListener
 			return;
 		}
 		
-		Poll poll = new Poll();
+		//Get duration of the poll
+		int duration = 60;
+		if (durationArg != null)
+			duration = (int) durationArg.getAsLong();
 		
+		//Create the poll.
+		Poll poll = new Poll(questionArg.getAsString());
 		for (int i = 1; i <= 9; i++)
 		{
 			OptionMapping optionArg = event.getOption("option" + i);
@@ -127,31 +135,41 @@ public class PollListener extends BotListener
 		}
 		
 		//Create the poll message.
-		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed(author.getName() + " ha creato un sondaggio!", author);
-		embedBuilder.setDescription("*" + questionArg.getAsString() + "*");
-		
-		MessageBuilder messageBuilder = new MessageBuilder();
-		messageBuilder.setEmbed(embedBuilder.build());
-		
-		//Create buttons
-		messageBuilder.setActionRows(this.buildPollMessageButtons(poll));
-		ButtonGroup buttonGroup = this.buildPollButtons(poll);
+		MessageBuilder messageBuilder = PollListener.generatePollMessage(poll, author);
+		ButtonGroup buttonGroup = PollListener.buildPollButtons(poll);
 		
 		//Send the pool and get the message id.
 		InteractionHook hook = event.reply(messageBuilder.build())
-				//.addFile(pieChartImage.toByteArray(), "pie_chart.png")
 				.setEphemeral(false)
 				.complete();
 		String messageId = hook.retrieveOriginal().complete().getId();
 		
-		poll.setMessageId(messageId);
-		this.addButtonGroup(guild.getId(), messageId, buttonGroup);
-		this.polls.put(messageId, poll);
+		
+		poll.setMessageId(messageId); //Set poll message.
+		this.addButtonGroup(guild.getId(), messageId, buttonGroup); //Register button group.
+		this.polls.put(messageId, poll); //Add poll to the list.
+		
+		//Set a timer to stop the poll.
+		Timer timer = new Timer(duration * 1 * 1000, e -> this.stopPoll(poll, channel)); //TODO: set 1 to 60.
+		timer.setRepeats(false);
+		timer.start();
 		
 		//Poll poll = new Poll()
 	}
 	
-	private ArrayList<ActionRow> buildPollMessageButtons(Poll poll)
+	private void stopPoll(Poll poll, MessageChannel channel)
+	{
+		Poll removedPoll = this.polls.remove(poll.getMessageId());
+		
+		if (removedPoll == null)
+			return;
+		
+		removedPoll.setFinished(true);
+		Message message = channel.retrieveMessageById(poll.getMessageId()).complete();
+		PollListener.refreshPollMessage(poll, message);
+	}
+	
+	private static ArrayList<ActionRow> buildPollMessageButtons(Poll poll)
 	{
 		ArrayList<ActionRow> rows = new ArrayList<>();
 		ArrayList<Button> buttons = new ArrayList<>();
@@ -174,7 +192,7 @@ public class PollListener extends BotListener
 		return rows;
 	}
 	
-	private ButtonGroup buildPollButtons(Poll poll)
+	private static ButtonGroup buildPollButtons(Poll poll)
 	{
 		ButtonGroup buttonGroup = new ButtonGroup();
 		
@@ -187,17 +205,7 @@ public class PollListener extends BotListener
 				if (!voteAdded)
 					return ButtonCallback.LEAVE_MESSAGE;
 				
-				MessageEmbed embed = event.getMessage().getEmbeds().get(0);
-				MessageBuilder messageBuilder = this.refreshPollMessage(poll, embed);
-				
-				ByteArrayOutputStream pieChartImage = poll.generatePieChart();
-				
-				event.getMessage().editMessage(messageBuilder.build())
-						.retainFiles(new ArrayList<>())
-						.addFile(pieChartImage.toByteArray(), "pie_chart.png")
-						.queue();
-				System.out.println("VOTATO L'OPZIONE: " + option.getId());
-				System.out.println("Voti: " + poll.getPercent(option.getId()));
+				PollListener.refreshPollMessage(poll, message);
 				
 				return ButtonCallback.LEAVE_MESSAGE;
 			}));
@@ -206,37 +214,54 @@ public class PollListener extends BotListener
 		return buttonGroup;
 	}
 	
-	private MessageBuilder refreshPollMessage(Poll poll, MessageEmbed embed)
+	private static MessageBuilder generatePollMessage(Poll poll, User author)
 	{
-		//Create the poll message.
-		EmbedBuilder embedBuilder = new EmbedBuilder(embed);
-		
-		//Refresh poll status in the embed.
-		/*embedBuilder.clearFields();
-		StringBuilder names = new StringBuilder();
-		StringBuilder rateos = new StringBuilder();
-		
-		Stream<Poll.PollOption> sortedOptions = poll.getOptions().parallelStream().sorted(Comparator.comparingInt(Poll.PollOption::getVotesCount));
-		
-		for (Poll.PollOption option : sortedOptions.collect(Collectors.toCollection(ArrayList::new)))
-		{
-			names.append(option.getText() + "\n");
-			rateos.append((poll.getPercent(option.getId())) * 100 + "%\n");
-		}
-		
-		embedBuilder.addField("Opzioni", names.toString(), true);
-		embedBuilder.addField("Risultati", rateos.toString(), true);*/
-		
-		embedBuilder.setImage("attachment://pie_chart.png");
-		
 		MessageBuilder messageBuilder = new MessageBuilder();
+		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed(poll.getQuestion(), author)
+				.setDescription("*Sondaggio in corso...*");
+		
+		if (poll.isFinished())
+			embedBuilder.setDescription(PollListener.getWinnerDescription(poll));
+		else
+			//Create buttons
+			messageBuilder.setActionRows(PollListener.buildPollMessageButtons(poll));
+		
+		if (poll.getVotesCount() > 0)
+			embedBuilder.setImage("attachment://pie_chart.png");
+		
 		messageBuilder.setEmbed(embedBuilder.build());
 		
-		//Create buttons
-		messageBuilder.setActionRows(this.buildPollMessageButtons(poll));
 		return messageBuilder;
-		//ButtonGroup buttonGroup = this.buildPollButtons(poll);
-		//this.remo
-		//this.addButtonGroup(guildID, );
+	}
+	
+	private static String getWinnerDescription(Poll pool)
+	{
+		StringBuilder stringBuilder = new StringBuilder();
+		
+		ArrayList<Poll.PollOption> winners = pool.getWinners();
+		
+		if (winners.size() == 1)
+			return "_Risultato: **" + winners.get(0).getText() + "**_";
+		
+		stringBuilder.append("*Il sondaggio è finito con un pareggio:*\n");
+		
+		for (Poll.PollOption winner : winners)
+		{
+			stringBuilder.append("***" + winner.getText() + "***\n");
+		}
+		
+		return stringBuilder.toString();
+	}
+	
+	private static void refreshPollMessage(Poll poll, Message message)
+	{
+		MessageBuilder messageBuilder = PollListener.generatePollMessage(poll, message.getAuthor());
+		
+		MessageAction editMessage = message.editMessage(messageBuilder.build());
+		
+		if (poll.getVotesCount() > 0)
+			editMessage.addFile(poll.generatePieChart().toByteArray(), "pie_chart.png");
+		
+		editMessage.queue();
 	}
 }
