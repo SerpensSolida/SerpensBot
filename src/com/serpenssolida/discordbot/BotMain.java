@@ -70,6 +70,9 @@ public class BotMain
 		System.out.println("Bot ready!");
 	}
 	
+	/**
+	 * Update command list for all guilds.
+	 */
 	public static void updateAllGuildsCommands()
 	{
 		for (Guild guild : api.getGuilds())
@@ -78,6 +81,12 @@ public class BotMain
 		}
 	}
 	
+	/**
+	 * Update the command list of the given guild.
+	 *
+	 * @param guild
+	 * 		The guild that will receive the update command list.
+	 */
 	public static void updateGuildCommands(Guild guild)
 	{
 		CommandListUpdateAction commands = guild.updateCommands();
@@ -97,6 +106,17 @@ public class BotMain
 		commands.queue(a -> System.out.println("Comandi per la guild \"" + guild.getName() + "\" cambiati correttamente."));
 	}
 	
+	/**
+	 * Search multiple users by the given name.
+	 *
+	 * @param guild
+	 * 		The guild from where to search from.
+	 * @param userName
+	 * 		The username of the users to search for.
+	 *
+	 * @return
+	 * 		An {@link ArrayList<Member>} that contains all the match.
+	 */
 	public static ArrayList<Member> findUsersByName(Guild guild, String userName)
 	{
 		HashSet<Member> users = new HashSet<>();
@@ -107,6 +127,16 @@ public class BotMain
 		return new ArrayList<>(users);
 	}
 	
+	/**
+	 * Check if the user has administration permission.
+	 *
+	 * @param member
+	 * 		The user to check.
+	 *
+	 * @return
+	 * 		-True if the user has administration permission.
+	 * 		-False if the user has not administration permission.
+	 */
 	public static boolean isAdmin(Member member)
 	{
 		if (member == null) return false;
@@ -122,6 +152,12 @@ public class BotMain
 		return false;
 	}
 	
+	/**
+	 * Load the token from file.
+	 *
+	 * @return
+	 * 		The token of the bot as {@link String};
+	 */
 	private static String getBotToken()
 	{
 		File tokenFile = new File("bot.json");
@@ -188,6 +224,12 @@ public class BotMain
 		return null;
 	}
 	
+	/**
+	 * Load the setting of the bot for the given guild.
+	 *
+	 * @param guildID
+	 * 		The id of the guild.
+	 */
 	public static void loadSettings(String guildID)
 	{
 		File settingsFile = new File(Paths.get("server_data", guildID, BotMain.settingsFolder, "settings.json").toString());
@@ -242,6 +284,12 @@ public class BotMain
 		
 	}
 	
+	/**
+	 * Save the guild setting.
+	 *
+	 * @param guildID
+	 * 		The id of the guild.
+	 */
 	public static void saveSettings(String guildID)
 	{
 		File settingsFile = new File(Paths.get("server_data", guildID, BotMain.settingsFolder, "settings.json").toString());
@@ -292,6 +340,14 @@ public class BotMain
 		
 	}
 	
+	/**
+	 * Set the unlisted command symbol for the given guild.
+	 *
+	 * @param guildID
+	 * 		The id of the guild.
+	 * @param symbol
+	 * 		The symbol that will be used for unlisted commands.
+	 */
 	public static void setCommandSymbol(String guildID, String symbol)
 	{
 		//If key is not found the settings are not loaded or are not created.
@@ -303,6 +359,15 @@ public class BotMain
 		BotMain.commandSymbol.put(guildID, symbol);
 	}
 	
+	/**
+	 * Get the current unlisted command symbol for the given guild.
+	 *
+	 * @param guildID
+	 * 		The id of the guild.
+	 *
+	 * @return
+	 * 		The symbol used for unlisted commands of the given guild.
+	 */
 	public static String getCommandSymbol(String guildID)
 	{
 		//If key is not found the settings are not loaded or are not created.
@@ -314,6 +379,14 @@ public class BotMain
 		return BotMain.commandSymbol.get(guildID);
 	}
 	
+	/**
+	 * Set the flag for deleting messsage after an unlisted command sent in the given guild.
+	 *
+	 * @param guildID
+	 * 		The id of the guild.
+	 * @param value
+	 *		If set to true the bot will delete message when receiving an unlisted command, false will instead do the opposite.
+	 */
 	public static void setDeleteCommandMessages(String guildID, boolean value)
 	{
 		//If key is not found the settings are not loaded or are not created.
@@ -325,6 +398,15 @@ public class BotMain
 		BotMain.deleteCommandMessages.put(guildID, value);
 	}
 	
+	/**
+	 * Get the flag for deleting message after an unlisted command sent in the given guild.
+	 *
+	 * @param guildID
+	 * 		The id of the guild.
+	 *
+	 * @return
+	 * 		True if the bot should delete unlisted command messages, false otherwise.
+	 */
 	public static boolean getDeleteCommandMessages(String guildID)
 	{
 		//If key is not found the settings are not loaded or are not created.
@@ -336,6 +418,15 @@ public class BotMain
 		return BotMain.deleteCommandMessages.get(guildID);
 	}
 	
+	/**
+	 * Create an {@link EmbedBuilder} with standard content for ease of use.
+	 *
+	 * @param title
+	 * 		The title to give to the embed.
+	 *
+	 * @return
+	 * 		A {@link EmbedBuilder} with standard content.
+	 */
 	public static EmbedBuilder getDefaultEmbed(String title)
 	{
 		EmbedBuilder embedBuilder = new EmbedBuilder();
@@ -347,8 +438,18 @@ public class BotMain
 		return embedBuilder;
 	}
 	
+	/**
+	 * Create an {@link EmbedBuilder} with standard content and author footer for ease of use.
+	 *
+	 * @param title
+	 * 		The title to give to the embed.
+	 *
+	 * @return
+	 * 		A {@link EmbedBuilder} with standard content.
+	 */
 	public static EmbedBuilder getDefaultEmbed(String title, User author)
 	{
-		return BotMain.getDefaultEmbed(title).setFooter("Richiesto da " + author.getName(), author.getAvatarUrl());
+		return BotMain.getDefaultEmbed(title)
+				.setFooter("Richiesto da " + author.getName(), author.getAvatarUrl());
 	}
 }

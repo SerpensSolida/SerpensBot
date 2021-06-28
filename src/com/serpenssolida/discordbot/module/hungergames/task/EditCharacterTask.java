@@ -379,7 +379,7 @@ public class EditCharacterTask extends Task
 		
 		this.buttonGroup = new ButtonGroup();
 		
-		this.buttonGroup.addButton(new ButtonCallback("edit-name", this.user, this.channel, (event, guild, channel, message, author) ->
+		this.buttonGroup.addButton(new ButtonCallback("edit-name", (event, guild, channel, message, author) ->
 		{
 			this.state = State.NAME_CHARACTER;
 			
@@ -398,7 +398,7 @@ public class EditCharacterTask extends Task
 			return ButtonCallback.LEAVE_MESSAGE;
 		}));
 		
-		this.buttonGroup.addButton(new ButtonCallback("edit-stats", this.user, this.channel, (event, guild, channel, message, author) ->
+		this.buttonGroup.addButton(new ButtonCallback("edit-stats", (event, guild, channel, message, author) ->
 		{
 			this.state = State.ASSIGN_STATS;
 			MessageBuilder b = new MessageBuilder();

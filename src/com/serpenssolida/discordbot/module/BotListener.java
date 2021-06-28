@@ -164,6 +164,7 @@ public class BotListener extends ListenerAdapter
 		if (!event.getName().equals(this.getModulePrefix(guild.getId())))
 			return;
 		
+		//Get the command from the list using the event command name and run it.
 		BotCommand command = this.getBotCommand(event.getSubcommandName());
 		command.doAction(event);
 		
@@ -232,6 +233,15 @@ public class BotListener extends ListenerAdapter
 		}
 	}
 	
+	/**
+	 * Generate a list of commands for the given guild.
+	 *
+	 * @param guild
+	 * 		The guild.
+	 *
+	 * @return
+	 * 		An {@link ArrayList<com.serpenssolida.discordbot.module.UnlistedBotCommand.CommandData>} of commands.
+	 */
 	public ArrayList<CommandData> generateCommands(Guild guild)
 	{
 		ArrayList<CommandData> commandList = new ArrayList<>();
@@ -249,12 +259,9 @@ public class BotListener extends ListenerAdapter
 		return commandList;
 	}
 	
-	/*@Override
-	public void onGenericGuild(@Nonnull GenericGuildEvent event)
-	{
-		BotMain.loadSettings(event.getGuild().getId());
-	}*/
-	
+	/**
+	 * Method for the "cancel" command of a module. Based on the event data it will cancel a task.
+	 */
 	private void cancelTask(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		MessageBuilder messageBuilder = new MessageBuilder();
@@ -273,6 +280,9 @@ public class BotListener extends ListenerAdapter
 		event.reply(messageBuilder.build()).setEphemeral(task == null).queue();
 	}
 	
+	/**
+	 * Method for the "help" command of a module. Sends the module listed and unlisted command list.
+	 */
 	private void sendHelp(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		EmbedBuilder embedBuilder = new EmbedBuilder();
@@ -337,6 +347,14 @@ public class BotListener extends ListenerAdapter
 		event.reply(new MessageBuilder().setEmbed(embedBuilder.build()).build()).setEphemeral(false).queue();
 	}
 	
+	/**
+	 * Sets the prefix of the module for the given guild.
+	 *
+	 * @param guildID
+	 * 		The id of the guild.
+	 * @param modulePrefix
+	 * 		The new prefix of the module for the given guild.
+	 */
 	public void setModulePrefix(String guildID, String modulePrefix)
 	{
 		//Change unlisted command prefix.
@@ -348,6 +366,15 @@ public class BotListener extends ListenerAdapter
 		this.modulePrefix.put(guildID, modulePrefix);
 	}
 	
+	/**
+	 * Get the module prefix of the module for the given guild.
+	 *
+	 * @param guildID
+	 * 		The id of the guild.
+	 *
+	 * @return
+	 * 		The prefix of the module for the given guild.
+	 */
 	public String getModulePrefix(String guildID)
 	{
 		if (!this.modulePrefix.containsKey(guildID))
@@ -364,11 +391,6 @@ public class BotListener extends ListenerAdapter
 	public String getInternalID()
 	{
 		return this.internalID;
-	}
-	
-	public void setInternalID(String internalID)
-	{
-		this.internalID = internalID;
 	}
 	
 	public void addBotCommand(BotCommand command)

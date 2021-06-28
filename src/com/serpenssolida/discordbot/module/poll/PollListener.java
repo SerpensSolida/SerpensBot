@@ -201,7 +201,7 @@ public class PollListener extends BotListener
 		
 		for (Poll.PollOption option : poll.getOptions())
 		{
-			buttonGroup.addButton(new ButtonCallback(option.getId(), null, null, (event, guild, messageChannel, message, author) ->
+			buttonGroup.addButton(new ButtonCallback(option.getId(), (event, guild, messageChannel, message, author) ->
 			{
 				boolean voteAdded = poll.addVote(option.getId(), author);
 				

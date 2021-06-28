@@ -1,24 +1,21 @@
 package com.serpenssolida.discordbot.module;
 
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 
+/**
+ * This class is used to map a Discord button to an action.
+ */
 public class ButtonCallback
 {
 	private String id;
-	//private User user;
-	//private MessageChannel channel;
 	private ButtonAction action;
 	
 	public static boolean DELETE_MESSAGE = true;
 	public static boolean LEAVE_MESSAGE = false;
 	
-	public ButtonCallback(String id, User user, MessageChannel channel, ButtonAction action)
+	public ButtonCallback(String id, ButtonAction action)
 	{
 		this.id = id;
-		//this.user = user;
-		//this.channel = channel;
 		this.action = action;
 	}
 	
@@ -49,26 +46,6 @@ public class ButtonCallback
 	{
 		this.id = id;
 	}
-	
-	/*public User getUser()
-	{
-		return this.user;
-	}
-	
-	public void setUser(User user)
-	{
-		this.user = user;
-	}*/
-	
-	/*public MessageChannel getChannel()
-	{
-		return this.channel;
-	}
-	
-	public void setChannel(MessageChannel channel)
-	{
-		this.channel = channel;
-	}*/
 	
 	public ButtonAction getAction()
 	{

@@ -29,6 +29,9 @@ public abstract class Task
 		this.running = true;
 	}
 	
+	/**
+	 * Starts the task without using an event.
+	 */
 	public void start()
 	{
 		MessageBuilder messageBuilder = new MessageBuilder();
@@ -37,6 +40,9 @@ public abstract class Task
 		this.channel.sendMessage(messageBuilder.build()).queue(this::setLastMessage);
 	}
 	
+	/**
+	 * Starts the task using the given event.
+	 */
 	public void start(GenericInteractionCreateEvent event)
 	{
 		MessageBuilder messageBuilder = new MessageBuilder();
@@ -53,8 +59,15 @@ public abstract class Task
 				});
 	}
 	
-	
-	
+	/**
+	 * Fills the given {@link MessageBuilder} with the start message of the task.
+	 *
+	 * @param messageBuilder
+	 * 		The {@link MessageBuilder} to fill.
+	 *
+	 * @return
+	 * 		True if the message will be an ephemeral message. false otherwise.
+	 */
 	public abstract boolean startMessage(MessageBuilder messageBuilder);
 	
 	/**
@@ -63,7 +76,6 @@ public abstract class Task
 	 * @param message
 	 * 		The message the task will consume.
 	 *
-	 * //@return Whether or not the task has finished and can be removed.
 	 */
 	public abstract void consumeMessage(Message message);
 	
@@ -118,7 +130,7 @@ public abstract class Task
 	}
 	
 	/**
-	 * Send a message in the channel the task is running on and add a reaction tu it.
+	 * Sends a message in the channel the task is running on and add a reaction to it.
 	 * The message will also be stored in the variable this.lastMessage.
 	 *
 	 * @param messageBuilder
@@ -134,20 +146,32 @@ public abstract class Task
 		});
 	}
 	
+	/**
+	 * Adds a button, used to cancel the task, to the given {@link MessageBuilder}.
+	 *
+	 * @param messageBuilder
+	 * 		The {@link MessageBuilder} where the buttons will be added.
+	 */
 	public void addCancelButton(MessageBuilder messageBuilder)
 	{
 		messageBuilder.setActionRows(ActionRow.of(Button.danger("cancel-task", "Esci dalla procedura")));
 		this.registerCancelButton();
 	}
 	
+	/**
+	 * Register a "cancel" button that will cancel the task.
+	 */
 	public void registerCancelButton()
 	{
 		if (this.buttonGroup == null)
 			this.buttonGroup = new ButtonGroup();
 		
-		this.buttonGroup.addButton(new ButtonCallback("cancel-task", this.user, this.channel, this.CANCEL_BUTTON));
+		this.buttonGroup.addButton(new ButtonCallback("cancel-task", this.CANCEL_BUTTON));
 	}
 	
+	/**
+	 * Removes the buttons from the last message.
+	 */
 	public void deleteButtons()
 	{
 		if (this.lastMessage != null)
@@ -229,10 +253,14 @@ public abstract class Task
 		this.buttonGroup = buttonGroup;
 	}
 	
+	/**
+	 * This is the default callback used by the "cancel" button to cancel the task.
+	 */
 	public final ButtonAction CANCEL_BUTTON = (event, guild, channel, message, author) ->
 	{
-		MessageBuilder b = new MessageBuilder();
-		b.append(event.getMessage().getContentDisplay());//.append("> La procedura è stata annullata.");
+		MessageBuilder b = new MessageBuilder(event.getMessage());
+		b.setActionRows();
+		//b.append(event.getMessage().getContentDisplay());//.append("> La procedura è stata annullata.");
 		//this.getChannel().sendMessage(b.build()).queue();
 		this.running = false;
 		

@@ -13,16 +13,12 @@ public interface BotCommandAction
 	/**
 	 * Called when the command is sent to the chat.
 	 *
-	 *
 	 * @param guild
+	 * 		The guild the commands was sent on.
 	 * @param channel
-	 * 		Channel where the message was sent.
-	 * @param message
-	 * 		Message containing the command.
+	 * 		Channel where the command was sent.
 	 * @param author
-	 * 		Author of the message.
-	 * @param args
-	 * 		Arguments passed to the command.
+	 * 		Author that sent the command.
 	 *
 	 * @return
 	 */

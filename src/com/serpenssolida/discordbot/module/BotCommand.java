@@ -1,6 +1,5 @@
 package com.serpenssolida.discordbot.module;
 
-import com.serpenssolida.discordbot.BotMain;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
@@ -10,7 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 public class BotCommand
 {
 	private String id; //ID of the command, used to identify unequivocally a command.
-	private SubcommandData subcommand;
+	private SubcommandData subcommand; //The subcommand used by this BotCommand.
 	private BotCommandAction action; //Callback that is called when the command is sent to the chat.
 	
 	public BotCommand(String id, String description)
@@ -58,28 +57,14 @@ public class BotCommand
 		
 		return false;
 	}
-
 	
-	/**
-	 * @return The command id.
-	 */
 	public String getId()
 	{
 		return this.id;
 	}
 	
-	public String getArgumentsDescription(String guildID)
-	{
-		return (BotMain.getCommandSymbol(guildID) + " " + this.id + " ").strip();
-	}
-	
 	public SubcommandData getSubcommand()
 	{
-		return subcommand;
-	}
-	
-	public void setSubcommand(SubcommandData subcommand)
-	{
-		this.subcommand = subcommand;
+		return this.subcommand;
 	}
 }
