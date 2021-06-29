@@ -220,7 +220,7 @@ public class BotListener extends ListenerAdapter
 		else if (buttonGroup != null) //If no button group is found and the user hasn't got any task the user cannot press a button.
 		{
 			ButtonCallback buttonCallback = buttonGroup.getButton(button.getId());
-			event.deferEdit().queue(); //Let discord know we know the button has been clicked.
+			//event.deferEdit().queue(); //Let discord know we know the button has been clicked.
 			
 			//Do button action.
 			boolean deleteMessage = buttonCallback.doAction(event);
