@@ -8,6 +8,7 @@ import com.serpenssolida.discordbot.module.hungergames.task.EditCharacterTask;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -180,10 +181,8 @@ public class HungerGamesListener extends BotListener
 		}
 		else
 		{
-			EmbedBuilder embedBuilder = new EmbedBuilder()
-					.setDescription("L'utente non ha creato nessun personaggio.");
-			
-			event.reply(new MessageBuilder().setEmbed(embedBuilder.build()).build()).setEphemeral(false).queue();
+			Message message = BotListener.buildSimpleMessage("Creazione personaggio", author, "L'utente non ha creato nessun personaggio.");
+			event.reply(message).setEphemeral(true).queue();
 		}
 	}
 	
@@ -197,10 +196,8 @@ public class HungerGamesListener extends BotListener
 		//This command cannot be used while HungerGames is running.
 		if (HungerGamesController.isHungerGamesRunning(guild.getId()))
 		{
-			MessageBuilder messageBuilder = new MessageBuilder()
-					.setEmbed(embedBuilder.build());
-			messageBuilder.append("> Non puoi usare questo comando mentre è in corso un HungerGames.");
-			event.reply(messageBuilder.build()).queue();
+			Message message = BotListener.buildSimpleMessage("Attivazione/disattivazione personaggio", author, "Non puoi usare questo comando mentre è in corso un HungerGames.");
+			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
 		

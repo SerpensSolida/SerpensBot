@@ -4,10 +4,7 @@ import com.serpenssolida.discordbot.BotMain;
 import com.serpenssolida.discordbot.module.BotListener;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
@@ -79,26 +76,16 @@ public class BaseListener extends BotListener
 		//Check in the user has permission to run this command.
 		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
 		{
-			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Reset del simbolo dei comandi", author)
-					.appendDescription("Devi essere il proprietario o moderatore del server per resettare il simbolo per comandi non listati.");
-			
-			MessageBuilder messageBuilder = new MessageBuilder()
-					.setEmbed(embedBuilder.build());
-			
-			channel.sendMessage(messageBuilder.build()).queue();
+			Message message = BotListener.buildSimpleMessage("Reset del simbolo dei comandi", author, "Devi essere il proprietario o moderatore del server per resettare il simbolo per comandi non listati.");
+			channel.sendMessage(message).queue();
 			return;
 		}
 		
 		BotMain.setCommandSymbol(guild.getId(), "/");
 		BotMain.saveSettings(guild.getId());
 		
-		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Reset del simbolo dei comandi", author)
-				.appendDescription("Simbolo per i comandi non listati impostato a `/`.");
-		
-		MessageBuilder messageBuilder = new MessageBuilder()
-				.setEmbed(embedBuilder.build());
-		
-		channel.sendMessage(messageBuilder.build()).queue();
+		Message message = BotListener.buildSimpleMessage("Reset del simbolo dei comandi", author, "Simbolo per i comandi non listati impostato a `/`.");
+		channel.sendMessage(message).queue();
 	}
 	
 	/**
@@ -111,13 +98,8 @@ public class BaseListener extends BotListener
 		//Check in the user has permission to run this command.
 		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
 		{
-			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Reset dei prefissi dei comandi", author)
-					.appendDescription("Devi essere il proprietario o moderatore del server per resettare i prefissi.");
-			
-			MessageBuilder messageBuilder = new MessageBuilder()
-					.setEmbed(embedBuilder.build());
-			
-			channel.sendMessage(messageBuilder.build()).queue();
+			Message message = BotListener.buildSimpleMessage("Reset dei prefissi dei comandi", author, "Devi essere il proprietario o moderatore del server per resettare i prefissi.");
+			channel.sendMessage(message).queue();
 			return;
 		}
 		
@@ -129,12 +111,8 @@ public class BaseListener extends BotListener
 		BotMain.updateGuildCommands(guild);
 		BotMain.saveSettings(guild.getId());
 		
-		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Reset dei prefissi dei comandi", author)
-				.appendDescription("Prefisso dei moduli resettato correttamente.");
-		
-		MessageBuilder messageBuilder = new MessageBuilder()
-				.setEmbed(embedBuilder.build());
-		channel.sendMessage(messageBuilder.build()).queue();
+		Message message = BotListener.buildSimpleMessage("Reset dei prefissi dei comandi", author, "Prefisso dei moduli resettato correttamente.");
+		channel.sendMessage(message).queue();
 	}
 	
 	/**

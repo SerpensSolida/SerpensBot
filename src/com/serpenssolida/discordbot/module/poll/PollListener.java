@@ -65,7 +65,7 @@ public class PollListener extends BotListener
 		command.getSubcommand()
 				.addOption(OptionType.STRING, "poll-id", "Identificatore univoco del sondaggio", true);
 		this.addBotCommand(command);
-		
+		//TODO: Add command for editing poll description.
 		//Command for adding an option to the pool.
 		command = new BotCommand("add", "Aggiunge un opzione al sondaggio.");
 		command.setAction((event, guild, channel, author) ->
@@ -100,17 +100,7 @@ public class PollListener extends BotListener
 		
 		//Null check for arguments.
 		if (questionArg == null)
-		{
-			/*EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Sondaggio!", author);
-			embedBuilder.setDescription("Errore con gli argomenti.");
-			
-			MessageBuilder messageBuilder = new MessageBuilder();
-			messageBuilder.setEmbed(embedBuilder.build());
-			
-			event.reply(messageBuilder.build()).setEphemeral(true).queue();
-			*/
 			return;
-		}
 		
 		//Get duration of the poll
 		int duration = 60;
@@ -169,7 +159,7 @@ public class PollListener extends BotListener
 		//Poll poll = stopPoll(poll, )
 		Poll poll = this.polls.get(pollIdArg.getAsString());
 		
-		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Rimozione sondaggio", author);
+		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Arresto sondaggio", author);
 		MessageBuilder messageBuilder = new MessageBuilder();
 		
 		if (poll == null)
@@ -200,12 +190,8 @@ public class PollListener extends BotListener
 		
 		if (poll == null)
 		{
-			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Aggiunta opzione al sondaggio", author);
-			embedBuilder.setDescription("Nessun sondaggio trovato con id: " + pollIdArg.getAsString());
-			MessageBuilder messageBuilder = new MessageBuilder();
-			messageBuilder.setEmbed(embedBuilder.build());
-			
-			event.reply(messageBuilder.build()).setEphemeral(true).queue();
+			Message message = BotListener.buildSimpleMessage("Aggiunta opzione al sondaggio", author, "Nessuna poll trovata con id: " + pollIdArg.getAsString());
+			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
 		
@@ -213,41 +199,29 @@ public class PollListener extends BotListener
 		
 		if (!author.equals(poll.getAuthor()))
 		{
-			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Aggiunta opzione al sondaggio", author);
-			embedBuilder.setDescription("Questo sondaggio non appartiene a te.");
-			MessageBuilder messageBuilder = new MessageBuilder();
-			messageBuilder.setEmbed(embedBuilder.build());
-			
-			event.reply(messageBuilder.build()).setEphemeral(true).queue();
+			Message message = BotListener.buildSimpleMessage("Aggiunta opzione al sondaggio", author, "Questo sondaggio non appartiene a te.");
+			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
 		
 		if (pollSize >= 9)
 		{
-			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Aggiunta opzione al sondaggio", author);
-			embedBuilder.setDescription("Non è possibile aggiungere più di 9 opzioni ad un sondaggio.");
-			MessageBuilder messageBuilder = new MessageBuilder();
-			messageBuilder.setEmbed(embedBuilder.build());
-			
-			event.reply(messageBuilder.build()).setEphemeral(true).queue();
+			Message message = BotListener.buildSimpleMessage("Aggiunta opzione al sondaggio", author, "Non è possibile aggiungere più di 9 opzioni ad un sondaggio.");
+			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
 		
 		Poll.PollOption option = new Poll.PollOption("option" + (pollSize + 1), descriptionArg.getAsString());
 		poll.addOption(option);
 		
-		Message message = channel.retrieveMessageById(poll.getMessageId()).complete();
-		PollListener.refreshPollMessage(poll, message);
+		Message pollMessage = channel.retrieveMessageById(poll.getMessageId()).complete();
+		PollListener.refreshPollMessage(poll, pollMessage);
 		
 		ButtonGroup buttonGroup = PollListener.buildPollButtons(poll);
 		this.addButtonGroup(guild.getId(), poll.getMessageId(), buttonGroup);
 		
-		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Aggiunta opzione al sondaggio", author);
-		embedBuilder.setDescription("Aggiunta l'opzione \"" + option.getText() + "\" al sondaggio.");
-		MessageBuilder messageBuilder = new MessageBuilder();
-		messageBuilder.setEmbed(embedBuilder.build());
-		
-		event.reply(messageBuilder.build()).setEphemeral(false).queue();
+		Message message = BotListener.buildSimpleMessage("Aggiunta opzione al sondaggio", author, "Aggiunta l'opzione \"" + option.getText() + "\" al sondaggio.");
+		event.reply(message).setEphemeral(false).queue();
 	}
 	
 	private void removeOption(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
@@ -262,19 +236,22 @@ public class PollListener extends BotListener
 		//Collection<Poll.PollOption> options = poll.getOptions();
 		int optionIndex = (int) indexArg.getAsLong();
 		
+		if (poll == null)
+		{
+			Message message = BotListener.buildSimpleMessage("Rimozione opzione dal sondaggio", author, "Nessuna poll trovata con id: " + pollIdArg.getAsString());
+			event.reply(message).setEphemeral(true).queue();
+			return;
+		}
+		
 		if (!author.equals(poll.getAuthor()))
 		{
-			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Rimozione opzione dal sondaggio", author);
-			embedBuilder.setDescription("Questo sondaggio non appartiene a te.");
-			MessageBuilder messageBuilder = new MessageBuilder();
-			messageBuilder.setEmbed(embedBuilder.build());
-			
-			event.reply(messageBuilder.build()).setEphemeral(true).queue();
+			Message message = BotListener.buildSimpleMessage("Rimozione opzione dal sondaggio", author, "Questo sondaggio non appartiene a te.");
+			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
 		
 		boolean success = poll.removeOption("option" + optionIndex); //TODO: Check option count. Use position in LinkedHashMap instead of id.
-		
+		//TODO: Add null check.
 		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Rimozione opzione dal sondaggio", author);
 		
 		if (success)
@@ -396,7 +373,7 @@ public class PollListener extends BotListener
 		ArrayList<Poll.PollOption> winners = pool.getWinners();
 		
 		if (winners.size() == 1)
-			return "*Sondaggio temrinato!*\nRisultato: **" + winners.get(0).getText() + "** (voti: " + winners.get(0).getVotesCount() + ")";
+			return "*Sondaggio terminato!*\nRisultato: **" + winners.get(0).getText() + "** (voti: " + winners.get(0).getVotesCount() + ")";
 		
 		stringBuilder.append("*Il sondaggio è finito con un pareggio:*\n");
 		

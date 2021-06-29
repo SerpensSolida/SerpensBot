@@ -5,10 +5,7 @@ import com.serpenssolida.discordbot.module.BotCommand;
 import com.serpenssolida.discordbot.module.BotListener;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -71,10 +68,8 @@ public class SettingsListener extends BotListener
 		//Check in the user has permission to run this command.
 		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
 		{
-			embedBuilder.appendDescription("Devi essere il proprietario o moderatore del server per modificare questa impostazione.");
-			messageBuilder.setEmbed(embedBuilder.build());
-			
-			event.reply(messageBuilder.build()).setEphemeral(true).queue();
+			Message message = BotListener.buildSimpleMessage("Cancellazione messaggi", author, "Devi essere il proprietario o moderatore del server per modificare questa impostazione.");
+			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
 		
@@ -143,20 +138,16 @@ public class SettingsListener extends BotListener
 			//Check in the user has permission to run this command.
 			if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
 			{
-				embedBuilder.setDescription("Devi essere il proprietario o moderatore del server per modificare il prefisso di un modulo.");
-				messageBuilder.setEmbed(embedBuilder.build());
-				
-				event.reply(messageBuilder.build()).queue();
+				Message message = BotListener.buildSimpleMessage("Prefissi dei comandi", author, "Devi essere il proprietario o moderatore del server per modificare il prefisso di un modulo.");
+				event.reply(message).setEphemeral(true).queue();
 				return;
 			}
 			
 			//Check if the module prefix to set is suitable.
 			if (!newPrefix.chars().allMatch(Character::isLetterOrDigit) || newPrefix.length() > 16)
 			{
-				embedBuilder.setDescription("Il prefisso deve essere alfanumerico e non può superare i 16 caratteri.");
-				messageBuilder.setEmbed(embedBuilder.build());
-				
-				event.reply(messageBuilder.build()).queue();
+				Message message = BotListener.buildSimpleMessage("Prefissi dei comandi", author, "Il prefisso deve essere alfanumerico e non può superare i 16 caratteri.");
+				event.reply(message).setEphemeral(true).queue();
 				return;
 			}
 			
