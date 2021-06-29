@@ -4,10 +4,7 @@ import com.serpenssolida.discordbot.BotMain;
 import com.serpenssolida.discordbot.ButtonGroup;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.MessageReaction;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -350,6 +347,17 @@ public class BotListener extends ListenerAdapter
 		
 		//channel.sendMessage(new MessageBuilder().setEmbed(embedBuilder.build()).build()).queue();
 		event.reply(new MessageBuilder().setEmbed(embedBuilder.build()).build()).setEphemeral(false).queue();
+	}
+	
+	protected static Message buildSimpleMessage(String title, User author, String description)
+	{
+		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed(title, author);
+		embedBuilder.setDescription(description);
+		MessageBuilder messageBuilder = new MessageBuilder();
+		messageBuilder.setEmbed(embedBuilder.build());
+		
+//		event.reply(messageBuilder.build()).setEphemeral(true).queue();
+		return messageBuilder.build();
 	}
 	
 	/**
