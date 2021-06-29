@@ -38,7 +38,9 @@ public class BotListener extends ListenerAdapter
 		//this.modulePrefix = modulePrefix;
 		this.internalID = modulePrefix;
 		
-		BotCommand command = new BotCommand("help", "Mostra questo messaggio oppure le info su come usare il comando dato.");
+		//TODO: Add methods to add these commands manually
+		
+		BotCommand command = new BotCommand("help", "Mostra un messaggio di aiuto per il modulo.");
 		command.setAction((event, guild, channel, author) ->
 		{
 			this.sendHelp(event, guild, channel, author);
@@ -287,6 +289,8 @@ public class BotListener extends ListenerAdapter
 	private void sendHelp(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		EmbedBuilder embedBuilder = new EmbedBuilder();
+		
+		//TODO: Fix this command.
 		
 		//Add footer
 		embedBuilder.setFooter("Richiesto da " + author.getName(), author.getAvatarUrl());

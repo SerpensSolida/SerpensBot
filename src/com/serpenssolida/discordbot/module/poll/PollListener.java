@@ -88,7 +88,7 @@ public class PollListener extends BotListener
 		});
 		command.getSubcommand()
 				.addOption(OptionType.STRING, "poll-id", "Identificatore univoco del sondaggio", true)
-				.addOption(OptionType.STRING, "index", "Indice dell'opzione da rimuovere (parte da 1)", true);
+				.addOption(OptionType.STRING, "position", "Posizione dell'opzione da rimuovere (parte da 1)", true);
 		this.addBotCommand(command);
 		
 	}
@@ -253,7 +253,7 @@ public class PollListener extends BotListener
 	private void removeOption(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping pollIdArg = event.getOption("poll-id");
-		OptionMapping indexArg = event.getOption("index");
+		OptionMapping indexArg = event.getOption("position");
 		
 		if (pollIdArg == null || indexArg == null)
 			return;
@@ -273,7 +273,7 @@ public class PollListener extends BotListener
 			return;
 		}
 		
-		boolean success = poll.removeOption("option" + optionIndex);
+		boolean success = poll.removeOption("option" + optionIndex); //TODO: Check option count. Use position in LinkedHashMap instead of id.
 		
 		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Rimozione opzione dal sondaggio", author);
 		
@@ -418,7 +418,6 @@ public class PollListener extends BotListener
 		
 		if (poll.getVotesCount() > 0)
 		{
-			System.out.println("Rimozione attachment.");
 			//editMessage.override(true);//
 			editMessage.addFile(poll.generatePieChart().toByteArray(), "pie_chart.png");
 		}
