@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.interactions.components.Button;
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 public class BotListener extends ListenerAdapter
 {
@@ -29,7 +30,7 @@ public class BotListener extends ListenerAdapter
 	private String moduleName = ""; //Readable name of the module.
 	private HashMap<String, HashMap<User, Task>> tasks = new HashMap<>(); //List of task currently running. //TODO: Make task linked to servers.
 	private HashMap<String, UnlistedBotCommand> unlistedBotCommands = new HashMap<>(); //List of commands of the module.
-	private HashMap<String, BotCommand> botCommands = new HashMap<>(); //List of commands of the module that are displayed in the client command list. //TODO: Encapsulate.
+	private LinkedHashMap<String, BotCommand> botCommands = new LinkedHashMap<>(); //List of commands of the module that are displayed in the client command list. //TODO: Encapsulate.
 	private HashMap<String, HashMap<String, ButtonGroup>> activeGlobalButtons = new HashMap<>();
 	
 	public BotListener(String modulePrefix)
@@ -37,18 +38,18 @@ public class BotListener extends ListenerAdapter
 		//this.modulePrefix = modulePrefix;
 		this.internalID = modulePrefix;
 		
-		BotCommand command = new BotCommand("cancel", "Cancella la procedura corrente.");
+		BotCommand command = new BotCommand("help", "Mostra questo messaggio oppure le info su come usare il comando dato.");
 		command.setAction((event, guild, channel, author) ->
 		{
-			this.cancelTask(event, guild, channel, author);
+			this.sendHelp(event, guild, channel, author);
 			return true;
 		});
 		this.addBotCommand(command);
 		
-		command = new BotCommand("help", "Mostra questo messaggio oppure le info su come usare il comando dato.");
+		command = new BotCommand("cancel", "Cancella la procedura corrente.");
 		command.setAction((event, guild, channel, author) ->
 		{
-			this.sendHelp(event, guild, channel, author);
+			this.cancelTask(event, guild, channel, author);
 			return true;
 		});
 		this.addBotCommand(command);
