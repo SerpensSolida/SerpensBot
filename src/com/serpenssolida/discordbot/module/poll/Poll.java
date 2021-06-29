@@ -96,11 +96,6 @@ public class Poll
 		return outputStream;
 	}
 	
-	public String getQuestion()
-	{
-		return this.question;
-	}
-	
 	public Collection<PollOption> getOptions()
 	{
 		return this.options.values();
@@ -135,6 +130,17 @@ public class Poll
 			this.users.removeAll(removed.users);
 		}
 		
+		LinkedHashMap<String, PollOption> options = new LinkedHashMap<>();
+		int k = 1;
+		for (PollOption option : this.options.values())
+		{
+			option.setId("option" + k);
+			options.put(option.getId(), option);
+			k++;
+		}
+		this.options = options;
+		//TODO: rebuild hashmap or maybe change it to an arraylist.
+		
 		return removed != null;
 	}
 	
@@ -164,6 +170,16 @@ public class Poll
 	public void setMessageId(String messageId)
 	{
 		this.messageId = messageId;
+	}
+	
+	public String getQuestion()
+	{
+		return this.question;
+	}
+	
+	public void setQuestion(String question)
+	{
+		this.question = question;
 	}
 	
 	public void setFinished(boolean finished)
@@ -209,9 +225,14 @@ public class Poll
 			return this.id;
 		}
 		
+		public void setId(String id)
+		{
+			this.id = id;
+		}
+		
 		public HashSet<User> getUsers()
 		{
-			return users;
+			return this.users;
 		}
 	}
 }

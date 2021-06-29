@@ -24,7 +24,7 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class PollListener extends BotListener
+public class PollListener extends BotListener //TODO: Commentare il codice.
 {
 	private HashMap<String, Poll> polls = new HashMap<>();
 	
@@ -65,7 +65,19 @@ public class PollListener extends BotListener
 		command.getSubcommand()
 				.addOption(OptionType.STRING, "poll-id", "Identificatore univoco del sondaggio", true);
 		this.addBotCommand(command);
-		//TODO: Add command for editing poll description.
+		
+		//Command for deleting a poll.
+		command = new BotCommand("edit", "Modifica la descrizione di un sondaggio.");
+		command.setAction((event, guild, channel, author) ->
+		{
+			this.editPollDescription(event, guild, channel, author);
+			return true;
+		});
+		command.getSubcommand()
+				.addOption(OptionType.STRING, "poll-id", "Identificatore univoco del sondaggio", true)
+				.addOption(OptionType.STRING, "description", "Nuova descrizione del sondaggio", true);
+		this.addBotCommand(command);
+		
 		//Command for adding an option to the pool.
 		command = new BotCommand("add", "Aggiunge un opzione al sondaggio.");
 		command.setAction((event, guild, channel, author) ->
@@ -178,6 +190,42 @@ public class PollListener extends BotListener
 		
 	}
 	
+	private void editPollDescription(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	{
+		OptionMapping pollIdArg = event.getOption("poll-id");
+		OptionMapping descriptionArg = event.getOption("description");
+		
+		if (pollIdArg == null || descriptionArg == null)
+			return;
+		
+		Poll poll = this.polls.get(pollIdArg.getAsString());
+		
+		if (poll == null)
+		{
+			Message message = BotListener.buildSimpleMessage("Modifica descrizione del sondaggio", author, "Nessuna poll trovata con id: " + pollIdArg.getAsString());
+			event.reply(message).setEphemeral(true).queue();
+			return;
+		}
+		
+		if (!author.equals(poll.getAuthor()))
+		{
+			Message message = BotListener.buildSimpleMessage("Modifica descrizione del sondaggio", author, "Questo sondaggio non appartiene a te.");
+			event.reply(message).setEphemeral(true).queue();
+			return;
+		}
+		
+		poll.setQuestion(descriptionArg.getAsString());
+		
+		Message pollMessage = channel.retrieveMessageById(poll.getMessageId()).complete();
+		PollListener.refreshPollMessage(poll, pollMessage);
+		
+		ButtonGroup buttonGroup = PollListener.buildPollButtons(poll);
+		this.addButtonGroup(guild.getId(), poll.getMessageId(), buttonGroup);
+		
+		Message message = BotListener.buildSimpleMessage("Modifica descrizione del sondaggio", author, "Descrizione cambiata con successo.");
+		event.reply(message).setEphemeral(false).queue();
+	}
+	
 	private void addOption(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping pollIdArg = event.getOption("poll-id");
@@ -250,8 +298,15 @@ public class PollListener extends BotListener
 			return;
 		}
 		
-		boolean success = poll.removeOption("option" + optionIndex); //TODO: Check option count. Use position in LinkedHashMap instead of id.
-		//TODO: Add null check.
+		if (poll.getOptions().size() <= 2)
+		{
+			Message message = BotListener.buildSimpleMessage("Rimozione opzione dal sondaggio", author, "Un sondaggio deve avere almeno 2 opzioni.");
+			event.reply(message).setEphemeral(true).queue();
+			return;
+		}
+		
+		boolean success = poll.removeOption("option" + optionIndex);
+		
 		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Rimozione opzione dal sondaggio", author);
 		
 		if (success)
