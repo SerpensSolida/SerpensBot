@@ -20,7 +20,7 @@ public class Poll
 	private String question;
 	private boolean finished;
 	private User author;
-	private HashMap<String, PollOption> options = new HashMap<>();
+	private LinkedHashMap<String, PollOption> options = new LinkedHashMap<>();
 	private HashSet<User> users = new HashSet<>();
 	
 	/*public Poll(String messageId)
@@ -126,14 +126,34 @@ public class Poll
 		this.options.put(option.getId(), option);
 	}
 	
+	public boolean removeOption(String optionId)
+	{
+		PollOption removed = this.options.remove(optionId);
+		
+		if (removed != null)
+		{
+			this.users.removeAll(removed.users);
+		}
+		
+		return removed != null;
+	}
+	
 	public boolean addVote(String optionId, User user)
 	{
 		if (this.users.contains(user))
 			return false;
 		
+		PollOption pollOption = this.options.get(optionId);
+		
 		this.users.add(user);
-		this.options.get(optionId).votesCount++;
+		pollOption.votesCount++;
+		pollOption.users.add(user);
 		return true;
+	}
+	
+	public boolean hasUserVoted(User author)
+	{
+		return this.users.contains(author);
 	}
 	
 	public String getMessageId()
@@ -166,6 +186,7 @@ public class Poll
 		private String text;
 		private String id;
 		private int votesCount = 0;
+		private HashSet<User> users = new HashSet<>();
 		
 		public PollOption(String id, String text)
 		{
@@ -186,6 +207,11 @@ public class Poll
 		public String getId()
 		{
 			return this.id;
+		}
+		
+		public HashSet<User> getUsers()
+		{
+			return users;
 		}
 	}
 }

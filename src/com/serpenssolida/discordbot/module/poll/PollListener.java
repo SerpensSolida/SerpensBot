@@ -64,36 +64,32 @@ public class PollListener extends BotListener
 		});
 		command.getSubcommand()
 				.addOption(OptionType.STRING, "poll-id", "Identificatore univoco del sondaggio", true);
-
 		this.addBotCommand(command);
-	}
-	
-	private void removePoll(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
-	{
-		OptionMapping pollIdArg = event.getOption("poll-id");
 		
-		if (pollIdArg == null)
-			return;
-		
-		//Poll poll = stopPoll(poll, )
-		Poll poll = this.polls.get(pollIdArg.getAsString());
-		
-		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Rimozione sondaggio", author);
-		MessageBuilder messageBuilder = new MessageBuilder();
-		
-		if (poll == null)
+		//Command for adding an option to the pool.
+		command = new BotCommand("add", "Aggiunge un opzione al sondaggio.");
+		command.setAction((event, guild, channel, author) ->
 		{
-			embedBuilder.setDescription("Nessun sondaggio trovato con id: " + pollIdArg.getAsString());
-		}
-		else
-		{
-			this.stopPoll(poll, channel);
-			
-			embedBuilder.setDescription("Sondaggio fermato correttamente.");
-		}
+			this.addOption(event, guild, channel, author);
+			return true;
+		});
+		command.getSubcommand()
+				.addOption(OptionType.STRING, "poll-id", "Identificatore univoco del sondaggio", true)
+				.addOption(OptionType.STRING, "description", "Testo dell'opzione da aggiungere", true);
+				//.addOption(OptionType.STRING, "option-index", "Indice dell'opzione da rimuovere");
+		this.addBotCommand(command);
 		
-		messageBuilder.setEmbed(embedBuilder.build());
-		event.reply(messageBuilder.build()).setEphemeral(true).queue();
+		//Command for removing an option from the pool.
+		command = new BotCommand("remove", "Rimuove un opzione dal sondaggio.");
+		command.setAction((event, guild, channel, author) ->
+		{
+			this.removeOption(event, guild, channel, author);
+			return true;
+		});
+		command.getSubcommand()
+				.addOption(OptionType.STRING, "poll-id", "Identificatore univoco del sondaggio", true)
+				.addOption(OptionType.STRING, "index", "Indice dell'opzione da rimuovere (parte da 1)", true);
+		this.addBotCommand(command);
 		
 	}
 	
@@ -105,14 +101,14 @@ public class PollListener extends BotListener
 		//Null check for arguments.
 		if (questionArg == null)
 		{
-			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Sondaggio!", author);
+			/*EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Sondaggio!", author);
 			embedBuilder.setDescription("Errore con gli argomenti.");
 			
 			MessageBuilder messageBuilder = new MessageBuilder();
 			messageBuilder.setEmbed(embedBuilder.build());
 			
 			event.reply(messageBuilder.build()).setEphemeral(true).queue();
-			
+			*/
 			return;
 		}
 		
@@ -123,6 +119,7 @@ public class PollListener extends BotListener
 		
 		//Create the poll.
 		Poll poll = new Poll(questionArg.getAsString(), author);
+		int k = 1;
 		for (int i = 1; i <= 9; i++)
 		{
 			OptionMapping optionArg = event.getOption("option" + i);
@@ -130,8 +127,10 @@ public class PollListener extends BotListener
 			if (optionArg == null)
 				continue;
 			
-			Poll.PollOption option = new Poll.PollOption(optionArg.getName(), optionArg.getAsString());
+//			Poll.PollOption option = new Poll.PollOption(optionArg.getName(), optionArg.getAsString());
+			Poll.PollOption option = new Poll.PollOption("option" + k, optionArg.getAsString());
 			poll.addOption(option);
+			k++;
 		}
 		
 		//Create the poll message.
@@ -153,14 +152,151 @@ public class PollListener extends BotListener
 		PollListener.refreshPollMessage(poll, message);
 		
 		//Set a timer to stop the poll.
-		Timer timer = new Timer(duration * 60 * 1000, e -> this.stopPoll(poll, channel));
+		Timer timer = new Timer(duration * 60 * 1000, e -> this.stopPoll(poll, guild, channel));
 		timer.setRepeats(false);
 		timer.start();
 		
 		//Poll poll = new Poll()
 	}
 	
-	private void stopPoll(Poll poll, MessageChannel channel)
+	private void removePoll(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	{
+		OptionMapping pollIdArg = event.getOption("poll-id");
+		
+		if (pollIdArg == null)
+			return;
+		
+		//Poll poll = stopPoll(poll, )
+		Poll poll = this.polls.get(pollIdArg.getAsString());
+		
+		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Rimozione sondaggio", author);
+		MessageBuilder messageBuilder = new MessageBuilder();
+		
+		if (poll == null)
+		{
+			embedBuilder.setDescription("Nessun sondaggio trovato con id: " + pollIdArg.getAsString());
+		}
+		else
+		{
+			this.stopPoll(poll, guild, channel);
+			
+			embedBuilder.setDescription("Sondaggio fermato correttamente.");
+		}
+		
+		messageBuilder.setEmbed(embedBuilder.build());
+		event.reply(messageBuilder.build()).setEphemeral(true).queue();
+		
+	}
+	
+	private void addOption(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	{
+		OptionMapping pollIdArg = event.getOption("poll-id");
+		OptionMapping descriptionArg = event.getOption("description");
+		
+		if (pollIdArg == null || descriptionArg == null)
+			return;
+		
+		Poll poll = this.polls.get(pollIdArg.getAsString());
+		
+		if (poll == null)
+		{
+			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Aggiunta opzione al sondaggio", author);
+			embedBuilder.setDescription("Nessun sondaggio trovato con id: " + pollIdArg.getAsString());
+			MessageBuilder messageBuilder = new MessageBuilder();
+			messageBuilder.setEmbed(embedBuilder.build());
+			
+			event.reply(messageBuilder.build()).setEphemeral(true).queue();
+			return;
+		}
+		
+		int pollSize = poll.getOptions().size();
+		
+		if (!author.equals(poll.getAuthor()))
+		{
+			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Aggiunta opzione al sondaggio", author);
+			embedBuilder.setDescription("Questo sondaggio non appartiene a te.");
+			MessageBuilder messageBuilder = new MessageBuilder();
+			messageBuilder.setEmbed(embedBuilder.build());
+			
+			event.reply(messageBuilder.build()).setEphemeral(true).queue();
+			return;
+		}
+		
+		if (pollSize >= 9)
+		{
+			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Aggiunta opzione al sondaggio", author);
+			embedBuilder.setDescription("Non è possibile aggiungere più di 9 opzioni ad un sondaggio.");
+			MessageBuilder messageBuilder = new MessageBuilder();
+			messageBuilder.setEmbed(embedBuilder.build());
+			
+			event.reply(messageBuilder.build()).setEphemeral(true).queue();
+			return;
+		}
+		
+		Poll.PollOption option = new Poll.PollOption("option" + (pollSize + 1), descriptionArg.getAsString());
+		poll.addOption(option);
+		
+		Message message = channel.retrieveMessageById(poll.getMessageId()).complete();
+		PollListener.refreshPollMessage(poll, message);
+		
+		ButtonGroup buttonGroup = PollListener.buildPollButtons(poll);
+		this.addButtonGroup(guild.getId(), poll.getMessageId(), buttonGroup);
+		
+		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Aggiunta opzione al sondaggio", author);
+		embedBuilder.setDescription("Aggiunta l'opzione \"" + option.getText() + "\" al sondaggio.");
+		MessageBuilder messageBuilder = new MessageBuilder();
+		messageBuilder.setEmbed(embedBuilder.build());
+		
+		event.reply(messageBuilder.build()).setEphemeral(false).queue();
+	}
+	
+	private void removeOption(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	{
+		OptionMapping pollIdArg = event.getOption("poll-id");
+		OptionMapping indexArg = event.getOption("index");
+		
+		if (pollIdArg == null || indexArg == null)
+			return;
+		
+		Poll poll = this.polls.get(pollIdArg.getAsString());
+		//Collection<Poll.PollOption> options = poll.getOptions();
+		int optionIndex = (int) indexArg.getAsLong();
+		
+		if (!author.equals(poll.getAuthor()))
+		{
+			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Rimozione opzione dal sondaggio", author);
+			embedBuilder.setDescription("Questo sondaggio non appartiene a te.");
+			MessageBuilder messageBuilder = new MessageBuilder();
+			messageBuilder.setEmbed(embedBuilder.build());
+			
+			event.reply(messageBuilder.build()).setEphemeral(true).queue();
+			return;
+		}
+		
+		boolean success = poll.removeOption("option" + optionIndex);
+		
+		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Rimozione opzione dal sondaggio", author);
+		
+		if (success)
+		{
+			Message message = channel.retrieveMessageById(poll.getMessageId()).complete();
+			PollListener.refreshPollMessage(poll, message);
+			
+			embedBuilder.setDescription("Opzione rimossa con successo.");
+		}
+		else
+		{
+			embedBuilder.setDescription("Non è stata trovata nessun opzione con id: " + optionIndex);
+			
+		}
+		
+		MessageBuilder messageBuilder = new MessageBuilder();
+		messageBuilder.setEmbed(embedBuilder.build());
+		
+		event.reply(messageBuilder.build()).setEphemeral(!success).queue();
+	}
+	
+	private void stopPoll(Poll poll, Guild guild, MessageChannel channel)
 	{
 		Poll removedPoll = this.polls.remove(poll.getMessageId());
 		
@@ -170,6 +306,7 @@ public class PollListener extends BotListener
 		removedPoll.setFinished(true);
 		Message message = channel.retrieveMessageById(poll.getMessageId()).complete();
 		PollListener.refreshPollMessage(poll, message);
+		this.removeButtonGroup(guild.getId(), poll.getMessageId());
 	}
 	
 	private static ArrayList<ActionRow> buildPollMessageButtons(Poll poll)
@@ -203,6 +340,21 @@ public class PollListener extends BotListener
 		{
 			buttonGroup.addButton(new ButtonCallback(option.getId(), (event, guild, messageChannel, message, author) ->
 			{
+				if (poll.hasUserVoted(author))
+				{
+					event.deferReply(true).queue();
+					
+					EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Votazione sondaggio", author);
+					embedBuilder.setDescription("Hai già votato per questo sondaggio.");
+					MessageBuilder messageBuilder = new MessageBuilder();
+					messageBuilder.setEmbed(embedBuilder.build());
+					
+					event.getHook().sendMessage(messageBuilder.build()).setEphemeral(true).queue();
+					return ButtonCallback.LEAVE_MESSAGE;
+				}
+				
+				event.deferEdit().queue();
+				
 				boolean voteAdded = poll.addVote(option.getId(), author);
 				
 				if (!voteAdded)
@@ -262,9 +414,12 @@ public class PollListener extends BotListener
 		
 		MessageAction editMessage = message.editMessage(messageBuilder.build());
 		
+		editMessage.retainFiles(new ArrayList<>());
+		
 		if (poll.getVotesCount() > 0)
 		{
-			editMessage.retainFiles(new ArrayList<>());
+			System.out.println("Rimozione attachment.");
+			//editMessage.override(true);//
 			editMessage.addFile(poll.generatePieChart().toByteArray(), "pie_chart.png");
 		}
 		
