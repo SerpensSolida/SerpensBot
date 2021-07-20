@@ -186,6 +186,9 @@ public class BotListener extends ListenerAdapter
 		if (BotMain.api.getSelfUser().getId().equals(author.getId()))
 			return;
 		
+		if (button == null)
+			return;
+		
 		//Get the button that the user can press.
 		ButtonGroup buttonGroup = this.getButtonGroup(guild.getId(), event.getMessageId());
 		

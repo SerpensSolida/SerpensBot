@@ -8,6 +8,7 @@ import com.serpenssolida.discordbot.module.hungergames.HungerGamesListener;
 import com.serpenssolida.discordbot.module.poll.PollListener;
 import com.serpenssolida.discordbot.module.settings.SettingsData;
 import com.serpenssolida.discordbot.module.settings.SettingsListener;
+import com.serpenssolida.discordbot.module.tictactoe.TicTacToeListener;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -65,6 +66,7 @@ public class BotMain
 		api.addEventListener(new SettingsListener());
 		api.addEventListener(new HungerGamesListener());
 		api.addEventListener(new PollListener());
+		api.addEventListener(new TicTacToeListener());
 		api.addEventListener(new BaseListener());
 		
 		System.out.println("Bot ready!");
