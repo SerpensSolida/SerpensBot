@@ -66,18 +66,20 @@ public class TicTacToeListener extends BotListener
 		if (opponentArg == null)
 			return;
 		
+		//Get the opponent and create a new game.
 		User opponent = opponentArg.getAsUser();
 		TicTacToeGame game = new TicTacToeGame(author, opponent);
 		
 		MessageBuilder messageBuilder = generateGameMessage(game, author);
 		
-		//Send the pool and get the message id.
+		//Send the game message and get its id.
 		InteractionHook hook = event.reply(messageBuilder.build())
 				.setEphemeral(false)
 				.complete();
 		Message message = hook.retrieveOriginal().complete();
 		String messageId = message.getId();
 		
+		//Set the game id, register it and refresh the game message.
 		game.setMessageId(messageId);
 		this.games.put(messageId, game);
 		this.addButtonGroup(guild.getId(), messageId, this.generateGameCallback());
@@ -91,20 +93,24 @@ public class TicTacToeListener extends BotListener
 		if (gameIdArg == null)
 			return;
 		
+		//Get the game by id.
 		TicTacToeGame game = this.games.get(gameIdArg.getAsString());
 		
+		//Check if a game was found.
 		if (game == null)
 		{
 			event.reply(BotListener.buildSimpleMessage("TicTacToe", author, "Nessuna partita trovata con l'id:" + gameIdArg.getAsString())).setEphemeral(true).queue();
 			return;
 		}
 		
+		//Check if the user is one of the players.
 		if (!game.getPlayers().contains(author))
 		{
 			event.reply(BotListener.buildSimpleMessage("TicTacToe", author, "Non puoi fermare una partita di cui non sei il partecipante")).setEphemeral(true).queue();
 			return;
 		}
 		
+		//Stop the game.
 		this.stopGame(game, guild, channel);
 		
 		event.reply(BotListener.buildSimpleMessage("TicTacToe", author, "La partita è stata interrotta con successo.")).setEphemeral(false).queue();
@@ -125,6 +131,8 @@ public class TicTacToeListener extends BotListener
 	{
 		ArrayList<Button> buttons = new ArrayList<>();
 		ArrayList<ActionRow> actionRows = new ArrayList<>();
+		
+		//Generate the rows for the buttons
 		for (int i = 0; i < TicTacToeGame.FIELD_WIDHT; i++)
 		{
 			for (int j = 0; j < TicTacToeGame.FIELD_HEIGHT; j++)
@@ -161,8 +169,8 @@ public class TicTacToeListener extends BotListener
 		{
 			for (int j = 0; j < TicTacToeGame.FIELD_HEIGHT; j++)
 			{
-				int finalI = i;
-				int finalJ = j;
+				int x = i;
+				int y = j;
 				ButtonCallback button = new ButtonCallback("" + (i + j * TicTacToeGame.FIELD_WIDHT), (event, guild, channel, message, author) ->
 				{
 					TicTacToeGame game = this.games.get(message.getId());
@@ -177,22 +185,12 @@ public class TicTacToeListener extends BotListener
 					{
 						event.deferEdit().queue();
 						
-						if (game.isCellEmpty(finalI, finalJ))
+						if (game.isCellEmpty(x, y))
 						{
-							game.setCell(game.getCurrentTurn(), finalI, finalJ);
+							game.setCell(game.getCurrentTurn(), x, y);
 							game.incrementTurn();
 						}
-						/*if (game.isFinished())
-						{
-							User winner = game.getWinner();
-							
-							Message resultMessage = BotListener.buildSimpleMessage("La partita è finita!", author, winner != null ? "Il vincitore è: " + winner.getName() : "La partita si è conclusa con un pareggio.");
-							event.reply(resultMessage).queue();
-						}
-						else
-						{
-							TicTacToeListener.refreshGameMessage(game, message, author);
-						}*/
+						
 						TicTacToeListener.refreshGameMessage(game, message, author);
 						
 						if (game.isFinished())

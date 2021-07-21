@@ -13,8 +13,7 @@ public class TicTacToeGame
 	private int currentTurn = 0;
 	private boolean interrupted = false;
 
-	public static int FIELD_WIDHT = 3;
-	public static int FIELD_HEIGHT = 3;
+	public static int FIELD_SIZE = 3;
 	
 	public TicTacToeGame(User player1, User player2)
 	{
@@ -47,14 +46,14 @@ public class TicTacToeGame
 	public boolean isFinished()
 	{
 		//Rows
-		for (int i = 0; i < FIELD_HEIGHT; i++)
+		for (int i = 0; i < FIELD_SIZE; i++)
 		{
 			if (this.field[0][i] == this.field[1][i] && this.field[1][i] == this.field[2][i] && this.field[0][i] != -1)
 				return true;
 		}
 		
 		//Column
-		for (int i = 0; i < FIELD_WIDHT; i++)
+		for (int i = 0; i < FIELD_SIZE; i++)
 		{
 			if (this.field[i][0] == this.field[i][1] && this.field[i][1] == this.field[i][2] && this.field[i][0] != -1)
 				return true;
@@ -84,14 +83,14 @@ public class TicTacToeGame
 	public int getWinnerIndex()
 	{
 		//Rows
-		for (int i = 0; i < FIELD_HEIGHT; i++)
+		for (int i = 0; i < FIELD_SIZE; i++)
 		{
 			if (this.field[0][i] == this.field[1][i] && this.field[1][i] == this.field[2][i] && this.field[0][i] != -1)
 				return this.field[0][i];
 		}
 		
 		//Column
-		for (int i = 0; i < FIELD_WIDHT; i++)
+		for (int i = 0; i < FIELD_SIZE; i++)
 		{
 			if (this.field[i][0] == this.field[i][1] && this.field[i][1] == this.field[i][2] && this.field[i][0] != -1)
 				return this.field[i][0];

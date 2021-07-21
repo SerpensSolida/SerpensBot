@@ -16,24 +16,23 @@ import java.util.stream.Stream;
 
 public class Poll
 {
-	private String messageId;
-	private String question;
-	private boolean finished;
-	private User author;
-	private LinkedHashMap<String, PollOption> options = new LinkedHashMap<>();
-	private HashSet<User> users = new HashSet<>();
-	
-	/*public Poll(String messageId)
-	{
-		this.messageId = messageId;
-	}*/
-	
+	private String messageId; //Id of the message the poll is in.
+	private String question; //Question of the poll.
+	private boolean finished; //If the poll is finished.
+	private User author; //The author of the poll.
+	private LinkedHashMap<String, PollOption> options = new LinkedHashMap<>(); //Options of the poll.
+	private HashSet<User> users = new HashSet<>(); //Users that added a vote in the poll.
+
 	public Poll(String question, User author)
 	{
 		this.question = question;
 		this.author = author;
 	}
 	
+	/**
+	 * Return the winners of the poll.
+	 * @return A list of winners of the poll.
+	 */
 	public ArrayList<PollOption> getWinners()
 	{
 		ArrayList<PollOption> winners = new ArrayList<>();
@@ -64,6 +63,10 @@ public class Poll
 		return winners;
 	}
 	
+	/**
+	 * Generate a pie chart picture displaying options and their votes.
+	 * @return The picture generated as {@link ByteArrayOutputStream}.
+	 */
 	public ByteArrayOutputStream generatePieChart() //TODO: find a better one.
 	{
 		//Get dataset values.
@@ -96,16 +99,29 @@ public class Poll
 		return outputStream;
 	}
 	
+	/**
+	 * Get a collection of {@link PollOption} of this poll.
+	 * @return A collection of {@link PollOption}.
+	 */
 	public Collection<PollOption> getOptions()
 	{
 		return this.options.values();
 	}
 	
+	/**
+	 * Returns the sum of all votes of each option added together.
+	 * @return All the votes added to the poll.
+	 */
 	public int getVotesCount()
 	{
 		return this.options.values().parallelStream().mapToInt(PollOption::getVotesCount).sum();
 	}
 	
+	/**
+	 * Get the percentage of votes added to the given option.
+	 * @param optionId The option to get the percentage of.
+	 * @return The percentage of vote of the given option (0 - 1).
+	 */
 	public float getPercent(String optionId)
 	{
 		int votesCount = this.getVotesCount();
@@ -116,11 +132,20 @@ public class Poll
 		return ((float) this.options.get(optionId).getVotesCount()) / votesCount;
 	}
 	
+	/**
+	 * Add the given option to the poll.
+	 * @param option The option to add to the poll.
+	 */
 	public void addOption(PollOption option)
 	{
 		this.options.put(option.getId(), option);
 	}
 	
+	/**
+	 * Remove the option with the given id from the poll.
+	 * @param optionId The id of the option to remove from the poll.
+	 * @return Whether or not the option was removed.
+	 */
 	public boolean removeOption(String optionId)
 	{
 		PollOption removed = this.options.remove(optionId);
@@ -144,6 +169,12 @@ public class Poll
 		return removed != null;
 	}
 	
+	/**
+	 * Adds the vote of the given user to the given option.
+	 * @param optionId The option to add the vote to.
+	 * @param user The user who voted for the option.
+	 * @return Whether or not the vote was correctly added.
+	 */
 	public boolean addVote(String optionId, User user)
 	{
 		if (this.users.contains(user))
