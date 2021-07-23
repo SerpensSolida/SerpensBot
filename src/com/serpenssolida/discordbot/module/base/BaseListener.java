@@ -39,6 +39,10 @@ public class BaseListener extends BotListener
 	@Override
 	public void onMessageReceived(@Nonnull MessageReceivedEvent event)
 	{
+		//Don't accept messages from private channels.
+		if (!event.isFromGuild())
+			return;
+		
 		String message = event.getMessage().getContentDisplay().replaceAll(" +", " "); //Received message.
 		Guild guild = event.getGuild();
 		User author = event.getAuthor(); //Author of the message.
@@ -135,12 +139,18 @@ public class BaseListener extends BotListener
 		//Add module list to the embed.
 		for (BotListener listener : BotMain.getModules())
 		{
-			//Don't add this listener to the list.
-			if (listener instanceof BaseListener) continue;
+			/*//Don't add this listener to the list.
+			if (listener instanceof BaseListener)
+				continue;*/
+			
+			String modulePrefix = listener.getModulePrefix(guild.getId());
+			
+			if (modulePrefix.isBlank())
+				continue;
 			
 			//Add listener to the list.
 			builderList.append("Modulo " + listener.getModuleName() + "\n");
-			builderCommands.append("`" + BotMain.getCommandSymbol(guild.getId()) + listener.getModulePrefix(guild.getId()) + " help`\n");
+			builderCommands.append("`" + BotMain.getCommandSymbol(guild.getId()) + modulePrefix + " help`\n");
 		}
 		
 		embedBuilder.addField("Moduli", builderList.toString(), true);

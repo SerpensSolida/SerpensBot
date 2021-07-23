@@ -60,6 +60,10 @@ public class BotListener extends ListenerAdapter
 	
 	public void onMessageReceived(@Nonnull MessageReceivedEvent event)
 	{
+		//Don't accept messages from private channels.
+		if (!event.isFromGuild())
+			return;
+		
 		String message = event.getMessage().getContentDisplay().replaceAll(" +", " "); //Received message.
 		Guild guild = event.getGuild();
 		User author = event.getAuthor(); //Author of the message.

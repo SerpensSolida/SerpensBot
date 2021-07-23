@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.serpenssolida.discordbot.module.BotListener;
 import com.serpenssolida.discordbot.module.base.BaseListener;
 import com.serpenssolida.discordbot.module.hungergames.HungerGamesListener;
+import com.serpenssolida.discordbot.module.owner.OwnerListener;
 import com.serpenssolida.discordbot.module.poll.PollListener;
 import com.serpenssolida.discordbot.module.settings.SettingsData;
 import com.serpenssolida.discordbot.module.settings.SettingsListener;
@@ -32,12 +33,14 @@ public class BotMain
 	public static JDA api;
 	public static HashMap<String, String> commandSymbol = new HashMap<>();
 	public static HashMap<String, Boolean> deleteCommandMessages = new HashMap<>();
+	public static String ownerId;
 	
 	public static String settingsFolder = "settings";
 	
 	public static void main(String[] args)
 	{
-		String token = BotMain.getBotToken(); //Loading the token from file.
+		//Load data from file.
+		BotData data = BotMain.loadBotData();
 		
 		//Setting headless mode. We are using some drawing function without the gui.
 		System.setProperty("java.awt.headless", "true");
@@ -45,7 +48,7 @@ public class BotMain
 		try
 		{
 			api = JDABuilder
-					.createDefault(token)
+					.createDefault(data.getToken())
 					.setMemberCachePolicy(MemberCachePolicy.ALL)
 					.enableIntents(GatewayIntent.GUILD_MEMBERS)
 					.build();
@@ -53,12 +56,14 @@ public class BotMain
 		}
 		catch (LoginException e)
 		{
-			System.out.println("Login error.");
+			System.err.println("Login error.");
 			e.printStackTrace();
+			return;
 		}
 		catch (InterruptedException e)
 		{
 			e.printStackTrace();
+			return;
 		}
 		
 		api.addEventListener(new SettingsListener());
@@ -66,6 +71,16 @@ public class BotMain
 		api.addEventListener(new PollListener());
 		api.addEventListener(new TicTacToeListener());
 		api.addEventListener(new BaseListener());
+		api.addEventListener(new OwnerListener());
+		
+		if (data.getOwner() == null || data.getOwner().isBlank())
+		{
+			System.err.println("No bot owner set in the json file.");
+			return;
+		}
+		
+		//Set the owner of the bot.
+		BotMain.ownerId = data.getOwner();
 		
 		System.out.println("Bot ready!");
 	}
@@ -153,12 +168,12 @@ public class BotMain
 	}
 	
 	/**
-	 * Load the token from file.
+	 * Load the bot data from file.
 	 *
 	 * @return
-	 * 		The token of the bot as {@link String};
+	 * 		The data read from file.
 	 */
-	private static String getBotToken()
+	private static BotData loadBotData()
 	{
 		File tokenFile = new File("bot.json");
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -166,11 +181,11 @@ public class BotMain
 		
 		try (BufferedReader reader = new BufferedReader(new FileReader(tokenFile)))
 		{
-			BotToken botToken = gson.fromJson(reader, BotToken.class);
+			BotData botData = gson.fromJson(reader, BotData.class);
 			
-			System.out.println("Token caricato: " + botToken.getToken());
+			System.out.println("Token caricato: " + botData.getToken());
 			
-			return botToken.getToken();
+			return botData;
 		}
 		catch (FileNotFoundException e)
 		{
@@ -181,7 +196,7 @@ public class BotMain
 			e.printStackTrace();
 		}
 		
-		return "";
+		return new BotData();
 	}
 	
 	/**

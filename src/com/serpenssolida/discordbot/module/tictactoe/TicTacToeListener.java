@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -84,6 +85,11 @@ public class TicTacToeListener extends BotListener
 		this.games.put(messageId, game);
 		this.addButtonGroup(guild.getId(), messageId, this.generateGameCallback());
 		TicTacToeListener.refreshGameMessage(game, message, author);
+		
+		//Set a timer of 5 minutes to stop the game.
+		Timer timer = new Timer(5 * 60 * 1000, e -> this.stopGame(game, guild, channel));
+		timer.setRepeats(false);
+		timer.start();
 	}
 	
 	private void removeGame(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
@@ -118,6 +124,9 @@ public class TicTacToeListener extends BotListener
 	
 	private void stopGame(TicTacToeGame game, Guild guild, MessageChannel channel)
 	{
+		if (game == null)
+			return;
+		
 		game.setInterrupted(true);
 		
 		Message gameMessage = channel.retrieveMessageById(game.getMessageId()).complete();
