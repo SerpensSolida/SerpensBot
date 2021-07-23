@@ -10,9 +10,9 @@ Command bot for Discord
 
     ```json
     {
-       "token" : "place your token here." 
+       "token" : "place your token here.", 
+       "owner" : "place your discord id here."
     }
     ```
     
-7) Place you token in the botToken variable.
-8) You can start coding.
+7) You can start coding.
