@@ -24,7 +24,7 @@ import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class PollListener extends BotListener //TODO: Commentare il codice.
+public class PollListener extends BotListener
 {
 	private HashMap<String, Poll> polls = new HashMap<>();
 	
@@ -91,8 +91,19 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 				//.addOption(OptionType.STRING, "option-index", "Indice dell'opzione da rimuovere");
 		this.addBotCommand(command);
 		
+		//Command for removing a vote from the pool.
+		command = new BotCommand("remove-vote", "Rimuove il proprio voto da un sondaggio.");
+		command.setAction((event, guild, channel, author) ->
+		{
+			this.removeVote(event, guild, channel, author);
+			return true;
+		});
+		command.getSubcommand()
+				.addOption(OptionType.STRING, "poll-id", "Identificatore univoco del sondaggio", true);
+		this.addBotCommand(command);
+		
 		//Command for removing an option from the pool.
-		command = new BotCommand("remove", "Rimuove un opzione dal sondaggio.");
+		command = new BotCommand("remove-option", "Rimuove un opzione dal sondaggio.");
 		command.setAction((event, guild, channel, author) ->
 		{
 			this.removeOption(event, guild, channel, author);
@@ -102,7 +113,6 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 				.addOption(OptionType.STRING, "poll-id", "Identificatore univoco del sondaggio", true)
 				.addOption(OptionType.STRING, "position", "Posizione dell'opzione da rimuovere (parte da 1)", true);
 		this.addBotCommand(command);
-		
 	}
 	
 	private void createNewPoll(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
@@ -138,7 +148,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		
 		//Create the poll message.
 		MessageBuilder messageBuilder = PollListener.generatePollMessage(poll, author);
-		ButtonGroup buttonGroup = PollListener.buildPollButtons(poll);
+		ButtonGroup buttonGroup = PollListener.generateButtonCallback(poll);
 		
 		//Send the pool and get the message id.
 		InteractionHook hook = event.reply(messageBuilder.build())
@@ -160,7 +170,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		timer.start();
 	}
 	
-	private void removePoll(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private void removeVote(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping pollIdArg = event.getOption("poll-id");
 		
@@ -173,12 +183,28 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		//Check if a poll was found.
 		if (poll == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Arresto sondaggio", author, "Nessun sondaggio trovato con id: " + pollIdArg.getAsString());
+			Message message = MessageUtils.buildErrorMessage("Rimozione voto", author, "Nessun sondaggio trovato con id: " + pollIdArg.getAsString());
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
 		
-		//Stop the poll if the user is the author of the poll.
+		boolean removed = poll.removeVote(author);
+		
+		if (!removed)
+		{
+			Message message = MessageUtils.buildErrorMessage("Rimozione voto", author, "Non hai aggiunto nessun voto al sondaggio con id: " + pollIdArg.getAsString());
+			event.reply(message).setEphemeral(true).queue();
+			return;
+		}
+		
+		//Refresh the message.
+		Message message = channel.retrieveMessageById(poll.getMessageId()).complete();
+		PollListener.refreshPollMessage(poll, message);
+		
+		message = MessageUtils.buildSimpleMessage("Rimozione voto", author, "Voto rimosso con successo.");
+		event.reply(message).setEphemeral(true).queue();
+		
+		/*//Stop the poll if the user is the author of the poll.
 		if (author.equals(poll.getAuthor()))
 		{
 			this.stopPoll(poll, guild, channel);
@@ -190,7 +216,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		{
 			Message message = MessageUtils.buildErrorMessage("Arresto sondaggio", author, "Non sei il proprietario del sondaggio.");
 			event.reply(message).setEphemeral(true).queue();
-		}
+		}*/
 	}
 	
 	private void editPollDescription(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
@@ -227,7 +253,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		Message pollMessage = channel.retrieveMessageById(poll.getMessageId()).complete();
 		PollListener.refreshPollMessage(poll, pollMessage);
 		
-		ButtonGroup buttonGroup = PollListener.buildPollButtons(poll);
+		ButtonGroup buttonGroup = PollListener.generateButtonCallback(poll);
 		this.addButtonGroup(guild.getId(), poll.getMessageId(), buttonGroup);
 		
 		Message message = MessageUtils.buildSimpleMessage("Modifica descrizione del sondaggio", author, "Descrizione cambiata con successo.");
@@ -278,7 +304,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		Message pollMessage = channel.retrieveMessageById(poll.getMessageId()).complete();
 		PollListener.refreshPollMessage(poll, pollMessage);
 		
-		ButtonGroup buttonGroup = PollListener.buildPollButtons(poll);
+		ButtonGroup buttonGroup = PollListener.generateButtonCallback(poll);
 		this.addButtonGroup(guild.getId(), poll.getMessageId(), buttonGroup);
 		
 		Message message = MessageUtils.buildSimpleMessage("Aggiunta opzione al sondaggio", author, "Aggiunta l'opzione \"" + option.getText() + "\" al sondaggio.");
@@ -348,6 +374,39 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		event.reply(messageBuilder.build()).setEphemeral(!success).queue();
 	}
 	
+	private void removePoll(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	{
+		OptionMapping pollIdArg = event.getOption("poll-id");
+		
+		if (pollIdArg == null)
+			return;
+		
+		//Get the poll from map.
+		Poll poll = this.polls.get(pollIdArg.getAsString());
+		
+		//Check if a poll was found.
+		if (poll == null)
+		{
+			Message message = MessageUtils.buildErrorMessage("Arresto sondaggio", author, "Nessun sondaggio trovato con id: " + pollIdArg.getAsString());
+			event.reply(message).setEphemeral(true).queue();
+			return;
+		}
+		
+		//Check if the user is the owner of the poll.
+		if (!author.equals(poll.getAuthor()))
+		{
+			Message message = MessageUtils.buildErrorMessage("Arresto sondaggio", author, "Non sei il proprietario del sondaggio.");
+			event.reply(message).setEphemeral(true).queue();
+			return;
+		}
+		
+		//Stop the poll.
+		this.stopPoll(poll, guild, channel);
+		
+		Message message = MessageUtils.buildSimpleMessage("Arresto sondaggio", author, "Sondaggio fermato correttamente.");
+		event.reply(message).setEphemeral(false).queue();
+	}
+	
 	/**
 	 * Stop the given poll and refresh its message.
 	 * @param poll The poll to stop.
@@ -393,7 +452,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		return rows;
 	}
 	
-	private static ButtonGroup buildPollButtons(Poll poll)
+	private static ButtonGroup generateButtonCallback(Poll poll)
 	{
 		ButtonGroup buttonGroup = new ButtonGroup();
 		
@@ -402,18 +461,20 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		{
 			buttonGroup.addButton(new ButtonCallback(option.getId(), (event, guild, messageChannel, message, author) ->
 			{
-				//If the user already voted.
+				//If the user already voted try to switch vote.
 				if (poll.hasUserVoted(author))
 				{
-					//TODO: Switch vote.
-					event.deferReply(true).queue();
+					boolean switched = poll.switchVote(option.getId(), author);
 					
-					EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Votazione sondaggio", author);
-					embedBuilder.setDescription("Hai già votato per questo sondaggio.");
-					MessageBuilder messageBuilder = new MessageBuilder();
-					messageBuilder.setEmbed(embedBuilder.build());
+					//The user tried to switch the with the same vote.
+					if (!switched)
+					{
+						event.reply(MessageUtils.buildErrorMessage("Votazione sondaggio", author, "Hai già votato per l'opzione: *" + option.getId() + "*")).setEphemeral(true).queue();
+						return ButtonCallback.LEAVE_MESSAGE;
+					}
 					
-					event.getHook().sendMessage(messageBuilder.build()).setEphemeral(true).queue();
+					event.deferEdit().queue();
+					PollListener.refreshPollMessage(poll, message);
 					return ButtonCallback.LEAVE_MESSAGE;
 				}
 				

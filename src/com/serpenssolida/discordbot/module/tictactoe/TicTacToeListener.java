@@ -177,7 +177,7 @@ public class TicTacToeListener extends BotListener
 					
 					if (game == null)
 					{
-						//TODO: message.
+						event.reply(MessageUtils.buildErrorMessage("TicTacToe", author, "Si è verificato un errore.")).setEphemeral(true).queue();
 						return ButtonCallback.DELETE_MESSAGE;
 					}
 					

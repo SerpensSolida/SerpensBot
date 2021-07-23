@@ -109,6 +109,16 @@ public class Poll
 	}
 	
 	/**
+	 * Get the option with the given id.
+	 * @param optionId The id of the option.
+	 * @return The option with the given id.
+	 */
+	public PollOption getOption(String optionId)
+	{
+		return this.options.get(optionId);
+	}
+	
+	/**
 	 * Returns the sum of all votes of each option added together.
 	 * @return All the votes added to the poll.
 	 */
@@ -152,9 +162,11 @@ public class Poll
 		
 		if (removed != null)
 		{
+			//Remove the users that voted this option from the users set.
 			this.users.removeAll(removed.users);
 		}
 		
+		//Rebuild hashmap.
 		LinkedHashMap<String, PollOption> options = new LinkedHashMap<>();
 		int k = 1;
 		for (PollOption option : this.options.values())
@@ -164,7 +176,6 @@ public class Poll
 			k++;
 		}
 		this.options = options;
-		//TODO: rebuild hashmap or maybe change it to an arraylist.
 		
 		return removed != null;
 	}
@@ -183,9 +194,54 @@ public class Poll
 		PollOption pollOption = this.options.get(optionId);
 		
 		this.users.add(user);
-		pollOption.votesCount++;
-		pollOption.users.add(user);
+		pollOption.addVote(user);
 		return true;
+	}
+	
+	public boolean removeVote(User user)
+	{
+		if (!this.users.contains(user))
+			return false;
+		
+		for (PollOption pollOption : this.options.values())
+		{
+			if (pollOption.users.contains(user))
+			{
+				this.users.remove(user);
+				pollOption.removeVote(user);
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	public boolean switchVote(String optionId, User user)
+	{
+		PollOption option = this.getVote(user);
+		
+		if (option.getId().equals(optionId))
+			return false;
+		
+		this.removeVote(user);
+		this.addVote(optionId, user);
+		return true;
+	}
+	
+	public PollOption getVote(User user)
+	{
+		if (!this.users.contains(user))
+			return null;
+		
+		for (PollOption pollOption : this.options.values())
+		{
+			if (pollOption.users.contains(user))
+			{
+				return pollOption;
+			}
+		}
+		
+		return null;
 	}
 	
 	public boolean hasUserVoted(User author)
@@ -239,6 +295,26 @@ public class Poll
 		{
 			this.text = text;
 			this.id = id;
+		}
+		
+		public boolean addVote(User user)
+		{
+			if (this.users.contains(user))
+				return false;
+			
+			this.votesCount++;
+			this.users.add(user);
+			return true;
+		}
+		
+		public boolean removeVote(User user)
+		{
+			boolean removed = this.users.remove(user);
+			
+			if (removed)
+				this.votesCount--;
+			
+			return removed;
 		}
 		
 		public int getVotesCount()
