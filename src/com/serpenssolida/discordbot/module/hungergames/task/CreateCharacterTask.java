@@ -93,22 +93,7 @@ public class CreateCharacterTask extends Task
 		this.running = false;
 	}
 	
-	public void reactionAdded(Message message, String reaction)
-	{
-		/*
-		//Abort task if there is an HungerGames running.
-		if (HungerGamesController.isHungerGamesRunning(this.getGuild().getId()))
-		{
-			MessageBuilder builder = new MessageBuilder()
-					.append("> Non puoi completare la procedura perchè è in corso un HungerGames.");
-			this.sendMessage(builder.build());
-			
-			this.running = false;
-			return;
-		}
-		
-		this.running = false;*/
-	}
+	public void reactionAdded(Message message, String reaction) {}
 	
 	private void manageNameCharacterState(Message receivedMessage)
 	{

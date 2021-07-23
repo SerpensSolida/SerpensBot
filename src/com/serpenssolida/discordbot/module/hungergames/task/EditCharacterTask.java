@@ -33,8 +33,6 @@ public class EditCharacterTask extends Task
 		MENU,
 		NAME_CHARACTER,
 		ASSIGN_STATS,
-		ASSIGN_AVATAR, //TODO: Ability to send avatar of the character.
-		FINISHED
 	}
 	
 	@Override
@@ -113,62 +111,7 @@ public class EditCharacterTask extends Task
 		this.running = false;
 	}
 	
-	public void reactionAdded(Message message, String reaction)
-	{
-		/*MessageBuilder builder = new MessageBuilder();
-		
-		//Abort task if there is an HungerGames running.
-		if (HungerGamesController.isHungerGamesRunning(this.getGuild().getId()))
-		{
-			builder = new MessageBuilder()
-					.append("> Non puoi completare la procedura perchè è in corso un HungerGames.");
-			this.sendMessage(builder.build());
-			
-			this.running = false;
-			return;
-		}
-		
-		//Check if the reaction is added to the menu.
-		if (this.reactionCheckMessage != null && this.reactionCheckMessage.getId().equals(message.getId()))
-		{
-			if (this.getState() != State.MENU)
-				return;
-			
-			switch (reaction)
-			{
-				case "🇦":
-					//Edit name of the player.
-					this.state = State.NAME_CHARACTER;
-					
-					builder.append("> Inserisci il nuovo nome del tuo personaggio. (max 15 caratteri)");
-					
-					break;
-				
-				case "🇧":
-					//Edit stats of the player.
-					this.state = State.ASSIGN_STATS;
-					
-					builder.appendFormat("> Stai modificando le caratteristiche di **%s**", this.getCharacter().getDisplayName())
-							.append("\n> Assegna le caratteristiche al personaggio. Invia un messaggio con 7 numeri separati da uno spazio che rappresentano le caratteristiche del tuo personaggio.")
-							.append("\n> Le caratteristiche sono: ")
-							.append("Vitalità, Forza, Abilità, Special, Velocità, Resistenza e Gusto. ")
-							.appendFormat("\n> La somma dei valori delle caratteristiche deve essere %d punti e ogni carateristica deve essere compresa tra 0 e 10.", SUM_STATS);
-					
-					break;
-				
-				case "❌":
-					this.getChannel().deleteMessageById(this.reactionCheckMessage.getId()).queue(); //Delete the menu.
-					
-					this.state = State.FINISHED;
-					this.running = false;
-					return;
-			}
-			
-			this.getChannel().deleteMessageById(this.reactionCheckMessage.getId()).queue();
-		}
-		
-		this.sendWithCancelButton(builder);*/
-	}
+	public void reactionAdded(Message message, String reaction) {}
 	
 	private void manageNameCharacterState(Message receivedMessage)
 	{

@@ -12,10 +12,12 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.components.Button;
 
 import javax.annotation.Nonnull;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -25,9 +27,9 @@ public class BotListener extends ListenerAdapter
 	private HashMap<String, String> modulePrefix = new HashMap<>(); //Prefix of the module, used for commands.
 	private String internalID = ""; //Internal id used for retrieving listeners from the list.
 	private String moduleName = ""; //Readable name of the module.
-	private HashMap<String, HashMap<User, Task>> tasks = new HashMap<>(); //List of task currently running. //TODO: Make task linked to servers.
+	private HashMap<String, HashMap<User, Task>> tasks = new HashMap<>(); //List of task currently running.
 	private HashMap<String, UnlistedBotCommand> unlistedBotCommands = new HashMap<>(); //List of commands of the module.
-	private LinkedHashMap<String, BotCommand> botCommands = new LinkedHashMap<>(); //List of commands of the module that are displayed in the client command list. //TODO: Encapsulate.
+	private LinkedHashMap<String, BotCommand> botCommands = new LinkedHashMap<>(); //List of commands of the module that are displayed in the client command list.
 	private HashMap<String, HashMap<String, ButtonGroup>> activeGlobalButtons = new HashMap<>();
 	
 	public BotListener(String modulePrefix)
@@ -35,14 +37,14 @@ public class BotListener extends ListenerAdapter
 		//this.modulePrefix = modulePrefix;
 		this.internalID = modulePrefix;
 		
-		//TODO: Add methods to add these commands manually
-		
 		BotCommand command = new BotCommand("help", "Mostra un messaggio di aiuto per il modulo.");
 		command.setAction((event, guild, channel, author) ->
 		{
 			this.sendHelp(event, guild, channel, author);
 			return true;
 		});
+		command.getSubcommand()
+				.addOption(OptionType.STRING, "command-name", "Nome del comando di cui mostrare le informazioni. (solo comandi non listati)", false);
 		this.addBotCommand(command);
 		
 		command = new BotCommand("cancel", "Cancella la procedura corrente.");
@@ -290,13 +292,11 @@ public class BotListener extends ListenerAdapter
 	{
 		EmbedBuilder embedBuilder = new EmbedBuilder();
 		
-		//TODO: Fix this command.
-		
 		//Add footer
 		embedBuilder.setFooter("Richiesto da " + author.getName(), author.getAvatarUrl());
 		embedBuilder.setAuthor(BotMain.api.getSelfUser().getName(), "https://github.com/SerpensSolida/SerpensBot", BotMain.api.getSelfUser().getAvatarUrl());
 		
-		OptionMapping commandName = event.getOption("nomecomando");
+		OptionMapping commandName = event.getOption("command-name");
 		if (commandName == null)
 		{
 			//Send list of commands.
@@ -340,7 +340,6 @@ public class BotListener extends ListenerAdapter
 				embedBuilder.setTitle(String.format("Descrizione comando *%s*", command.getId()));
 				embedBuilder.appendDescription(String.format("Utilizzo: `%s`\n", command.getArgumentsDescription(guild.getId())))
 						.appendDescription(command.getHelp());
-				//TODO: Add long help.
 			}
 			else
 			{
@@ -352,6 +351,13 @@ public class BotListener extends ListenerAdapter
 		event.reply(new MessageBuilder().setEmbed(embedBuilder.build()).build()).setEphemeral(false).queue();
 	}
 	
+	/**
+	 * Method used to generate simple embed messages.
+	 * @param title Title of the embed.
+	 * @param author Author of the embed.
+	 * @param description String showed as description of the embed.
+	 * @return The message containing the generated embed.
+	 */
 	protected static Message buildSimpleMessage(String title, User author, String description)
 	{
 		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed(title, author);
@@ -360,6 +366,26 @@ public class BotListener extends ListenerAdapter
 		messageBuilder.setEmbed(embedBuilder.build());
 		
 //		event.reply(messageBuilder.build()).setEphemeral(true).queue();
+		return messageBuilder.build();
+	}
+	
+	/**
+	 * Method used to generate simple embed messages.
+	 * @param title Title of the embed.
+	 * @param author Author of the embed.
+	 * @param description String showed as description of the embed.
+	 * @param color Color of the embed.
+	 * @return The message containing the generated embed.
+	 */
+	protected static Message buildSimpleMessage(String title, User author, String description, Color color)
+	{
+		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed(title, author);
+		embedBuilder.setDescription(description);
+		embedBuilder.setColor(color);
+		MessageBuilder messageBuilder = new MessageBuilder();
+		messageBuilder.setEmbed(embedBuilder.build());
+		
+		//		event.reply(messageBuilder.build()).setEphemeral(true).queue();
 		return messageBuilder.build();
 	}
 	

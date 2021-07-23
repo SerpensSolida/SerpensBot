@@ -100,21 +100,7 @@ public abstract class Task
 	 */
 	public void consumeReaction(Message message, String reaction)
 	{
-		//MessageBuilder messageBuilder = new MessageBuilder();
-		
-		//TODO: Remove it, may be obsolete now.
-		//Check if the player
-		/*if (this.getLastMessage() != null && this.getLastMessage().getId().equals(message.getId()))
-		{
-			if ("❌".equals(reaction))
-			{
-				messageBuilder.append("> La procedura è stata annullata.");
-				this.getChannel().sendMessage(messageBuilder.build()).queue();
-				this.running = false;
-				return;
-			}
-		}*/
-		
+		//Call the reaction added event.
 		this.reactionAdded(message, reaction);
 	}
 	

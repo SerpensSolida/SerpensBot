@@ -133,9 +133,9 @@ public class TicTacToeListener extends BotListener
 		ArrayList<ActionRow> actionRows = new ArrayList<>();
 		
 		//Generate the rows for the buttons
-		for (int i = 0; i < TicTacToeGame.FIELD_WIDHT; i++)
+		for (int i = 0; i < TicTacToeGame.FIELD_SIZE; i++)
 		{
-			for (int j = 0; j < TicTacToeGame.FIELD_HEIGHT; j++)
+			for (int j = 0; j < TicTacToeGame.FIELD_SIZE; j++)
 			{
 				String label = " ";
 				switch (game.getCell(i, j))
@@ -147,7 +147,7 @@ public class TicTacToeListener extends BotListener
 						label = "O";
 				}
 				
-				Button button = Button.secondary("" + (i + j * TicTacToeGame.FIELD_WIDHT), label);
+				Button button = Button.secondary("" + (i + j * TicTacToeGame.FIELD_SIZE), label);
 				
 				if (!game.isCellEmpty(i, j) || game.isFinished())
 					button = button.asDisabled();
@@ -165,13 +165,13 @@ public class TicTacToeListener extends BotListener
 	private ButtonGroup generateGameCallback()
 	{
 		ButtonGroup buttonGroup = new ButtonGroup();
-		for (int i = 0; i < TicTacToeGame.FIELD_WIDHT; i++)
+		for (int i = 0; i < TicTacToeGame.FIELD_SIZE; i++)
 		{
-			for (int j = 0; j < TicTacToeGame.FIELD_HEIGHT; j++)
+			for (int j = 0; j < TicTacToeGame.FIELD_SIZE; j++)
 			{
 				int x = i;
 				int y = j;
-				ButtonCallback button = new ButtonCallback("" + (i + j * TicTacToeGame.FIELD_WIDHT), (event, guild, channel, message, author) ->
+				ButtonCallback button = new ButtonCallback("" + (i + j * TicTacToeGame.FIELD_SIZE), (event, guild, channel, message, author) ->
 				{
 					TicTacToeGame game = this.games.get(message.getId());
 					
