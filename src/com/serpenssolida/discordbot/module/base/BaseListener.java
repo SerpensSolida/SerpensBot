@@ -77,7 +77,7 @@ public class BaseListener extends BotListener
 		//Check in the user has permission to run this command.
 		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
 		{
-			Message message = MessageUtils.buildSimpleMessage("Reset del simbolo dei comandi", author, "Devi essere il proprietario o moderatore del server per resettare il simbolo per comandi non listati.");
+			Message message = MessageUtils.buildErrorMessage("Reset del simbolo dei comandi", author, "Devi essere il proprietario o moderatore del server per resettare il simbolo per comandi non listati.");
 			channel.sendMessage(message).queue();
 			return;
 		}
@@ -99,7 +99,7 @@ public class BaseListener extends BotListener
 		//Check in the user has permission to run this command.
 		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
 		{
-			Message message = MessageUtils.buildSimpleMessage("Reset dei prefissi dei comandi", author, "Devi essere il proprietario o moderatore del server per resettare i prefissi.");
+			Message message = MessageUtils.buildErrorMessage("Reset dei prefissi dei comandi", author, "Devi essere il proprietario o moderatore del server per resettare i prefissi.");
 			channel.sendMessage(message).queue();
 			return;
 		}

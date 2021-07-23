@@ -63,34 +63,31 @@ public class SettingsListener extends BotListener
 	{
 		Member authorMember = guild.retrieveMember(author).complete();
 		
-		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Cancellazione dei messaggi", author);
-		MessageBuilder messageBuilder = new MessageBuilder();
+		//Argument parsing.
+		OptionMapping argument = event.getOption("value");
 		
 		//Check in the user has permission to run this command.
 		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
 		{
-			Message message = MessageUtils.buildSimpleMessage("Cancellazione messaggi", author, "Devi essere il proprietario o moderatore del server per modificare questa impostazione.");
+			Message message = MessageUtils.buildErrorMessage("Cancellazione messaggi", author, "Devi essere il proprietario o moderatore del server per modificare questa impostazione.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
 		
-		//Argument parsing.
-		OptionMapping argument = event.getOption("value");
-		if (argument != null)
+		if (argument == null)
 		{
-			boolean value = argument.getAsBoolean();
-			BotMain.setDeleteCommandMessages(guild.getId(), value);
-			BotMain.saveSettings(guild.getId());
-			embedBuilder.setDescription((value ? "Cancellerò" : "Lascerò") + " i comandi che sono stati inviati in chat.");
-		}
-		else
-		{
-			embedBuilder.setDescription("> Devi inserire (true|false) come argomento.");
+			Message message = MessageUtils.buildErrorMessage("Cancellazione messaggi", author, "Devi inserire l'argomento.");
+			event.reply(message).setEphemeral(true).queue();
+			return;
 		}
 		
-		messageBuilder.setEmbed(embedBuilder.build());
+		//Update option.
+		boolean value = argument.getAsBoolean();
+		BotMain.setDeleteCommandMessages(guild.getId(), value);
+		BotMain.saveSettings(guild.getId());
 		
-		event.reply(messageBuilder.build()).setEphemeral(argument == null).queue(); //Set ephemeral if the user didn't put the argument.
+		Message message = MessageUtils.buildSimpleMessage("Cancellazione dei messaggi", author, (value ? "Cancellerò" : "Lascerò") + " i comandi che sono stati inviati in chat.");
+		event.reply(message).setEphemeral(false).queue(); //Set ephemeral if the user didn't put the argument.
 	}
 	
 	private void modulePrefixCommand(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
@@ -121,14 +118,14 @@ public class SettingsListener extends BotListener
 			BotListener listener = BotMain.getModuleById(moduleID.getAsString());
 			
 			//Print the result.
-			if (listener != null)
+			if (listener == null)
 			{
-				embedBuilder.appendDescription("Il prefisso del modulo `" + listener.getInternalID() + "` è `" + listener.getModulePrefix(guild.getId()) + "`.");
+				Message message = MessageUtils.buildErrorMessage("Prefissi dei comandi", author, "Modulo con id `" + moduleID + "` non trovato.");
+				event.reply(message).setEphemeral(true).queue();
+				return;
 			}
-			else
-			{
-				embedBuilder.appendDescription("Modulo con id `" + moduleID + "` non trovato.");
-			}
+			
+			embedBuilder.appendDescription("Il prefisso del modulo `" + listener.getInternalID() + "` è `" + listener.getModulePrefix(guild.getId()) + "`.");
 		}
 		else if (argumentCount == 2 && moduleID != null && modulePrefix != null)
 		{
@@ -139,7 +136,7 @@ public class SettingsListener extends BotListener
 			//Check in the user has permission to run this command.
 			if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
 			{
-				Message message = MessageUtils.buildSimpleMessage("Prefissi dei comandi", author, "Devi essere il proprietario o moderatore del server per modificare il prefisso di un modulo.");
+				Message message = MessageUtils.buildErrorMessage("Prefissi dei comandi", author, "Devi essere il proprietario o moderatore del server per modificare il prefisso di un modulo.");
 				event.reply(message).setEphemeral(true).queue();
 				return;
 			}
@@ -147,24 +144,30 @@ public class SettingsListener extends BotListener
 			//Check if the module prefix to set is suitable.
 			if (!newPrefix.chars().allMatch(Character::isLetterOrDigit) || newPrefix.length() > 16)
 			{
-				Message message = MessageUtils.buildSimpleMessage("Prefissi dei comandi", author, "Il prefisso deve essere alfanumerico e non può superare i 16 caratteri.");
+				Message message = MessageUtils.buildErrorMessage("Prefissi dei comandi", author, "Il prefisso deve essere alfanumerico e non può superare i 16 caratteri.");
 				event.reply(message).setEphemeral(true).queue();
 				return;
 			}
 			
-			if (listener != null)
+			if (listener == null)
 			{
-				//Set the new prefix to the module.
-				listener.setModulePrefix(guild.getId(), newPrefix);
-				BotMain.updateGuildCommands(guild);
-				BotMain.saveSettings(guild.getId());
-				
-				embedBuilder.setDescription("Prefisso del modulo `" + listener.getInternalID() + "` è stato impostato a `" + listener.getModulePrefix(guild.getId()) + "`.");
+				Message message = MessageUtils.buildErrorMessage("Prefissi dei comandi", author, "Modulo con id `" + moduleID + "` non trovato.");
+				event.reply(message).setEphemeral(true).queue();
+				return;
 			}
-			else
-			{
-				embedBuilder.setDescription("Modulo con id `" + moduleID + "` non trovato.");
-			}
+			
+			//Set the new prefix to the module.
+			listener.setModulePrefix(guild.getId(), newPrefix);
+			BotMain.updateGuildCommands(guild);
+			BotMain.saveSettings(guild.getId());
+			
+			embedBuilder.setDescription("Prefisso del modulo `" + listener.getInternalID() + "` è stato impostato a `" + listener.getModulePrefix(guild.getId()) + "`.");
+		}
+		else
+		{
+			Message message = MessageUtils.buildErrorMessage("Prefissi dei comandi", author, "Devi inserire tutti gli argomenti per modificare il nome di un prefisso.");
+			event.reply(message).setEphemeral(true).queue();
+			return;
 		}
 		
 		messageBuilder.setEmbed(embedBuilder.build());

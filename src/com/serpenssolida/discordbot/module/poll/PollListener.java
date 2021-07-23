@@ -170,30 +170,26 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		//Get the poll from map.
 		Poll poll = this.polls.get(pollIdArg.getAsString());
 		
-		/*EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Arresto sondaggio", author);
-		MessageBuilder messageBuilder = new MessageBuilder();*/
-		
 		//Check if a poll was found.
 		if (poll == null)
 		{
-			Message message = MessageUtils.buildSimpleMessage("Arresto sondaggio", author, "Nessun sondaggio trovato con id: " + pollIdArg.getAsString());
+			Message message = MessageUtils.buildErrorMessage("Arresto sondaggio", author, "Nessun sondaggio trovato con id: " + pollIdArg.getAsString());
 			event.reply(message).setEphemeral(true).queue();
+			return;
+		}
+		
+		//Stop the poll if the user is the author of the poll.
+		if (author.equals(poll.getAuthor()))
+		{
+			this.stopPoll(poll, guild, channel);
+			
+			Message message = MessageUtils.buildSimpleMessage("Arresto sondaggio", author, "Sondaggio fermato correttamente.");
+			event.reply(message).setEphemeral(false).queue();
 		}
 		else
 		{
-			//Stop the poll if the user is the author of the poll.
-			if (author.equals(poll.getAuthor()))
-			{
-				this.stopPoll(poll, guild, channel);
-				
-				Message message = MessageUtils.buildSimpleMessage("Arresto sondaggio", author, "Sondaggio fermato correttamente.");
-				event.reply(message).setEphemeral(false).queue();
-			}
-			else
-			{
-				Message message = MessageUtils.buildSimpleMessage("Arresto sondaggio", author, "Non sei il proprietario del sondaggio.");
-				event.reply(message).setEphemeral(true).queue();
-			}
+			Message message = MessageUtils.buildErrorMessage("Arresto sondaggio", author, "Non sei il proprietario del sondaggio.");
+			event.reply(message).setEphemeral(true).queue();
 		}
 	}
 	
@@ -211,7 +207,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		//Check if a poll was found.
 		if (poll == null)
 		{
-			Message message = MessageUtils.buildSimpleMessage("Modifica descrizione del sondaggio", author, "Nessuna poll trovata con id: " + pollIdArg.getAsString());
+			Message message = MessageUtils.buildErrorMessage("Modifica descrizione del sondaggio", author, "Nessuna poll trovata con id: " + pollIdArg.getAsString());
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -219,7 +215,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		//Check if the user trying to edit the poll is also the its author.
 		if (!author.equals(poll.getAuthor()))
 		{
-			Message message = MessageUtils.buildSimpleMessage("Modifica descrizione del sondaggio", author, "Questo sondaggio non appartiene a te.");
+			Message message = MessageUtils.buildErrorMessage("Modifica descrizione del sondaggio", author, "Questo sondaggio non appartiene a te.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -252,7 +248,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		//Check if a poll was found.
 		if (poll == null)
 		{
-			Message message = MessageUtils.buildSimpleMessage("Aggiunta opzione al sondaggio", author, "Nessuna poll trovata con id: " + pollIdArg.getAsString());
+			Message message = MessageUtils.buildErrorMessage("Aggiunta opzione al sondaggio", author, "Nessuna poll trovata con id: " + pollIdArg.getAsString());
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -260,7 +256,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		//Check if the user is the auhor of the poll.
 		if (!author.equals(poll.getAuthor()))
 		{
-			Message message = MessageUtils.buildSimpleMessage("Aggiunta opzione al sondaggio", author, "Questo sondaggio non appartiene a te.");
+			Message message = MessageUtils.buildErrorMessage("Aggiunta opzione al sondaggio", author, "Questo sondaggio non appartiene a te.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -269,7 +265,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		int pollSize = poll.getOptions().size();
 		if (pollSize >= 9)
 		{
-			Message message = MessageUtils.buildSimpleMessage("Aggiunta opzione al sondaggio", author, "Non è possibile aggiungere più di 9 opzioni ad un sondaggio.");
+			Message message = MessageUtils.buildErrorMessage("Aggiunta opzione al sondaggio", author, "Non è possibile aggiungere più di 9 opzioni ad un sondaggio.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -303,7 +299,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		//Check if a poll was found.
 		if (poll == null)
 		{
-			Message message = MessageUtils.buildSimpleMessage("Rimozione opzione dal sondaggio", author, "Nessuna poll trovata con id: " + pollIdArg.getAsString());
+			Message message = MessageUtils.buildErrorMessage("Rimozione opzione dal sondaggio", author, "Nessuna poll trovata con id: " + pollIdArg.getAsString());
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -311,7 +307,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		//Check if the user is the auhor of the poll.
 		if (!author.equals(poll.getAuthor()))
 		{
-			Message message = MessageUtils.buildSimpleMessage("Rimozione opzione dal sondaggio", author, "Questo sondaggio non appartiene a te.");
+			Message message = MessageUtils.buildErrorMessage("Rimozione opzione dal sondaggio", author, "Questo sondaggio non appartiene a te.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -319,7 +315,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		//Minimum number of poll option is 2.
 		if (poll.getOptions().size() <= 2)
 		{
-			Message message = MessageUtils.buildSimpleMessage("Rimozione opzione dal sondaggio", author, "Un sondaggio deve avere almeno 2 opzioni.");
+			Message message = MessageUtils.buildErrorMessage("Rimozione opzione dal sondaggio", author, "Un sondaggio deve avere almeno 2 opzioni.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}

@@ -182,7 +182,7 @@ public class HungerGamesListener extends BotListener
 		}
 		else
 		{
-			Message message = MessageUtils.buildSimpleMessage("Creazione personaggio", author, "L'utente non ha creato nessun personaggio.");
+			Message message = MessageUtils.buildErrorMessage("Creazione personaggio", author, "L'utente non ha creato nessun personaggio.");
 			event.reply(message).setEphemeral(true).queue();
 		}
 	}
@@ -192,15 +192,15 @@ public class HungerGamesListener extends BotListener
 		Character character = HungerGamesController.getCharacter(guild.getId(), author.getId());
 		OptionMapping valueArg = event.getOption("value");
 		
-		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Attivazione/disattivazione personaggio", author);
-		
 		//This command cannot be used while HungerGames is running.
 		if (HungerGamesController.isHungerGamesRunning(guild.getId()))
 		{
-			Message message = MessageUtils.buildSimpleMessage("Attivazione/disattivazione personaggio", author, "Non puoi usare questo comando mentre è in corso un HungerGames.");
+			Message message = MessageUtils.buildErrorMessage("Attivazione/disattivazione personaggio", author, "Non puoi usare questo comando mentre è in corso un HungerGames.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
+		
+		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Attivazione/disattivazione personaggio", author);
 		
 		if (character != null)
 		{

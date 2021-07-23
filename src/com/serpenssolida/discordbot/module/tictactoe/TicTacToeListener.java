@@ -99,14 +99,14 @@ public class TicTacToeListener extends BotListener
 		//Check if a game was found.
 		if (game == null)
 		{
-			event.reply(MessageUtils.buildSimpleMessage("TicTacToe", author, "Nessuna partita trovata con l'id:" + gameIdArg.getAsString())).setEphemeral(true).queue();
+			event.reply(MessageUtils.buildErrorMessage("TicTacToe", author, "Nessuna partita trovata con l'id:" + gameIdArg.getAsString())).setEphemeral(true).queue();
 			return;
 		}
 		
 		//Check if the user is one of the players.
 		if (!game.getPlayers().contains(author))
 		{
-			event.reply(MessageUtils.buildSimpleMessage("TicTacToe", author, "Non puoi fermare una partita di cui non sei il partecipante")).setEphemeral(true).queue();
+			event.reply(MessageUtils.buildErrorMessage("TicTacToe", author, "Non puoi fermare una partita di cui non sei il partecipante")).setEphemeral(true).queue();
 			return;
 		}
 		
