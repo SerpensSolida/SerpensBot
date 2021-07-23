@@ -1,7 +1,7 @@
 package com.serpenssolida.discordbot.module.poll;
 
-import com.serpenssolida.discordbot.BotMain;
 import com.serpenssolida.discordbot.ButtonGroup;
+import com.serpenssolida.discordbot.MessageUtils;
 import com.serpenssolida.discordbot.module.BotCommand;
 import com.serpenssolida.discordbot.module.BotListener;
 import com.serpenssolida.discordbot.module.ButtonCallback;
@@ -176,7 +176,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		//Check if a poll was found.
 		if (poll == null)
 		{
-			Message message = BotListener.buildSimpleMessage("Arresto sondaggio", author, "Nessun sondaggio trovato con id: " + pollIdArg.getAsString());
+			Message message = MessageUtils.buildSimpleMessage("Arresto sondaggio", author, "Nessun sondaggio trovato con id: " + pollIdArg.getAsString());
 			event.reply(message).setEphemeral(true).queue();
 		}
 		else
@@ -186,12 +186,12 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 			{
 				this.stopPoll(poll, guild, channel);
 				
-				Message message = BotListener.buildSimpleMessage("Arresto sondaggio", author, "Sondaggio fermato correttamente.");
+				Message message = MessageUtils.buildSimpleMessage("Arresto sondaggio", author, "Sondaggio fermato correttamente.");
 				event.reply(message).setEphemeral(false).queue();
 			}
 			else
 			{
-				Message message = BotListener.buildSimpleMessage("Arresto sondaggio", author, "Non sei il proprietario del sondaggio.");
+				Message message = MessageUtils.buildSimpleMessage("Arresto sondaggio", author, "Non sei il proprietario del sondaggio.");
 				event.reply(message).setEphemeral(true).queue();
 			}
 		}
@@ -211,7 +211,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		//Check if a poll was found.
 		if (poll == null)
 		{
-			Message message = BotListener.buildSimpleMessage("Modifica descrizione del sondaggio", author, "Nessuna poll trovata con id: " + pollIdArg.getAsString());
+			Message message = MessageUtils.buildSimpleMessage("Modifica descrizione del sondaggio", author, "Nessuna poll trovata con id: " + pollIdArg.getAsString());
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -219,7 +219,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		//Check if the user trying to edit the poll is also the its author.
 		if (!author.equals(poll.getAuthor()))
 		{
-			Message message = BotListener.buildSimpleMessage("Modifica descrizione del sondaggio", author, "Questo sondaggio non appartiene a te.");
+			Message message = MessageUtils.buildSimpleMessage("Modifica descrizione del sondaggio", author, "Questo sondaggio non appartiene a te.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -234,7 +234,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		ButtonGroup buttonGroup = PollListener.buildPollButtons(poll);
 		this.addButtonGroup(guild.getId(), poll.getMessageId(), buttonGroup);
 		
-		Message message = BotListener.buildSimpleMessage("Modifica descrizione del sondaggio", author, "Descrizione cambiata con successo.");
+		Message message = MessageUtils.buildSimpleMessage("Modifica descrizione del sondaggio", author, "Descrizione cambiata con successo.");
 		event.reply(message).setEphemeral(false).queue();
 	}
 	
@@ -252,7 +252,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		//Check if a poll was found.
 		if (poll == null)
 		{
-			Message message = BotListener.buildSimpleMessage("Aggiunta opzione al sondaggio", author, "Nessuna poll trovata con id: " + pollIdArg.getAsString());
+			Message message = MessageUtils.buildSimpleMessage("Aggiunta opzione al sondaggio", author, "Nessuna poll trovata con id: " + pollIdArg.getAsString());
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -260,7 +260,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		//Check if the user is the auhor of the poll.
 		if (!author.equals(poll.getAuthor()))
 		{
-			Message message = BotListener.buildSimpleMessage("Aggiunta opzione al sondaggio", author, "Questo sondaggio non appartiene a te.");
+			Message message = MessageUtils.buildSimpleMessage("Aggiunta opzione al sondaggio", author, "Questo sondaggio non appartiene a te.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -269,7 +269,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		int pollSize = poll.getOptions().size();
 		if (pollSize >= 9)
 		{
-			Message message = BotListener.buildSimpleMessage("Aggiunta opzione al sondaggio", author, "Non è possibile aggiungere più di 9 opzioni ad un sondaggio.");
+			Message message = MessageUtils.buildSimpleMessage("Aggiunta opzione al sondaggio", author, "Non è possibile aggiungere più di 9 opzioni ad un sondaggio.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -285,7 +285,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		ButtonGroup buttonGroup = PollListener.buildPollButtons(poll);
 		this.addButtonGroup(guild.getId(), poll.getMessageId(), buttonGroup);
 		
-		Message message = BotListener.buildSimpleMessage("Aggiunta opzione al sondaggio", author, "Aggiunta l'opzione \"" + option.getText() + "\" al sondaggio.");
+		Message message = MessageUtils.buildSimpleMessage("Aggiunta opzione al sondaggio", author, "Aggiunta l'opzione \"" + option.getText() + "\" al sondaggio.");
 		event.reply(message).setEphemeral(false).queue();
 	}
 	
@@ -303,7 +303,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		//Check if a poll was found.
 		if (poll == null)
 		{
-			Message message = BotListener.buildSimpleMessage("Rimozione opzione dal sondaggio", author, "Nessuna poll trovata con id: " + pollIdArg.getAsString());
+			Message message = MessageUtils.buildSimpleMessage("Rimozione opzione dal sondaggio", author, "Nessuna poll trovata con id: " + pollIdArg.getAsString());
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -311,7 +311,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		//Check if the user is the auhor of the poll.
 		if (!author.equals(poll.getAuthor()))
 		{
-			Message message = BotListener.buildSimpleMessage("Rimozione opzione dal sondaggio", author, "Questo sondaggio non appartiene a te.");
+			Message message = MessageUtils.buildSimpleMessage("Rimozione opzione dal sondaggio", author, "Questo sondaggio non appartiene a te.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -319,7 +319,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		//Minimum number of poll option is 2.
 		if (poll.getOptions().size() <= 2)
 		{
-			Message message = BotListener.buildSimpleMessage("Rimozione opzione dal sondaggio", author, "Un sondaggio deve avere almeno 2 opzioni.");
+			Message message = MessageUtils.buildSimpleMessage("Rimozione opzione dal sondaggio", author, "Un sondaggio deve avere almeno 2 opzioni.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -328,7 +328,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 		int optionIndex = (int) indexArg.getAsLong();
 		boolean success = poll.removeOption("option" + optionIndex);
 		
-		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Rimozione opzione dal sondaggio", author);
+		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Rimozione opzione dal sondaggio", author);
 		
 		if (success)
 		{
@@ -412,7 +412,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 					//TODO: Switch vote.
 					event.deferReply(true).queue();
 					
-					EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Votazione sondaggio", author);
+					EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Votazione sondaggio", author);
 					embedBuilder.setDescription("Hai già votato per questo sondaggio.");
 					MessageBuilder messageBuilder = new MessageBuilder();
 					messageBuilder.setEmbed(embedBuilder.build());
@@ -442,7 +442,7 @@ public class PollListener extends BotListener //TODO: Commentare il codice.
 	private static MessageBuilder generatePollMessage(Poll poll, User author)
 	{
 		MessageBuilder messageBuilder = new MessageBuilder();
-		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed(poll.getQuestion(), author)
+		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed(poll.getQuestion(), author)
 				.setDescription("*Sondaggio in corso...*")
 				.setFooter("Richiesto da " + author.getName() + " | ID: " + poll.getMessageId(), author.getAvatarUrl());
 		

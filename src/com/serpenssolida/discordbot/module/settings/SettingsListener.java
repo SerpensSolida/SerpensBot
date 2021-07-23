@@ -1,6 +1,7 @@
 package com.serpenssolida.discordbot.module.settings;
 
 import com.serpenssolida.discordbot.BotMain;
+import com.serpenssolida.discordbot.MessageUtils;
 import com.serpenssolida.discordbot.module.BotCommand;
 import com.serpenssolida.discordbot.module.BotListener;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -62,13 +63,13 @@ public class SettingsListener extends BotListener
 	{
 		Member authorMember = guild.retrieveMember(author).complete();
 		
-		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Cancellazione dei messaggi", author);
+		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Cancellazione dei messaggi", author);
 		MessageBuilder messageBuilder = new MessageBuilder();
 		
 		//Check in the user has permission to run this command.
 		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
 		{
-			Message message = BotListener.buildSimpleMessage("Cancellazione messaggi", author, "Devi essere il proprietario o moderatore del server per modificare questa impostazione.");
+			Message message = MessageUtils.buildSimpleMessage("Cancellazione messaggi", author, "Devi essere il proprietario o moderatore del server per modificare questa impostazione.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -98,7 +99,7 @@ public class SettingsListener extends BotListener
 		OptionMapping modulePrefix = event.getOption("new_prefix"); //Module prefix passed to the command.
 		Member authorMember = guild.retrieveMember(author).complete(); //Member that sent the command.
 		MessageBuilder messageBuilder = new MessageBuilder();
-		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Prefissi dei comandi", author);
+		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Prefissi dei comandi", author);
 		
 		int argumentCount = event.getOptions().size();
 		
@@ -138,7 +139,7 @@ public class SettingsListener extends BotListener
 			//Check in the user has permission to run this command.
 			if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
 			{
-				Message message = BotListener.buildSimpleMessage("Prefissi dei comandi", author, "Devi essere il proprietario o moderatore del server per modificare il prefisso di un modulo.");
+				Message message = MessageUtils.buildSimpleMessage("Prefissi dei comandi", author, "Devi essere il proprietario o moderatore del server per modificare il prefisso di un modulo.");
 				event.reply(message).setEphemeral(true).queue();
 				return;
 			}
@@ -146,7 +147,7 @@ public class SettingsListener extends BotListener
 			//Check if the module prefix to set is suitable.
 			if (!newPrefix.chars().allMatch(Character::isLetterOrDigit) || newPrefix.length() > 16)
 			{
-				Message message = BotListener.buildSimpleMessage("Prefissi dei comandi", author, "Il prefisso deve essere alfanumerico e non può superare i 16 caratteri.");
+				Message message = MessageUtils.buildSimpleMessage("Prefissi dei comandi", author, "Il prefisso deve essere alfanumerico e non può superare i 16 caratteri.");
 				event.reply(message).setEphemeral(true).queue();
 				return;
 			}
@@ -172,7 +173,7 @@ public class SettingsListener extends BotListener
 	
 	private void setUnlistedBotCommandSymbol(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
-		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Simbolo comandi non listati", author);
+		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Simbolo comandi non listati", author);
 		MessageBuilder messageBuilder = new MessageBuilder();
 		OptionMapping newSymbolOption = event.getOption("value");
 		Member authorMember = guild.retrieveMember(author).complete();

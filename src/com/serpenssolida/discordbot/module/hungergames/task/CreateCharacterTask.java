@@ -1,6 +1,6 @@
 package com.serpenssolida.discordbot.module.hungergames.task;
 
-import com.serpenssolida.discordbot.BotMain;
+import com.serpenssolida.discordbot.MessageUtils;
 import com.serpenssolida.discordbot.module.Task;
 import com.serpenssolida.discordbot.module.hungergames.Character;
 import com.serpenssolida.discordbot.module.hungergames.HungerGamesController;
@@ -35,7 +35,7 @@ public class CreateCharacterTask extends Task
 		//Abort task if there is an HungerGames running.
 		if (HungerGamesController.isHungerGamesRunning(this.getGuild().getId()))
 		{
-			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Creazione del personaggio", this.getUser())
+			EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Creazione del personaggio", this.getUser())
 					.setDescription("Non puoi usare questo comando perchè è in corso un HungerGames.");
 			messageBuilder.setEmbed(embedBuilder.build());
 
@@ -45,7 +45,7 @@ public class CreateCharacterTask extends Task
 			this.running = false;
 			return true;
 		}
-		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Creazione del personaggio", this.getUser())
+		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Creazione del personaggio", this.getUser())
 				.setDescription("Stai creando un personaggio! Inserisci il nome del tuo personaggio. (max 16 caratteri)");
 		messageBuilder.setEmbed(embedBuilder.build());
 
@@ -67,7 +67,7 @@ public class CreateCharacterTask extends Task
 		//Abort task if there is an HungerGames running.
 		if (HungerGamesController.isHungerGamesRunning(this.getGuild().getId()))
 		{
-			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Creazione del personaggio", this.getUser())
+			EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Creazione del personaggio", this.getUser())
 					.setDescription("Non puoi completare la procedura perchè è in corso un HungerGames.");
 			MessageBuilder messageBuilder = new MessageBuilder()
 					.setEmbed(embedBuilder.build());
@@ -102,7 +102,7 @@ public class CreateCharacterTask extends Task
 		
 		if (name.length() <= 0 || name.length() > 16)
 		{
-			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Creazione del personaggio", this.getUser())
+			EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Creazione del personaggio", this.getUser())
 					.setDescription((name.length() <= 0) ? "Devi inserire un nome!" : "Il nome non può essere più lungo di 15 caratteri!");
 			MessageBuilder messageBuilder = new MessageBuilder()
 					.setEmbed(embedBuilder.build());
@@ -115,7 +115,7 @@ public class CreateCharacterTask extends Task
 		this.state = State.ASSIGN_STATS;
 		
 		System.out.println("Nome assegnato: " + name);
-		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Creazione del personaggio", this.getUser());
+		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Creazione del personaggio", this.getUser());
 		
 		embedBuilder
 				.appendDescription("Nome selezionato: **")
@@ -140,7 +140,7 @@ public class CreateCharacterTask extends Task
 		//Check number of ability sent with the message.
 		if (abilities.length != 7)
 		{
-			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Creazione del personaggio", this.getUser())
+			EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Creazione del personaggio", this.getUser())
 					.appendDescription("Inserisci tutte le caratteristiche!")
 					.appendDescription("\nLe caratteristiche sono: ")
 					.appendDescription("Vitalità, Forza, Abilità, Special, Velocità, Resistenza e Gusto. ")
@@ -168,7 +168,7 @@ public class CreateCharacterTask extends Task
 		}
 		catch (NumberFormatException e)
 		{
-			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Creazione del personaggio", this.getUser())
+			EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Creazione del personaggio", this.getUser())
 				.appendDescription("Formato delle caratteristiche errato. Inserisci solo numeri tra 0 e 10!");
 			
 			MessageBuilder messageBuilder = new MessageBuilder()
@@ -180,7 +180,7 @@ public class CreateCharacterTask extends Task
 		
 		if (sum != HungerGamesController.SUM_STATS)
 		{
-			EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Creazione del personaggio", this.getUser())
+			EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Creazione del personaggio", this.getUser())
 					.appendDescription("La somma dei valori delle caratteristiche deve essere " +  HungerGamesController.SUM_STATS + " punti! Somma dei valori inseriti: " + sum);
 			
 			MessageBuilder messageBuilder = new MessageBuilder()
@@ -194,7 +194,7 @@ public class CreateCharacterTask extends Task
 		
 		HungerGamesController.addCharacter(this.getGuild().getId(), this.character);
 		
-		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Creazione del personaggio", this.getUser())
+		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Creazione del personaggio", this.getUser())
 				.appendDescription("Creazione personaggio completata");
 		
 		MessageBuilder messageBuilder = new MessageBuilder()

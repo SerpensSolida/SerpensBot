@@ -1,6 +1,7 @@
 package com.serpenssolida.discordbot.module.base;
 
 import com.serpenssolida.discordbot.BotMain;
+import com.serpenssolida.discordbot.MessageUtils;
 import com.serpenssolida.discordbot.module.BotListener;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
@@ -76,7 +77,7 @@ public class BaseListener extends BotListener
 		//Check in the user has permission to run this command.
 		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
 		{
-			Message message = BotListener.buildSimpleMessage("Reset del simbolo dei comandi", author, "Devi essere il proprietario o moderatore del server per resettare il simbolo per comandi non listati.");
+			Message message = MessageUtils.buildSimpleMessage("Reset del simbolo dei comandi", author, "Devi essere il proprietario o moderatore del server per resettare il simbolo per comandi non listati.");
 			channel.sendMessage(message).queue();
 			return;
 		}
@@ -84,7 +85,7 @@ public class BaseListener extends BotListener
 		BotMain.setCommandSymbol(guild.getId(), "/");
 		BotMain.saveSettings(guild.getId());
 		
-		Message message = BotListener.buildSimpleMessage("Reset del simbolo dei comandi", author, "Simbolo per i comandi non listati impostato a `/`.");
+		Message message = MessageUtils.buildSimpleMessage("Reset del simbolo dei comandi", author, "Simbolo per i comandi non listati impostato a `/`.");
 		channel.sendMessage(message).queue();
 	}
 	
@@ -98,7 +99,7 @@ public class BaseListener extends BotListener
 		//Check in the user has permission to run this command.
 		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
 		{
-			Message message = BotListener.buildSimpleMessage("Reset dei prefissi dei comandi", author, "Devi essere il proprietario o moderatore del server per resettare i prefissi.");
+			Message message = MessageUtils.buildSimpleMessage("Reset dei prefissi dei comandi", author, "Devi essere il proprietario o moderatore del server per resettare i prefissi.");
 			channel.sendMessage(message).queue();
 			return;
 		}
@@ -111,7 +112,7 @@ public class BaseListener extends BotListener
 		BotMain.updateGuildCommands(guild);
 		BotMain.saveSettings(guild.getId());
 		
-		Message message = BotListener.buildSimpleMessage("Reset dei prefissi dei comandi", author, "Prefisso dei moduli resettato correttamente.");
+		Message message = MessageUtils.buildSimpleMessage("Reset dei prefissi dei comandi", author, "Prefisso dei moduli resettato correttamente.");
 		channel.sendMessage(message).queue();
 	}
 	

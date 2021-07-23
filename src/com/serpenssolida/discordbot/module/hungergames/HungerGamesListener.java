@@ -1,6 +1,7 @@
 package com.serpenssolida.discordbot.module.hungergames;
 
 import com.serpenssolida.discordbot.BotMain;
+import com.serpenssolida.discordbot.MessageUtils;
 import com.serpenssolida.discordbot.module.BotCommand;
 import com.serpenssolida.discordbot.module.BotListener;
 import com.serpenssolida.discordbot.module.hungergames.task.CreateCharacterTask;
@@ -181,7 +182,7 @@ public class HungerGamesListener extends BotListener
 		}
 		else
 		{
-			Message message = BotListener.buildSimpleMessage("Creazione personaggio", author, "L'utente non ha creato nessun personaggio.");
+			Message message = MessageUtils.buildSimpleMessage("Creazione personaggio", author, "L'utente non ha creato nessun personaggio.");
 			event.reply(message).setEphemeral(true).queue();
 		}
 	}
@@ -191,12 +192,12 @@ public class HungerGamesListener extends BotListener
 		Character character = HungerGamesController.getCharacter(guild.getId(), author.getId());
 		OptionMapping valueArg = event.getOption("value");
 		
-		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Attivazione/disattivazione personaggio", author);
+		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Attivazione/disattivazione personaggio", author);
 		
 		//This command cannot be used while HungerGames is running.
 		if (HungerGamesController.isHungerGamesRunning(guild.getId()))
 		{
-			Message message = BotListener.buildSimpleMessage("Attivazione/disattivazione personaggio", author, "Non puoi usare questo comando mentre è in corso un HungerGames.");
+			Message message = MessageUtils.buildSimpleMessage("Attivazione/disattivazione personaggio", author, "Non puoi usare questo comando mentre è in corso un HungerGames.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -230,7 +231,7 @@ public class HungerGamesListener extends BotListener
 	{
 		OptionMapping secondsArg = event.getOption("seconds");
 		
-		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Velocità degli Hunger Games", author);
+		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Velocità degli Hunger Games", author);
 		
 		if (secondsArg != null && secondsArg.getAsLong() >= 1.0f)
 		{
@@ -314,7 +315,7 @@ public class HungerGamesListener extends BotListener
 	private void stopHungerGames(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		//MessageBuilder messageBuilder = new MessageBuilder();
-		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("Hunger Games", author);
+		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Hunger Games", author);
 		
 		boolean isRunning = HungerGamesController.isHungerGamesRunning(guild.getId());
 		

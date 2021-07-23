@@ -9,14 +9,12 @@ import com.serpenssolida.discordbot.module.poll.PollListener;
 import com.serpenssolida.discordbot.module.settings.SettingsData;
 import com.serpenssolida.discordbot.module.settings.SettingsListener;
 import com.serpenssolida.discordbot.module.tictactoe.TicTacToeListener;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -418,40 +416,5 @@ public class BotMain
 		}
 		
 		return BotMain.deleteCommandMessages.get(guildID);
-	}
-	
-	/**
-	 * Create an {@link EmbedBuilder} with standard content for ease of use.
-	 *
-	 * @param title
-	 * 		The title to give to the embed.
-	 *
-	 * @return
-	 * 		A {@link EmbedBuilder} with standard content.
-	 */
-	public static EmbedBuilder getDefaultEmbed(String title)
-	{
-		EmbedBuilder embedBuilder = new EmbedBuilder();
-		
-		//Add footer
-		embedBuilder.setTitle(title);
-		embedBuilder.setAuthor(BotMain.api.getSelfUser().getName(), "https://github.com/SerpensSolida/SerpensBot", BotMain.api.getSelfUser().getAvatarUrl());
-		
-		return embedBuilder;
-	}
-	
-	/**
-	 * Create an {@link EmbedBuilder} with standard content and author footer for ease of use.
-	 *
-	 * @param title
-	 * 		The title to give to the embed.
-	 *
-	 * @return
-	 * 		A {@link EmbedBuilder} with standard content.
-	 */
-	public static EmbedBuilder getDefaultEmbed(String title, User author)
-	{
-		return BotMain.getDefaultEmbed(title)
-				.setFooter("Richiesto da " + author.getName(), author.getAvatarUrl());
 	}
 }

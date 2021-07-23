@@ -4,7 +4,10 @@ import com.serpenssolida.discordbot.BotMain;
 import com.serpenssolida.discordbot.ButtonGroup;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.MessageReaction;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -17,7 +20,6 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.components.Button;
 
 import javax.annotation.Nonnull;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -349,44 +351,6 @@ public class BotListener extends ListenerAdapter
 		
 		//channel.sendMessage(new MessageBuilder().setEmbed(embedBuilder.build()).build()).queue();
 		event.reply(new MessageBuilder().setEmbed(embedBuilder.build()).build()).setEphemeral(false).queue();
-	}
-	
-	/**
-	 * Method used to generate simple embed messages.
-	 * @param title Title of the embed.
-	 * @param author Author of the embed.
-	 * @param description String showed as description of the embed.
-	 * @return The message containing the generated embed.
-	 */
-	protected static Message buildSimpleMessage(String title, User author, String description)
-	{
-		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed(title, author);
-		embedBuilder.setDescription(description);
-		MessageBuilder messageBuilder = new MessageBuilder();
-		messageBuilder.setEmbed(embedBuilder.build());
-		
-//		event.reply(messageBuilder.build()).setEphemeral(true).queue();
-		return messageBuilder.build();
-	}
-	
-	/**
-	 * Method used to generate simple embed messages.
-	 * @param title Title of the embed.
-	 * @param author Author of the embed.
-	 * @param description String showed as description of the embed.
-	 * @param color Color of the embed.
-	 * @return The message containing the generated embed.
-	 */
-	protected static Message buildSimpleMessage(String title, User author, String description, Color color)
-	{
-		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed(title, author);
-		embedBuilder.setDescription(description);
-		embedBuilder.setColor(color);
-		MessageBuilder messageBuilder = new MessageBuilder();
-		messageBuilder.setEmbed(embedBuilder.build());
-		
-		//		event.reply(messageBuilder.build()).setEphemeral(true).queue();
-		return messageBuilder.build();
 	}
 	
 	/**

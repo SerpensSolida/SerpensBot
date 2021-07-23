@@ -1,7 +1,7 @@
 package com.serpenssolida.discordbot.module.tictactoe;
 
-import com.serpenssolida.discordbot.BotMain;
 import com.serpenssolida.discordbot.ButtonGroup;
+import com.serpenssolida.discordbot.MessageUtils;
 import com.serpenssolida.discordbot.module.BotCommand;
 import com.serpenssolida.discordbot.module.BotListener;
 import com.serpenssolida.discordbot.module.ButtonCallback;
@@ -99,21 +99,21 @@ public class TicTacToeListener extends BotListener
 		//Check if a game was found.
 		if (game == null)
 		{
-			event.reply(BotListener.buildSimpleMessage("TicTacToe", author, "Nessuna partita trovata con l'id:" + gameIdArg.getAsString())).setEphemeral(true).queue();
+			event.reply(MessageUtils.buildSimpleMessage("TicTacToe", author, "Nessuna partita trovata con l'id:" + gameIdArg.getAsString())).setEphemeral(true).queue();
 			return;
 		}
 		
 		//Check if the user is one of the players.
 		if (!game.getPlayers().contains(author))
 		{
-			event.reply(BotListener.buildSimpleMessage("TicTacToe", author, "Non puoi fermare una partita di cui non sei il partecipante")).setEphemeral(true).queue();
+			event.reply(MessageUtils.buildSimpleMessage("TicTacToe", author, "Non puoi fermare una partita di cui non sei il partecipante")).setEphemeral(true).queue();
 			return;
 		}
 		
 		//Stop the game.
 		this.stopGame(game, guild, channel);
 		
-		event.reply(BotListener.buildSimpleMessage("TicTacToe", author, "La partita è stata interrotta con successo.")).setEphemeral(false).queue();
+		event.reply(MessageUtils.buildSimpleMessage("TicTacToe", author, "La partita è stata interrotta con successo.")).setEphemeral(false).queue();
 	}
 	
 	private void stopGame(TicTacToeGame game, Guild guild, MessageChannel channel)
@@ -222,7 +222,7 @@ public class TicTacToeListener extends BotListener
 	private static MessageBuilder generateGameMessage(TicTacToeGame game, User author)
 	{
 		MessageBuilder messageBuilder = new MessageBuilder();
-		EmbedBuilder embedBuilder = BotMain.getDefaultEmbed("TicTacToe: " + game.getPlayer(0).getName() + " vs. " + game.getPlayer(1).getName(), author);
+		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("TicTacToe: " + game.getPlayer(0).getName() + " vs. " + game.getPlayer(1).getName(), author);
 		
 		if (game.getMessageId() != null)
 			embedBuilder.setFooter("Richiesto da " + game.getPlayer(0).getName() + " | ID: " + game.getMessageId(), game.getPlayer(0).getAvatarUrl());
