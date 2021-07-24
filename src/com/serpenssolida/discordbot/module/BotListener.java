@@ -84,7 +84,7 @@ public class BotListener extends ListenerAdapter
 			//Check if the command exists.
 			if (command == null)
 			{
-				channel.sendMessage("> Il comando `" + data.commandID + "` non esiste.").queue();
+				//channel.sendMessage("> Il comando `" + data.commandID + "` non esiste.").queue();
 				return;
 			}
 			
@@ -112,7 +112,8 @@ public class BotListener extends ListenerAdapter
 			}
 			else
 			{
-				channel.sendMessage("> Numero argomenti errato.").queue();
+				//channel.sendMessage("> Numero argomenti errato.").queue();
+				channel.sendMessage(MessageUtils.buildSimpleMessage("Comando " + command.getId(), author, "Numero argomenti errato.")).queue();
 			}
 		}
 		else if (task != null && task.getChannel().equals(channel))

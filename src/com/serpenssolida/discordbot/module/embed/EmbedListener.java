@@ -45,7 +45,7 @@ public class EmbedListener extends BotListener
 		this.addBotCommand(command);
 		
 		//Command for creating an embed from a message.
-		command = new BotCommand("generate", "Genera un embed usando il contenuto di un messaggio esistente");
+		command = new BotCommand("generate", "Genera un embed usando il contenuto di un messaggio esistente.");
 		command.setAction((event, guild, channel, author) ->
 		{
 			this.generateEmbed(event, guild, channel, author);
