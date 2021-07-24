@@ -193,7 +193,7 @@ public class EmbedListener extends BotListener
 		//Check if the message was found.
 		if (originalMessage == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Creazione embed", author, "Nessun messaggio trovato con id:" + messageIdArg.getAsString());
+			Message message = MessageUtils.buildErrorMessage("Creazione embed", author, "Nessun messaggio trovato con id: " + messageIdArg.getAsString());
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
