@@ -231,26 +231,28 @@ public class TicTacToeListener extends BotListener
 	private static MessageBuilder generateGameMessage(TicTacToeGame game, User author)
 	{
 		MessageBuilder messageBuilder = new MessageBuilder();
-		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("TicTacToe: " + game.getPlayer(0).getName() + " vs. " + game.getPlayer(1).getName(), author);
+		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Partita a TicTacToe", author);
 		
 		if (game.getMessageId() != null)
 			embedBuilder.setFooter("Richiesto da " + game.getPlayer(0).getName() + " | ID: " + game.getMessageId(), game.getPlayer(0).getAvatarUrl());
 		else
 			embedBuilder.setFooter("Richiesto da " + game.getPlayer(0).getName(), game.getPlayer(0).getAvatarUrl());
 		
+		embedBuilder.setDescription("**" + game.getPlayer(0).getName() + "** (X) vs. **" + game.getPlayer(1).getName() + "** (O)\n\n");
+		
 		if (game.isFinished())
 		{
 			User winner = game.getWinner();
-			embedBuilder.setDescription(winner != null ? "Il vincitore è: " + winner.getName() : "La partita si è conclusa con un pareggio.");
+			embedBuilder.appendDescription(winner != null ? "Il vincitore è: " + winner.getName() : "La partita si è conclusa con un pareggio.");
 			TicTacToeListener.addTicTacToeButtons(messageBuilder, game);
 		}
 		else if (game.isInterrupted())
 		{
-			embedBuilder.setDescription("Partita interrotta.");
+			embedBuilder.appendDescription("Partita interrotta.");
 		}
 		else
 		{
-			embedBuilder.setDescription("Turno di " + game.getCurrentUser().getName());
+			embedBuilder.appendDescription("Turno: **" + game.getCurrentUser().getName() + "**\nSimbolo: " + (game.getCurrentTurn() == 0 ? "**X**" : "**O**"));
 			TicTacToeListener.addTicTacToeButtons(messageBuilder, game);
 		}
 		

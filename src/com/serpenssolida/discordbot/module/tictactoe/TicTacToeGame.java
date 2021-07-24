@@ -8,7 +8,7 @@ import java.util.HashSet;
 public class TicTacToeGame
 {
 	private String messageId;
-	private int[][] field = new int[3][3];
+	private int[][] field = new int[FIELD_SIZE][FIELD_SIZE];
 	private User[] players = new User[2];
 	private int currentTurn = 0;
 	private boolean interrupted = false;
