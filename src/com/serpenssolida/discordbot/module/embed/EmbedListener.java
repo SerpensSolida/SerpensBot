@@ -185,7 +185,7 @@ public class EmbedListener extends BotListener
 		{
 			originalMessage = channel.retrieveMessageById(messageId).complete();
 		}
-		catch (ErrorResponseException ignored)
+		catch (ErrorResponseException | IllegalArgumentException e)
 		{
 			originalMessage = null;
 		}
