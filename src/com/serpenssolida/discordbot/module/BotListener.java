@@ -2,17 +2,16 @@ package com.serpenssolida.discordbot.module;
 
 import com.serpenssolida.discordbot.BotMain;
 import com.serpenssolida.discordbot.ButtonGroup;
+import com.serpenssolida.discordbot.MessageUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.MessageReaction;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.ButtonClickEvent;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -131,9 +130,14 @@ public class BotListener extends ListenerAdapter
 	
 	public void onMessageReactionAdd(@Nonnull MessageReactionAddEvent event)
 	{
+		//Don't accept reaction from private channels.
+		if (!event.isFromGuild())
+			return;
+		
 		MessageReaction messageReaction = event.getReaction(); //Reaction added to the message.
 		User author = event.getUser(); //The user that added the reaction.
 		Guild guild = event.getGuild(); //The user that added the reaction.
+		MessageChannel channel = event.getChannel(); //The user that added the reaction.
 		
 		if (author == null)
 			return;
@@ -151,12 +155,21 @@ public class BotListener extends ListenerAdapter
 		//Get the message the reaction was added to.
 		event.retrieveMessage().queue(message ->
 		{
-			task.consumeReaction(message, messageReaction.getReactionEmote().getName());
-			
-			//Remove the task if it finished.
-			if (!task.isRunning())
+			try
+			{
+				task.consumeReaction(message, messageReaction.getReactionEmote().getName());
+				
+				//Remove the task if it finished.
+				if (!task.isRunning())
+				{
+					this.removeTask(guild.getId(), task);
+				}
+			}
+			catch (PermissionException e)
 			{
 				this.removeTask(guild.getId(), task);
+				Message errorMessage = MessageUtils.buildErrorMessage("Imposibile eseguire l'azione", event.getUser(), "Permessi assenti: " + e.getPermission());
+				channel.sendMessage(errorMessage).queue();
 			}
 		});
 	}
@@ -172,10 +185,17 @@ public class BotListener extends ListenerAdapter
 		if (!event.getName().equals(this.getModulePrefix(guild.getId())))
 			return;
 		
-		//Get the command from the list using the event command name and run it.
-		BotCommand command = this.getBotCommand(event.getSubcommandName());
-		command.doAction(event);
-		
+		try
+		{
+			//Get the command from the list using the event command name and run it.
+			BotCommand command = this.getBotCommand(event.getSubcommandName());
+			command.doAction(event);
+		}
+		catch (PermissionException e)
+		{
+			Message message = MessageUtils.buildErrorMessage("Comando non eseguito.", event.getUser(), "Permessi assenti: " + e.getPermission());
+			event.reply(message).setEphemeral(true).queue();
+		}
 	}
 	
 	@Override
@@ -211,20 +231,29 @@ public class BotListener extends ListenerAdapter
 			{
 				ButtonCallback buttonCallback = buttonGroup.getButton(button.getId());
 				
-				//Do button action.
-				boolean deleteMessage = buttonCallback.doAction(event);
-				//task.deleteButtons();
-				
-				//Delete message that has the clicked button if it should be deleted.
-				if (BotMain.getDeleteCommandMessages(guild.getId()) && deleteMessage)
+				try
 				{
-					event.getHook().deleteOriginal().queue();
+					//Do button action.
+					boolean deleteMessage = buttonCallback.doAction(event);
+					//task.deleteButtons();
+					
+					//Delete message that has the clicked button if it should be deleted.
+					if (BotMain.getDeleteCommandMessages(guild.getId()) && deleteMessage)
+					{
+						event.getHook().deleteOriginal().queue();
+					}
+					
+					//Remove the task if it finished.
+					if (!task.isRunning())
+					{
+						this.removeTask(guild.getId(), task);
+					}
 				}
-				
-				//Remove the task if it finished.
-				if (!task.isRunning())
+				catch (PermissionException e)
 				{
 					this.removeTask(guild.getId(), task);
+					Message message = MessageUtils.buildErrorMessage("Imposibile completare task", event.getUser(), "Permessi assenti: " + e.getPermission());
+					event.reply(message).setEphemeral(true).queue();
 				}
 			}
 		}
@@ -233,13 +262,21 @@ public class BotListener extends ListenerAdapter
 			ButtonCallback buttonCallback = buttonGroup.getButton(button.getId());
 			//event.deferEdit().queue(); //Let discord know we know the button has been clicked.
 			
-			//Do button action.
-			boolean deleteMessage = buttonCallback.doAction(event);
-			
-			//Delete message that has the clicked button if it should be deleted.
-			if (BotMain.getDeleteCommandMessages(guild.getId()) && deleteMessage)
+			try
 			{
-				event.getHook().deleteOriginal().queue();
+				//Do button action.
+				boolean deleteMessage = buttonCallback.doAction(event);
+				
+				//Delete message that has the clicked button if it should be deleted.
+				if (BotMain.getDeleteCommandMessages(guild.getId()) && deleteMessage)
+				{
+					event.getHook().deleteOriginal().queue();
+				}
+			}
+			catch (PermissionException e)
+			{
+				Message message = MessageUtils.buildErrorMessage("Imposibile compiere azione", event.getUser(), "Permessi assenti: " + e.getPermission());
+				event.reply(message).setEphemeral(true).queue();
 			}
 		}
 	}
