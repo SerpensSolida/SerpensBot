@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.serpenssolida.discordbot.module.BotListener;
 import com.serpenssolida.discordbot.module.base.BaseListener;
+import com.serpenssolida.discordbot.module.connect4.Connect4Listener;
 import com.serpenssolida.discordbot.module.embed.EmbedListener;
 import com.serpenssolida.discordbot.module.hungergames.HungerGamesListener;
 import com.serpenssolida.discordbot.module.owner.OwnerListener;
@@ -74,6 +75,7 @@ public class BotMain
 		api.addEventListener(new BaseListener());
 		api.addEventListener(new OwnerListener());
 		api.addEventListener(new EmbedListener());
+		api.addEventListener(new Connect4Listener());
 		
 		if (data.getOwner() == null || data.getOwner().isBlank())
 		{

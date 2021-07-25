@@ -188,21 +188,16 @@ public class TicTacToeListener extends BotListener
 						return ButtonCallback.DELETE_MESSAGE;
 					}
 					
+					//Let discord know the bot received the interaction.
+					event.deferEdit().queue();
+					
 					//Check if is the turn of the user.
 					if (!author.equals(game.getCurrentUser()))
-					{
-						event.deferEdit().queue();
 						return ButtonCallback.LEAVE_MESSAGE;
-					}
-					
-					event.deferEdit().queue();
 					
 					//Check if the cell is empty.
 					if (!game.isCellEmpty(x, y))
-					{
-						event.deferEdit().queue();
 						return ButtonCallback.LEAVE_MESSAGE;
-					}
 					
 					//Execute player move.
 					int turn = game.getCurrentTurn();
@@ -262,7 +257,7 @@ public class TicTacToeListener extends BotListener
 		if (game.isFinished())
 		{
 			User winner = game.getWinner();
-			embedBuilder.appendDescription(winner != null ? "Il vincitore è: " + winner.getName() : "La partita si è conclusa con un pareggio.");
+			embedBuilder.appendDescription(winner != null ? "Il vincitore è " + winner.getName() + "." : "La partita si è conclusa con un pareggio.");
 			TicTacToeListener.addTicTacToeButtons(messageBuilder, game);
 		}
 		else if (game.isInterrupted())
@@ -271,7 +266,7 @@ public class TicTacToeListener extends BotListener
 		}
 		else
 		{
-			embedBuilder.appendDescription("Turno: **" + game.getCurrentUser().getName() + "**\nSimbolo: " + (game.getCurrentTurn() == 0 ? "**X**" : "**O**"));
+			embedBuilder.appendDescription("Turno: **" + game.getCurrentUser().getName() + "**\nSimbolo: " + (game.getCurrentTurn() == 0 ? "**❌**" : "**⭕**"));
 			TicTacToeListener.addTicTacToeButtons(messageBuilder, game);
 		}
 		
