@@ -4,12 +4,11 @@ import com.serpenssolida.discordbot.RandomChoice;
 import com.serpenssolida.discordbot.module.hungergames.inventory.Food;
 import com.serpenssolida.discordbot.module.hungergames.inventory.Weapon;
 import com.serpenssolida.discordbot.module.hungergames.io.ItemData;
+import net.dv8tion.jda.api.entities.MessageChannel;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
-
-import net.dv8tion.jda.api.entities.MessageChannel;
 
 public class HungerGames
 {
@@ -247,6 +246,6 @@ public class HungerGames
 	
 	public String getGuildID()
 	{
-		return guildID;
+		return this.guildID;
 	}
 }

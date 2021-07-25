@@ -10,8 +10,16 @@ public class TicTacToeGame
 	private String messageId;
 	private int[][] field = new int[FIELD_SIZE][FIELD_SIZE];
 	private User[] players = new User[2];
+	private User winner;
 	private int currentTurn = 0;
 	private boolean interrupted = false;
+	private boolean finished = false;
+	
+	//Variable for win condition checking.
+	private int[] rowSum = new int[FIELD_SIZE];
+	private int[] columnSum = new int[FIELD_SIZE];
+	private int diagonalSum = 0;
+	private int antiDiagonalSum = 0;
 
 	public static int FIELD_SIZE = 3;
 	
@@ -25,12 +33,26 @@ public class TicTacToeGame
 		{
 			Arrays.fill(row, -1);
 		}
+		
+		Arrays.fill(this.rowSum, 0);
+		Arrays.fill(this.columnSum, 0);
 	}
 	
 	public void setCell(int playerIndex, int x, int y)
 	{
-		if (this.isCellEmpty(x, y))
-			this.field[x][y] = playerIndex;
+		if (!this.isCellEmpty(x, y))
+			return;
+		
+		this.field[x][y] = playerIndex;
+		
+		this.columnSum[x] += playerIndex;
+		this.rowSum[y] += playerIndex;
+		
+		if (x == y)
+			this.diagonalSum += playerIndex;
+		
+		if  (x == FIELD_SIZE - 1 - y)
+			this.antiDiagonalSum += playerIndex;
 	}
 	
 	public boolean isCellEmpty(int x, int y)
@@ -43,68 +65,59 @@ public class TicTacToeGame
 		return this.players[this.currentTurn];
 	}
 	
-	public boolean isFinished()
+	public boolean checkMove(int turn, int x, int y)
 	{
-		//Rows
-		for (int i = 0; i < FIELD_SIZE; i++)
-		{
-			if (this.field[0][i] == this.field[1][i] && this.field[1][i] == this.field[2][i] && this.field[0][i] != -1)
-				return true;
-		}
-		
-		//Column
-		for (int i = 0; i < FIELD_SIZE; i++)
-		{
-			if (this.field[i][0] == this.field[i][1] && this.field[i][1] == this.field[i][2] && this.field[i][0] != -1)
-				return true;
-		}
-		
-		//Main diagonal
-		if (this.field[0][0] == this.field[1][1] && this.field[1][1] == this.field[2][2] && this.field[0][0] != -1)
+		if ((this.columnSum[x] == turn * 3 && this.isColumnFull(x)) || (this.rowSum[y] == turn * 3 && this.isRowFull(y)))
 			return true;
 		
-		//Secondary diagonal
-		if (this.field[0][2] == this.field[1][1] && this.field[1][1] == this.field[2][0] && this.field[0][2] != -1)
+		if (x == y && this.isDiagonalFull() && this.diagonalSum == turn * 3)
 			return true;
 		
-		return this.isFieldFull();
+		return x == FIELD_SIZE - 1 - y && this.isAntiDiagonalFull() && this.antiDiagonalSum == turn * 3;
 	}
 	
-	public User getWinner()
+	public boolean isRowFull(int y)
 	{
-		int index = this.getWinnerIndex();
+		for (int i = 0; i < FIELD_SIZE; i++)
+		{
+			if (this.field[i][y] == -1)
+				return false;
+		}
 		
-		if (index == -1)
-			return null;
-		
-		return this.getPlayer(index);
+		return true;
 	}
 	
-	public int getWinnerIndex()
+	public boolean isColumnFull(int x)
 	{
-		//Rows
 		for (int i = 0; i < FIELD_SIZE; i++)
 		{
-			if (this.field[0][i] == this.field[1][i] && this.field[1][i] == this.field[2][i] && this.field[0][i] != -1)
-				return this.field[0][i];
+			if (this.field[x][i] == -1)
+				return false;
 		}
 		
-		//Column
+		return true;
+	}
+	
+	public boolean isDiagonalFull()
+	{
 		for (int i = 0; i < FIELD_SIZE; i++)
 		{
-			if (this.field[i][0] == this.field[i][1] && this.field[i][1] == this.field[i][2] && this.field[i][0] != -1)
-				return this.field[i][0];
+			if (this.field[i][i] == -1)
+				return false;
 		}
 		
-		//Main diagonal
-		if (this.field[0][0] == this.field[1][1] && this.field[1][1] == this.field[2][2] && this.field[0][0] != -1)
-			return this.field[0][0];
+		return true;
+	}
+	
+	public boolean isAntiDiagonalFull()
+	{
+		for (int i = 0; i < FIELD_SIZE; i++)
+		{
+			if (this.field[i][FIELD_SIZE - 1 - i] == -1)
+				return false;
+		}
 		
-		//Secondary diagonal
-		if (this.field[0][2] == this.field[1][1] && this.field[1][1] == this.field[2][0] && this.field[0][2] != -1)
-			return this.field[0][2];
-		
-		return -1;
+		return true;
 	}
 	
 	public User getPlayer(int playerIndex)
@@ -180,5 +193,25 @@ public class TicTacToeGame
 	public void setInterrupted(boolean interrupted)
 	{
 		this.interrupted = interrupted;
+	}
+	
+	public boolean isFinished()
+	{
+		return this.finished;
+	}
+	
+	public void setFinished(boolean finished)
+	{
+		this.finished = finished;
+	}
+	
+	public User getWinner()
+	{
+		return this.winner;
+	}
+	
+	public void setWinner(User winner)
+	{
+		this.winner = winner;
 	}
 }

@@ -7,10 +7,7 @@ import com.serpenssolida.discordbot.module.BotListener;
 import com.serpenssolida.discordbot.module.ButtonCallback;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -34,7 +31,7 @@ public class TicTacToeListener extends BotListener
 		//This module has no task.
 		this.removeBotCommand("cancel");
 		
-		//Command for creating a poll.
+		//Command for creating a game.
 		BotCommand command = new BotCommand("start", "Comincia una partita di tris.");
 		command.setAction((event, guild, channel, author) ->
 		{
@@ -46,7 +43,7 @@ public class TicTacToeListener extends BotListener
 				.addOption(OptionType.USER, "opponent", "L'avversario della partita", true);
 		this.addBotCommand(command);
 		
-		//Command for creating a poll.
+		//Command for stopping a game.
 		command = new BotCommand("stop", "Ferma una partita di tris.");
 		command.setAction((event, guild, channel, author) ->
 		{
@@ -141,7 +138,7 @@ public class TicTacToeListener extends BotListener
 		ArrayList<Button> buttons = new ArrayList<>();
 		ArrayList<ActionRow> actionRows = new ArrayList<>();
 		
-		//Generate the rows for the buttons
+		//Generate the rows for the buttons.
 		for (int i = 0; i < TicTacToeGame.FIELD_SIZE; i++)
 		{
 			for (int j = 0; j < TicTacToeGame.FIELD_SIZE; j++)
@@ -150,10 +147,10 @@ public class TicTacToeListener extends BotListener
 				switch (game.getCell(i, j))
 				{
 					case 0:
-						label = "X";
+						label = "❌";
 						break;
 					case 1:
-						label = "O";
+						label = "⭕";
 				}
 				
 				Button button = Button.secondary("" + (i + j * TicTacToeGame.FIELD_SIZE), label);
@@ -184,33 +181,55 @@ public class TicTacToeListener extends BotListener
 				{
 					TicTacToeGame game = this.games.get(message.getId());
 					
+					//Game must not be null.
 					if (game == null)
 					{
 						event.reply(MessageUtils.buildErrorMessage("TicTacToe", author, "Si è verificato un errore.")).setEphemeral(true).queue();
 						return ButtonCallback.DELETE_MESSAGE;
 					}
 					
-					if (author.equals(game.getCurrentUser()))
+					//Check if is the turn of the user.
+					if (!author.equals(game.getCurrentUser()))
 					{
 						event.deferEdit().queue();
-						
-						if (game.isCellEmpty(x, y))
-						{
-							game.setCell(game.getCurrentTurn(), x, y);
-							game.incrementTurn();
-						}
-						
-						TicTacToeListener.refreshGameMessage(game, message, author);
-						
-						if (game.isFinished())
-						{
-							this.games.remove(message.getId());
-							this.removeButtonGroup(guild.getId(), message.getId());
-						}
+						return ButtonCallback.LEAVE_MESSAGE;
 					}
-					else
+					
+					event.deferEdit().queue();
+					
+					//Check if the cell is empty.
+					if (!game.isCellEmpty(x, y))
 					{
 						event.deferEdit().queue();
+						return ButtonCallback.LEAVE_MESSAGE;
+					}
+					
+					//Execute player move.
+					int turn = game.getCurrentTurn();
+					game.setCell(game.getCurrentTurn(), x, y);
+					game.incrementTurn();
+					
+					//Check if the player made a winning move.
+					boolean winningMove = game.checkMove(turn, x, y);
+					
+					if (winningMove)
+					{
+						game.setFinished(true);
+						game.setWinner(game.getPlayer(turn));
+					}
+					else if (game.isFieldFull()) //Check if the field is full.
+					{
+						game.setFinished(true);
+					}
+					
+					//Refresh game message.
+					TicTacToeListener.refreshGameMessage(game, message, author);
+					
+					//If the game is finished remove the game and its callback.
+					if (game.isFinished())
+					{
+						this.games.remove(message.getId());
+						this.removeButtonGroup(guild.getId(), message.getId());
 					}
 					
 					return ButtonCallback.LEAVE_MESSAGE;
