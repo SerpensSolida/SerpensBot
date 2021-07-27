@@ -2,6 +2,11 @@ package com.serpenssolida.discordbot.module.connect4;
 
 import net.dv8tion.jda.api.entities.User;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -28,6 +33,132 @@ public class Connect4Game
 		{
 			Arrays.fill(row, -1);
 		}
+	}
+	
+	public boolean checkMove(int turn, int x, int y)
+	{
+		//Direction for the check.
+		int[][] directions =
+				{
+						{1, 0}, {1, 1}, {0, 1}, {-1, 1}
+				};
+		
+		for (int direction = 0; direction < directions.length; direction++) //Foreach direction
+		{
+			for (int offset = 0; offset < 4; offset++) //4 checks for each direction
+			{
+				int count = 0;
+				for (int i = 0; i < 4; i++) //Check if there is 4 in a row.
+				{
+					int posX = (i - offset) * directions[direction][0];
+					int posY = (i - offset) * directions[direction][1];
+					
+					int value;
+					
+					//Get the value from the field.
+					try
+					{
+						value = this.field[x + posX][y + posY];
+					}
+					catch (IndexOutOfBoundsException e)
+					{
+						break;
+					}
+					
+					if (value == turn)
+						count++;
+					else
+						break;
+				}
+				
+				//Check if there was 4 in a row.
+				if (count == 4)
+					return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	public ByteArrayOutputStream generateFieldImage()
+	{
+		//BufferedImage tombImage = this.getTombImage(); //Tombstone image.
+		
+		//Calculate image dimensions.
+		int fieldWidth = 512;
+		int fieldHeight = (fieldWidth * FIELD_HEIGHT / FIELD_WIDTH);
+		
+		int imageWidth = fieldWidth;
+		int imageHeight = fieldHeight + 64;
+		
+		int cellWidth = fieldWidth / FIELD_WIDTH;
+		int cellHeight = fieldHeight / FIELD_HEIGHT;
+		
+		//Create the image and get its Graphics.
+		BufferedImage statusImage = new BufferedImage(imageWidth, imageHeight, 6);
+		Graphics2D g = (Graphics2D) statusImage.getGraphics();
+
+		//Draw the field.
+		g.setColor(new Color(0x288AFF));
+		g.fillRect(0, 0, fieldWidth, fieldHeight);
+		g.setColor(new Color(0, 0, 0, 0));
+		g.setComposite(AlphaComposite.Clear);
+		for (int i = 0; i < FIELD_WIDTH; i++)
+		{
+			for (int j = 0; j < FIELD_HEIGHT; j++)
+			{
+				int x = i * cellWidth;
+				int y = fieldHeight - cellHeight - (j * cellHeight);
+				g.fillOval( x + 2,   y + 2, cellWidth - 4, cellHeight - 4);
+			}
+		}
+		g.setComposite(AlphaComposite.SrcOver);
+		
+		//Draw pawns.
+		Color[] pawnColor = {new Color(0xFF3030), new Color(0xFFFF30)};
+		Color[] darkPawnColor = {new Color(0x7F3030), new Color(0x7F7F30)};
+		for (int i = 0; i < FIELD_WIDTH; i++)
+		{
+			for (int j = 0; j < FIELD_HEIGHT; j++)
+			{
+				if (this.isCellEmpty(i, j))
+					continue;
+				
+				//Get the value of the cell.
+				int value = this.getCell(i, j);
+				
+				//Draw the pawn.
+				int x = i * cellWidth;
+				int y = fieldHeight - cellHeight - (j * cellHeight);
+				g.setColor(pawnColor[value]);
+				g.fillOval( x + 2,   y + 2, cellWidth - 4, cellHeight - 4);
+				g.setColor(darkPawnColor[value]);
+				g.fillOval(x + 10,   y + 10, cellWidth - 20, cellHeight - 20);
+			}
+		}
+		
+		//Draw number guide.
+		for (int i = 0; i < FIELD_WIDTH; i++)
+		{
+			g.setFont(g.getFont().deriveFont(32f));
+			g.setColor(Color.WHITE);
+			int w = g.getFontMetrics().stringWidth("" + (i + 1));
+			g.drawString("" + (i + 1), cellWidth / 2 + i * cellWidth - w / 2, fieldHeight + cellHeight / 2);
+		}
+		
+		ByteArrayOutputStream outputStream;
+		try
+		{
+			outputStream = new ByteArrayOutputStream();
+			ImageIO.write(statusImage, "png", outputStream);
+		}
+		catch (IOException e)
+		{
+			outputStream = null;
+			e.printStackTrace();
+		}
+		
+		return outputStream;
 	}
 	
 	public void setCell(int playerIndex, int x, int y)
@@ -79,51 +210,6 @@ public class Connect4Game
 	public boolean isCellEmpty(int x, int y)
 	{
 		return this.field[x][y] == -1;
-	}
-	
-	public boolean checkMove(int turn, int x, int y)
-	{
-		//Direction for the check.
-		int[][] directions =
-				{
-						{1, 0}, {1, 1}, {0, 1}, {-1, 1}
-				};
-		
-		for (int direction = 0; direction < directions.length; direction++) //Foreach direction
-		{
-			for (int offset = 0; offset < 4; offset++) //4 checks for each direction
-			{
-				int count = 0;
-				for (int i = 0; i < 4; i++) //Check if there is 4 in a row.
-				{
-					int posX = (i - offset) * directions[direction][0];
-					int posY = (i - offset) * directions[direction][1];
-					
-					int value;
-					
-					//Get the value from the field.
-					try
-					{
-						value = this.field[x + posX][y + posY];
-					}
-					catch (IndexOutOfBoundsException e)
-					{
-						break;
-					}
-					
-					if (value == turn)
-						count++;
-					else
-						break;
-				}
-				
-				//Check if there was 4 in a row.
-				if (count == 4)
-					return true;
-			}
-		}
-		
-		return false;
 	}
 	
 	public User getCurrentUser()

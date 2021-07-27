@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -237,7 +238,15 @@ public class Connect4Listener extends BotListener
 	
 	private static void refreshGameMessage(Connect4Game game, Message message, User author)
 	{
-		message.editMessage(Connect4Listener.generateGameMessage(game, author).build()).queue();
+		MessageAction editMessage = message.editMessage(Connect4Listener.generateGameMessage(game, author).build());
+		
+		//Remove all old attachments to create new ones.
+		editMessage.retainFiles(new ArrayList<>());
+		
+		//If there are votes in the poll we can generate an image.
+		editMessage.addFile(game.generateFieldImage().toByteArray(), "field.png");
+		
+		editMessage.queue();
 	}
 	
 	private static MessageBuilder generateGameMessage(Connect4Game game, User author)
@@ -267,33 +276,9 @@ public class Connect4Listener extends BotListener
 			Connect4Listener.addConnect4Buttons(messageBuilder, game);
 		}
 		
-		embedBuilder.appendDescription("\n\n");
+		//Add game immage.
+		embedBuilder.setImage("attachment://field.png");
 		
-		//Draw field. TODO: Use a generated image instead.
-		for (int y = Connect4Game.FIELD_HEIGHT - 1; y >= 0; y--)
-		{
-			for (int x = 0; x < Connect4Game.FIELD_WIDTH; x++)
-			{
-				switch (game.getCell(x, y))
-				{
-					case -1:
-						embedBuilder.appendDescription(":white_medium_small_square:");
-						break;
-						
-					case 0:
-						embedBuilder.appendDescription(":red_circle:");
-						break;
-						
-					case 1:
-						embedBuilder.appendDescription(":yellow_circle:");
-						break;
-				}
-			}
-			
-			embedBuilder.appendDescription("\n");
-		}
-		
-		embedBuilder.appendDescription(":one::two::three::four::five::six::seven:");
 		messageBuilder.setEmbed(embedBuilder.build());
 		
 		return messageBuilder;
