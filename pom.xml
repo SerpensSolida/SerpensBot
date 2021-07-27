@@ -8,8 +8,8 @@
 
     <groupId>com.serpensolida.discordbot</groupId>
     <artifactId>SerpensBot</artifactId>
-    <version>1.6.0</version>
-    <build>
+    <version>1.6.1</version>
+    <build>g
         <sourceDirectory>src</sourceDirectory>
         <plugins>
             <plugin>
