@@ -99,7 +99,7 @@ public class Connect4Game
 		Graphics2D g = (Graphics2D) statusImage.getGraphics();
 
 		//Draw the field.
-		g.setColor(new Color(0x288AFF));
+		g.setColor(new Color(0x2475C9));
 		g.fillRect(0, 0, fieldWidth, fieldHeight);
 		g.setColor(new Color(0, 0, 0, 0));
 		g.setComposite(AlphaComposite.Clear);
@@ -115,8 +115,8 @@ public class Connect4Game
 		g.setComposite(AlphaComposite.SrcOver);
 		
 		//Draw pawns.
-		Color[] pawnColor = {new Color(0xFF3030), new Color(0xFFFF30)};
-		Color[] darkPawnColor = {new Color(0x7F3030), new Color(0x7F7F30)};
+		Color[] pawnColor = {new Color(0xE43613), new Color(0xEFCC1C)};
+		Color[] darkPawnColor = {new Color(0x952F15), new Color(0x95771A)};
 		for (int i = 0; i < FIELD_WIDTH; i++)
 		{
 			for (int j = 0; j < FIELD_HEIGHT; j++)

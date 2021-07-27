@@ -88,7 +88,7 @@ public class Connect4Listener extends BotListener
 		Connect4Listener.refreshGameMessage(game, message, author);
 		
 		//Set a timer of 5 minutes to stop the game.
-		Timer timer = new Timer(10 * 60 * 1000, e -> this.stopGame(game, guild, channel));
+		Timer timer = new Timer(30 * 60 * 1000, e -> this.stopGame(game, guild, channel)); //TODO: Make it configurable.
 		timer.setRepeats(false);
 		timer.start();
 	}
