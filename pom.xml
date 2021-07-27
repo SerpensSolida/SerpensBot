@@ -9,7 +9,7 @@
     <groupId>com.serpensolida.discordbot</groupId>
     <artifactId>SerpensBot</artifactId>
     <version>1.6.1</version>
-    <build>g
+    <build>
         <sourceDirectory>src</sourceDirectory>
         <plugins>
             <plugin>
