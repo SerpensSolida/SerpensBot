@@ -35,7 +35,7 @@ public class Connect4Listener extends BotListener
 		this.removeBotCommand("cancel");
 		
 		//Command for creating a game.
-		BotCommand command = new BotCommand("start", "Comincia una partita di tris.");
+		BotCommand command = new BotCommand("start", "Comincia una partita di forza 4.");
 		command.setAction((event, guild, channel, author) ->
 		{
 			//this.createNewPoll(event, guild, channel, author);
@@ -47,7 +47,7 @@ public class Connect4Listener extends BotListener
 		this.addBotCommand(command);
 		
 		//Command for stopping a game.
-		command = new BotCommand("stop", "Ferma una partita di tris.");
+		command = new BotCommand("stop", "Ferma una partita di forza 4.");
 		command.setAction((event, guild, channel, author) ->
 		{
 			//this.createNewPoll(event, guild, channel, author);
