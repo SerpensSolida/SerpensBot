@@ -30,7 +30,7 @@ public class BaseListener extends BotListener
 	public ArrayList<CommandData> generateCommands(Guild guild)
 	{
 		ArrayList<CommandData> commandList = new ArrayList<>();
-		CommandData mainCommand = new CommandData("help" , "Mostra la lista di moduli disponibili.");
+		CommandData mainCommand = new CommandData("help" , SerpensBot.getMessage("base_command_help_description"));
 		
 		commandList.add(mainCommand);
 		return commandList;
@@ -81,7 +81,7 @@ public class BaseListener extends BotListener
 		//Check in the user has permission to run this command.
 		if (!SerpensBot.isAdmin(authorMember) && !authorMember.isOwner())
 		{
-			Message message = MessageUtils.buildErrorMessage("Reset del simbolo dei comandi", author, "Devi essere il proprietario o moderatore del server per resettare il simbolo per comandi non listati.");
+			Message message = MessageUtils.buildErrorMessage(SerpensBot.getMessage("base_command_symbol_title"), author, SerpensBot.getMessage("base_command_symbol_permission_error"));
 			channel.sendMessage(message).queue();
 			return;
 		}
@@ -89,7 +89,7 @@ public class BaseListener extends BotListener
 		SerpensBot.setCommandSymbol(guild.getId(), "/");
 		SerpensBot.saveSettings(guild.getId());
 		
-		Message message = MessageUtils.buildSimpleMessage("Reset del simbolo dei comandi", author, "Simbolo per i comandi non listati impostato a `/`.");
+		Message message = MessageUtils.buildSimpleMessage(SerpensBot.getMessage("base_command_symbol_title"), author, SerpensBot.getMessage("base_command_symbol_info"));
 		channel.sendMessage(message).queue();
 	}
 	
@@ -103,7 +103,7 @@ public class BaseListener extends BotListener
 		//Check in the user has permission to run this command.
 		if (!SerpensBot.isAdmin(authorMember) && !authorMember.isOwner())
 		{
-			Message message = MessageUtils.buildErrorMessage("Reset dei prefissi dei comandi", author, "Devi essere il proprietario o moderatore del server per resettare i prefissi.");
+			Message message = MessageUtils.buildErrorMessage(SerpensBot.getMessage("base_command_reset_prefix_title"), author, SerpensBot.getMessage("base_command_reset_prefix_permission_error"));
 			channel.sendMessage(message).queue();
 			return;
 		}
@@ -116,7 +116,7 @@ public class BaseListener extends BotListener
 		SerpensBot.updateGuildCommands(guild);
 		SerpensBot.saveSettings(guild.getId());
 		
-		Message message = MessageUtils.buildSimpleMessage("Reset dei prefissi dei comandi", author, "Prefisso dei moduli resettato correttamente.");
+		Message message = MessageUtils.buildSimpleMessage(SerpensBot.getMessage("base_command_reset_prefix_title"), author, SerpensBot.getMessage("base_command_reset_prefix_info"));
 		channel.sendMessage(message).queue();
 	}
 	
@@ -126,16 +126,13 @@ public class BaseListener extends BotListener
 	private void sendModuleHelp(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		MessageBuilder messageBuilder = new MessageBuilder();
-		EmbedBuilder embedBuilder = new EmbedBuilder();
 		
 		StringBuilder builderList = new StringBuilder();
 		StringBuilder builderCommands = new StringBuilder();
 		
 		//Add footer
-		embedBuilder.setTitle("Lista moduli disponibili");
-		embedBuilder.setFooter("Richiesto da " + author.getName(), author.getAvatarUrl());
-		embedBuilder.setAuthor(SerpensBot.api.getSelfUser().getName(), "https://github.com/SerpensSolida/SerpensBot", SerpensBot.api.getSelfUser().getAvatarUrl());
-		
+		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed(SerpensBot.getMessage("base_command_help_title"), author);
+
 		//Add module list to the embed.
 		for (BotListener listener : SerpensBot.getModules())
 		{
@@ -149,12 +146,12 @@ public class BaseListener extends BotListener
 				continue;
 			
 			//Add listener to the list.
-			builderList.append("Modulo " + listener.getModuleName() + "\n");
+			builderList.append(SerpensBot.getMessage("base_command_help_command_field_value", listener.getModuleName()) + "\n");
 			builderCommands.append("`" + SerpensBot.getCommandSymbol(guild.getId()) + modulePrefix + " help`\n");
 		}
 		
-		embedBuilder.addField("Moduli", builderList.toString(), true);
-		embedBuilder.addField("Comando help", builderCommands.toString(), true);
+		embedBuilder.addField(SerpensBot.getMessage("base_command_help_command_field_title"), builderList.toString(), true);
+		embedBuilder.addField(SerpensBot.getMessage("base_command_help_help_field_title"), builderCommands.toString(), true);
 		
 		messageBuilder.setEmbed(embedBuilder.build());
 		event.reply(messageBuilder.build()).setEphemeral(false).queue();

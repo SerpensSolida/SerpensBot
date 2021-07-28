@@ -37,17 +37,17 @@ public class BotListener extends ListenerAdapter
 		//this.modulePrefix = modulePrefix;
 		this.internalID = modulePrefix;
 		
-		BotCommand command = new BotCommand("help", "Mostra un messaggio di aiuto per il modulo.");
+		BotCommand command = new BotCommand("help", SerpensBot.getMessage("botlistener_command_help_desc"));
 		command.setAction((event, guild, channel, author) ->
 		{
 			this.sendHelp(event, guild, channel, author);
 			return true;
 		});
 		command.getSubcommand()
-				.addOption(OptionType.STRING, "command-name", "Nome del comando di cui mostrare le informazioni. (solo comandi non listati)", false);
+				.addOption(OptionType.STRING, "command-name", SerpensBot.getMessage("botlistener_command_help_param1"), false);
 		this.addBotCommand(command);
 		
-		command = new BotCommand("cancel", "Cancella la procedura corrente.");
+		command = new BotCommand("cancel", SerpensBot.getMessage("botlistener_command_cancel_desc"));
 		command.setAction((event, guild, channel, author) ->
 		{
 			this.cancelTask(event, guild, channel, author);
@@ -83,7 +83,6 @@ public class BotListener extends ListenerAdapter
 			//Check if the command exists.
 			if (command == null)
 			{
-				//channel.sendMessage("> Il comando `" + data.commandID + "` non esiste.").queue();
 				return;
 			}
 			
@@ -112,7 +111,9 @@ public class BotListener extends ListenerAdapter
 			else
 			{
 				//channel.sendMessage("> Numero argomenti errato.").queue();
-				channel.sendMessage(MessageUtils.buildSimpleMessage("Comando " + command.getId(), author, "Numero argomenti errato.")).queue();
+				String embedTitle = SerpensBot.getMessage("botlistener_unlisted_command_title", command.getId());
+				String embedDescription = SerpensBot.getMessage("botlistener_unlisted_command_argument_number_error");
+				channel.sendMessage(MessageUtils.buildSimpleMessage(embedTitle, author, embedDescription)).queue();
 			}
 		}
 		else if (task != null && task.getChannel().equals(channel))
@@ -168,7 +169,7 @@ public class BotListener extends ListenerAdapter
 			catch (PermissionException e)
 			{
 				this.removeTask(guild.getId(), task);
-				Message errorMessage = MessageUtils.buildErrorMessage("Imposibile eseguire l'azione", event.getUser(), "Permessi assenti: " + e.getPermission());
+				Message errorMessage = MessageUtils.buildErrorMessage(SerpensBot.getMessage("botlistener_reaction_action_error"), event.getUser(), SerpensBot.getMessage("botlistener_missing_permmision_error", e.getPermission()));
 				channel.sendMessage(errorMessage).queue();
 			}
 		});
@@ -193,7 +194,7 @@ public class BotListener extends ListenerAdapter
 		}
 		catch (PermissionException e)
 		{
-			Message message = MessageUtils.buildErrorMessage("Comando non eseguito.", event.getUser(), "Permessi assenti: " + e.getPermission());
+			Message message = MessageUtils.buildErrorMessage(SerpensBot.getMessage("botlistener_command_error"), event.getUser(), SerpensBot.getMessage("botlistener_missing_permmision_error", e.getPermission()));
 			event.reply(message).setEphemeral(true).queue();
 		}
 	}
@@ -252,7 +253,7 @@ public class BotListener extends ListenerAdapter
 				catch (PermissionException e)
 				{
 					this.removeTask(guild.getId(), task);
-					Message message = MessageUtils.buildErrorMessage("Imposibile completare task", event.getUser(), "Permessi assenti: " + e.getPermission());
+					Message message = MessageUtils.buildErrorMessage(SerpensBot.getMessage("botlistener_button_action_error"), event.getUser(), SerpensBot.getMessage("botlistener_missing_permmision_error", e.getPermission()));
 					event.reply(message).setEphemeral(true).queue();
 				}
 			}
@@ -275,7 +276,7 @@ public class BotListener extends ListenerAdapter
 			}
 			catch (PermissionException e)
 			{
-				Message message = MessageUtils.buildErrorMessage("Imposibile compiere azione", event.getUser(), "Permessi assenti: " + e.getPermission());
+				Message message = MessageUtils.buildErrorMessage(SerpensBot.getMessage("botlistener_button_action_error"), event.getUser(), SerpensBot.getMessage("botlistener_missing_permmision_error", e.getPermission()));
 				event.reply(message).setEphemeral(true).queue();
 			}
 		}
@@ -312,20 +313,21 @@ public class BotListener extends ListenerAdapter
 	 */
 	private void cancelTask(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
-		MessageBuilder messageBuilder = new MessageBuilder();
 		Task task = this.getTask(guild.getId(), author);
 		
-		if (task != null)
+		//Check if the user has a task active.
+		if (task == null)
 		{
-			this.removeTask(guild.getId(), this.getTask(guild.getId(), author));
-			messageBuilder.append("> La procedura corrente è stata annullata.");
-		}
-		else
-		{
-			messageBuilder.append("> Nessuna procedura in corso.");
+			Message message = MessageUtils.buildErrorMessage(SerpensBot.getMessage("botlistener_command_cancel_title"), event.getUser(), SerpensBot.getMessage("botlistener_command_cancel_no_task_error"));
+			event.reply(message).setEphemeral(true).queue();
+			return;
 		}
 		
-		event.reply(messageBuilder.build()).setEphemeral(task == null).queue();
+		//Remove the task
+		this.removeTask(guild.getId(), this.getTask(guild.getId(), author));
+		
+		Message message = MessageUtils.buildSimpleMessage(SerpensBot.getMessage("botlistener_command_cancel_title"), author, SerpensBot.getMessage("botlistener_command_cancel_info"));
+		event.reply(message).setEphemeral(false).queue();
 	}
 	
 	/**
@@ -333,17 +335,14 @@ public class BotListener extends ListenerAdapter
 	 */
 	private void sendHelp(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
-		EmbedBuilder embedBuilder = new EmbedBuilder();
-		
-		//Add footer
-		embedBuilder.setFooter("Richiesto da " + author.getName(), author.getAvatarUrl());
-		embedBuilder.setAuthor(SerpensBot.api.getSelfUser().getName(), "https://github.com/SerpensSolida/SerpensBot", SerpensBot.api.getSelfUser().getAvatarUrl());
-		
 		OptionMapping commandName = event.getOption("command-name");
+		
+		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("", author);
+		
 		if (commandName == null)
 		{
 			//Send list of commands.
-			embedBuilder.setTitle("Lista comandi modulo " + this.getModuleName());
+			embedBuilder.setTitle(SerpensBot.getMessage("botlistener_command_help_list_title", this.getModuleName()));
 			
 			if (!this.botCommands.isEmpty())
 			{
@@ -355,7 +354,7 @@ public class BotListener extends ListenerAdapter
 							.append(" " + command.getSubcommand().getDescription() + "\n");
 				}
 				
-				embedBuilder.addField("**Comandi listati**", commandField.toString(), false);
+				embedBuilder.addField(SerpensBot.getMessage("botlistener_command_help_listed_commands"), commandField.toString(), false);
 			}
 			
 			if (!this.unlistedBotCommands.isEmpty())
@@ -368,7 +367,7 @@ public class BotListener extends ListenerAdapter
 							.append(" " + command.getHelp() + "\n");
 				}
 				
-				embedBuilder.addField("**Comandi non listati**", commandField.toString(), false);
+				embedBuilder.addField(SerpensBot.getMessage("botlistener_command_help_unlisted_commands"), commandField.toString(), false);
 			}
 			
 		}
@@ -378,16 +377,19 @@ public class BotListener extends ListenerAdapter
 			String commandID = commandName.getAsString();
 			UnlistedBotCommand command = this.getUnlistedBotCommand(commandID);
 			
-			if (command != null)
+			if (command == null)
 			{
-				embedBuilder.setTitle(String.format("Descrizione comando *%s*", command.getId()));
-				embedBuilder.appendDescription(String.format("Utilizzo: `%s`\n", command.getArgumentsDescription(guild.getId())))
-						.appendDescription(command.getHelp());
+				String embedTitle = SerpensBot.getMessage("botlistener_command_help_command_title", commandID);
+				String embedDescription = SerpensBot.getMessage("botlistener_command_help_command_not_found_error", commandID);
+				Message message = MessageUtils.buildErrorMessage(embedTitle, event.getUser(), embedDescription);
+				event.reply(message).setEphemeral(true).queue();
+				return;
 			}
-			else
-			{
-				embedBuilder.appendDescription(String.format("> Il comando `%s` non esiste.", commandID));
-			}
+			
+			embedBuilder.setTitle(SerpensBot.getMessage("botlistener_command_help_command_title", command.getId()));
+			embedBuilder.appendDescription(SerpensBot.getMessage("botlistener_command_help_command_desc", command.getArgumentsDescription(guild.getId())) + "\n")
+					.appendDescription(command.getHelp());
+			
 		}
 		
 		//channel.sendMessage(new MessageBuilder().setEmbed(embedBuilder.build()).build()).queue();

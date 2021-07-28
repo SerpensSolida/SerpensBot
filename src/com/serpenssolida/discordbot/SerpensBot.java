@@ -19,10 +19,9 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 
 import javax.security.auth.login.LoginException;
 import java.io.*;
+import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 public class SerpensBot
 {
@@ -32,27 +31,37 @@ public class SerpensBot
 	public static String ownerId;
 	
 	public static String settingsFolder = "settings";
+	public static ResourceBundle language;
 	
 	public static void start()
 	{
+		//Load language
+		SerpensBot.language = loadLanguage();
+		
 		//Load data from file.
 		BotData data = SerpensBot.loadBotData();
+		
+		if (data == null)
+		{
+			System.err.println(SerpensBot.getMessage("missing_json"));
+			return;
+		}
 		
 		//Setting headless mode. We are using some drawing function without the gui.
 		System.setProperty("java.awt.headless", "true");
 		
 		try
 		{
-			api = JDABuilder
+			SerpensBot.api = JDABuilder
 					.createDefault(data.getToken())
 					.setMemberCachePolicy(MemberCachePolicy.ALL)
 					.enableIntents(GatewayIntent.GUILD_MEMBERS)
 					.build();
-			api.awaitReady();
+			SerpensBot.api.awaitReady();
 		}
 		catch (LoginException e)
 		{
-			System.err.println("Login error.");
+			System.err.println(SerpensBot.getMessage("login_error"));
 			e.printStackTrace();
 			return;
 		}
@@ -67,14 +76,14 @@ public class SerpensBot
 		
 		if (data.getOwner() == null || data.getOwner().isBlank())
 		{
-			System.err.println("No bot owner set in the json file.");
+			System.err.println(SerpensBot.getMessage("owner_not_set"));
 			return;
 		}
 		
 		//Set the owner of the bot.
 		SerpensBot.ownerId = data.getOwner();
 		
-		System.out.println("Bot ready!");
+		System.out.println(SerpensBot.getMessage("bot_ready"));
 	}
 	
 	/**
@@ -119,7 +128,7 @@ public class SerpensBot
 			}
 		}
 		
-		commands.queue(a -> System.out.println("Comandi per la guild \"" + guild.getName() + "\" cambiati correttamente."));
+		commands.queue(a -> System.out.println(SerpensBot.getMessage("guild_commands_updated", guild.getName())));
 	}
 	
 	/**
@@ -178,26 +187,56 @@ public class SerpensBot
 	{
 		File tokenFile = new File("bot.json");
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		System.out.println("Caricamento token.");
+		System.out.println(SerpensBot.getMessage("reading_main_settings"));
 		
 		try (BufferedReader reader = new BufferedReader(new FileReader(tokenFile)))
 		{
 			BotData botData = gson.fromJson(reader, BotData.class);
 			
-			System.out.println("Token caricato: " + botData.getToken());
+			System.out.println(SerpensBot.getMessage("token", botData.getToken()));
+			System.out.println(SerpensBot.getMessage("owner", botData.getOwner()));
 			
 			return botData;
-		}
-		catch (FileNotFoundException e)
-		{
-			System.out.println("Nessun file dei impostazioni da caricare.");
 		}
 		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
 		
-		return new BotData();
+		return null;
+	}
+	
+	/**
+	 * Load the {@link ResourceBundle} from the root directory. If there is no language file a default one will be used.
+	 */
+	public static ResourceBundle loadLanguage()
+	{
+		try
+		{
+			ResourceBundle language = new PropertyResourceBundle(Files.newInputStream(Paths.get("SerpensBot.properties")));
+			
+			System.out.println(language.getString("loaded_resource_bundle_external"));
+			
+			return language;
+		}
+		catch (IOException e)
+		{
+			ResourceBundle language = ResourceBundle.getBundle("SerpensBot");
+			
+			System.out.println(language.getString("loaded_resource_bundle_default"));
+			
+			return language;
+		}
+	}
+	
+	public static String getMessage(String key)
+	{
+		return SerpensBot.language.getString(key);
+	}
+	
+	public static String getMessage(String key, Object... args)
+	{
+		return String.format(SerpensBot.language.getString(key), args);
 	}
 	
 	/**
@@ -250,8 +289,12 @@ public class SerpensBot
 	{
 		File settingsFile = new File(Paths.get("server_data", guildID, SerpensBot.settingsFolder, "settings.json").toString());
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		System.out.println("Caricamento impostazioni per server con id: " + guildID + ".");
-		ArrayList<BotListener> loadedListeners = new ArrayList<>();
+		Guild guild = SerpensBot.api.getGuildById(guildID);
+		
+		if (guild == null)
+			return;
+		
+		System.out.println(SerpensBot.getMessage("loading_guild_settings", guild.getName()));
 		
 		try (BufferedReader reader = new BufferedReader(new FileReader(settingsFile)))
 		{
@@ -273,20 +316,12 @@ public class SerpensBot
 				}
 			}
 			
-			Guild guild = SerpensBot.api.getGuildById(guildID);
-			if (guild != null)
-			{
-				/*for (BotListener loadedListener : loadedListeners)
-				{
-					//BotMain.updateGuildCommands(guild);
-				}*/
-				SerpensBot.updateGuildCommands(guild);
-			}
+			SerpensBot.updateGuildCommands(guild);
 		}
 		catch (FileNotFoundException e)
 		{
-			System.out.println("Nessun file dei impostazioni da caricare.");
-			System.out.println("Creazione impostazioni di default.");
+			System.out.println(SerpensBot.getMessage("no_guild_settings_file", guild.getName()));
+			System.out.println(SerpensBot.getMessage("guild_settings_file_creation", guild.getName()));
 			
 			//Initialize default values.
 			SerpensBot.commandSymbol.put(guildID, "/");
@@ -316,6 +351,12 @@ public class SerpensBot
 	{
 		File settingsFile = new File(Paths.get("server_data", guildID, SerpensBot.settingsFolder, "settings.json").toString());
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		Guild guild = SerpensBot.api.getGuildById(guildID);
+		
+		if (guild == null)
+			return;
+		
+		System.out.println(SerpensBot.getMessage("saving_guild_settings", guild.getName()));
 		
 		try (PrintWriter writer = new PrintWriter(new FileWriter(settingsFile)))
 		{
@@ -336,12 +377,11 @@ public class SerpensBot
 			//Add delete command messages flag.
 			settingsData.setDeleteCommandMessages(SerpensBot.getDeleteCommandMessages(guildID));
 			
-			System.out.println("Salvataggio impostazioni.");
 			writer.println(gson.toJson(settingsData));
 		}
 		catch (FileNotFoundException e)
 		{
-			System.out.println("Nessun file impostazioni del server con id: " + guildID + ".");
+			System.out.println(SerpensBot.getMessage("guild_settings_file_missing", guild.getName()));
 			
 			try
 			{

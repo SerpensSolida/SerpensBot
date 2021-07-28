@@ -22,7 +22,7 @@ public class SettingsListener extends BotListener
 		this.setModuleName("Settings");
 		
 		//Command for changing the symbol for calling a command.
-		BotCommand command = new BotCommand("symbol", "Imposta il simbolo usato all'inizio dei comandi.");
+		BotCommand command = new BotCommand("symbol", SerpensBot.getMessage("settings_command_symbol_desc"));
 		command.setAction((event, guild, channel, author) ->
 		{
 			this.setUnlistedBotCommandSymbol(event, guild, channel, author);
@@ -33,26 +33,26 @@ public class SettingsListener extends BotListener
 		this.addBotCommand(command);
 		
 		//Command for changing the module prefix of a module.
-		command = new BotCommand("prefix", "Mostra la lista di moduli e i loro prefissi oppure cambia o mostra il prefisso usato da un modulo.");
+		command = new BotCommand("prefix", SerpensBot.getMessage("settings_command_prefix_desc"));
 		command.setAction((event, guild, channel, author) ->
 		{
 			this.modulePrefixCommand(event, guild, channel, author);
 			return true;
 		});
 		command.getSubcommand()
-				.addOptions(new OptionData(OptionType.STRING, "module_name", "Il nome del modulo di cui mostrare/impostare il prefisso.", false).setRequired(false))
-				.addOption(OptionType.STRING, "new_prefix", "Il nuovo prefisso da impostare al modulo.", false);
+				.addOptions(new OptionData(OptionType.STRING, "module_name", SerpensBot.getMessage("settings_command_prefix_param1"), false).setRequired(false))
+				.addOption(OptionType.STRING, "new_prefix", SerpensBot.getMessage("settings_command_prefix_param2"), false);
 		this.addBotCommand(command);
 		
 		//Command for changing the module prefix of a module.
-		command = new BotCommand("deletecommand", "Imposta se il bot cancellerà i comandi non listati inviati in chat oppure no.");
+		command = new BotCommand("deletecommand", SerpensBot.getMessage("settings_command_deletecommand_desc"));
 		command.setAction((event, guild, channel, author) ->
 		{
 			this.setDeleteCommandMessages(event, guild, channel, author);
 			return true;
 		});
 		command.getSubcommand()
-				.addOption(OptionType.BOOLEAN, "value", "Se impostato a true il bot cancellerà i comandi non listati inviati in chat.", true);
+				.addOption(OptionType.BOOLEAN, "value", SerpensBot.getMessage("settings_command_deletecommand_param1"), true);
 		this.addBotCommand(command);
 		
 		//This listener does not create any tasks so there is non need for a "cancel" command.
@@ -64,29 +64,30 @@ public class SettingsListener extends BotListener
 		Member authorMember = guild.retrieveMember(author).complete();
 		
 		//Argument parsing.
-		OptionMapping argument = event.getOption("value");
+		OptionMapping valueArg = event.getOption("value");
 		
 		//Check in the user has permission to run this command.
 		if (!SerpensBot.isAdmin(authorMember) && !authorMember.isOwner())
 		{
-			Message message = MessageUtils.buildErrorMessage("Cancellazione messaggi", author, "Devi essere il proprietario o moderatore del server per modificare questa impostazione.");
+			Message message = MessageUtils.buildErrorMessage(SerpensBot.getMessage("settings_command_deletecommand_title"), author, SerpensBot.getMessage("settings_permission_error"));
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
 		
-		if (argument == null)
+		if (valueArg == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Cancellazione messaggi", author, "Devi inserire l'argomento.");
+			Message message = MessageUtils.buildErrorMessage(SerpensBot.getMessage("settings_command_deletecommand_title"), author, SerpensBot.getMessage("settings_command_deletecommand_missing_value_error"));
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
 		
 		//Update option.
-		boolean value = argument.getAsBoolean();
+		boolean value = valueArg.getAsBoolean();
 		SerpensBot.setDeleteCommandMessages(guild.getId(), value);
 		SerpensBot.saveSettings(guild.getId());
 		
-		Message message = MessageUtils.buildSimpleMessage("Cancellazione dei messaggi", author, (value ? "Cancellerò" : "Lascerò") + " i comandi che sono stati inviati in chat.");
+		String description = (value ? SerpensBot.getMessage("settings_command_deletecommand_delete_info") : SerpensBot.getMessage("settings_command_deletecommand_leave_info"));
+		Message message = MessageUtils.buildSimpleMessage(SerpensBot.getMessage("settings_command_deletecommand_title"), author,  description);
 		event.reply(message).setEphemeral(false).queue(); //Set ephemeral if the user didn't put the argument.
 	}
 	
@@ -94,20 +95,25 @@ public class SettingsListener extends BotListener
 	{
 		OptionMapping moduleID = event.getOption("module_name"); //Module id passed to the command.
 		OptionMapping modulePrefix = event.getOption("new_prefix"); //Module prefix passed to the command.
+		
 		Member authorMember = guild.retrieveMember(author).complete(); //Member that sent the command.
 		MessageBuilder messageBuilder = new MessageBuilder();
-		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Prefissi dei comandi", author);
+		
+		String embedTitle = SerpensBot.getMessage("settings_command_prefix_title");
+		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed(embedTitle, author);
 		
 		int argumentCount = event.getOptions().size();
 		
 		if (argumentCount == 0)
 		{
 			//Send the list of modules and their prefixes.
-			embedBuilder.setTitle("Lista dei moduli e dei loro prefissi");
+			embedBuilder.setTitle(SerpensBot.getMessage("settings_command_prefix_list_title"));
 			
 			for (BotListener listener : SerpensBot.getModules())
 			{
-				embedBuilder.addField("Modulo " + listener.getModuleName(), String.format("ID modulo: `%s`\nPrefisso: `%s`", listener.getInternalID(), listener.getModulePrefix(guild.getId()).isBlank() ? " " : listener.getModulePrefix(guild.getId())), true);
+				String fieldTitle = SerpensBot.getMessage("settings_command_prefix_list_field_title", listener.getModuleName());
+				String fieldValue = SerpensBot.getMessage("settings_command_prefix_list_field_value", listener.getInternalID(), listener.getModulePrefix(guild.getId()).isBlank() ? " " : listener.getModulePrefix(guild.getId()));
+				embedBuilder.addField(fieldTitle, fieldValue, true);
 			}
 			
 			messageBuilder.setEmbed(embedBuilder.build());
@@ -120,12 +126,12 @@ public class SettingsListener extends BotListener
 			//Print the result.
 			if (listener == null)
 			{
-				Message message = MessageUtils.buildErrorMessage("Prefissi dei comandi", author, "Modulo con id `" + moduleID + "` non trovato.");
+				Message message = MessageUtils.buildErrorMessage(embedTitle, author, SerpensBot.getMessage("settings_module_not_found_error", moduleID));
 				event.reply(message).setEphemeral(true).queue();
 				return;
 			}
 			
-			embedBuilder.appendDescription("Il prefisso del modulo `" + listener.getInternalID() + "` è `" + listener.getModulePrefix(guild.getId()) + "`.");
+			embedBuilder.appendDescription(SerpensBot.getMessage("settings_command_prefix_prefix_info", listener.getModuleName(), listener.getModulePrefix(guild.getId())));
 		}
 		else if (argumentCount == 2 && moduleID != null && modulePrefix != null)
 		{
@@ -136,7 +142,7 @@ public class SettingsListener extends BotListener
 			//Check in the user has permission to run this command.
 			if (!SerpensBot.isAdmin(authorMember) && !authorMember.isOwner())
 			{
-				Message message = MessageUtils.buildErrorMessage("Prefissi dei comandi", author, "Devi essere il proprietario o moderatore del server per modificare il prefisso di un modulo.");
+				Message message = MessageUtils.buildErrorMessage(embedTitle, author, SerpensBot.getMessage("settings_permission_error"));
 				event.reply(message).setEphemeral(true).queue();
 				return;
 			}
@@ -144,14 +150,14 @@ public class SettingsListener extends BotListener
 			//Check if the module prefix to set is suitable.
 			if (!newPrefix.chars().allMatch(Character::isLetterOrDigit) || newPrefix.length() > 16)
 			{
-				Message message = MessageUtils.buildErrorMessage("Prefissi dei comandi", author, "Il prefisso deve essere alfanumerico e non può superare i 16 caratteri.");
+				Message message = MessageUtils.buildErrorMessage(embedTitle, author, SerpensBot.getMessage("settings_command_prefix_edit_format_error"));
 				event.reply(message).setEphemeral(true).queue();
 				return;
 			}
 			
 			if (listener == null)
 			{
-				Message message = MessageUtils.buildErrorMessage("Prefissi dei comandi", author, "Modulo con id `" + moduleID + "` non trovato.");
+				Message message = MessageUtils.buildErrorMessage(embedTitle, author, SerpensBot.getMessage("settings_module_not_found_error", moduleID));
 				event.reply(message).setEphemeral(true).queue();
 				return;
 			}
@@ -161,11 +167,11 @@ public class SettingsListener extends BotListener
 			SerpensBot.updateGuildCommands(guild);
 			SerpensBot.saveSettings(guild.getId());
 			
-			embedBuilder.setDescription("Prefisso del modulo `" + listener.getInternalID() + "` è stato impostato a `" + listener.getModulePrefix(guild.getId()) + "`.");
+			embedBuilder.setDescription(SerpensBot.getMessage("settings_command_prefix_set_info", listener.getInternalID(), listener.getModulePrefix(guild.getId())));
 		}
 		else
 		{
-			Message message = MessageUtils.buildErrorMessage("Prefissi dei comandi", author, "Devi inserire tutti gli argomenti per modificare il nome di un prefisso.");
+			Message message = MessageUtils.buildErrorMessage(embedTitle, author, SerpensBot.getMessage("settings_command_prefix_missing_argument_error"));
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -176,7 +182,7 @@ public class SettingsListener extends BotListener
 	
 	private void setUnlistedBotCommandSymbol(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
-		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Simbolo comandi non listati", author);
+		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed(SerpensBot.getMessage("settings_command_symbol_title"), author);
 		MessageBuilder messageBuilder = new MessageBuilder();
 		OptionMapping newSymbolOption = event.getOption("value");
 		Member authorMember = guild.retrieveMember(author).complete();
@@ -186,7 +192,7 @@ public class SettingsListener extends BotListener
 		//Check in the user has permission to run this command.
 		if (!SerpensBot.isAdmin(authorMember) && !authorMember.isOwner())
 		{
-			embedBuilder.appendDescription("Devi essere il proprietario o moderatore del server per resettare il simbolo dei comandi.");
+			embedBuilder.appendDescription(SerpensBot.getMessage("settings_permission_error"));
 			messageBuilder.setEmbed(embedBuilder.build());
 			
 			event.reply(messageBuilder.build()).setEphemeral(true).queue();
@@ -196,7 +202,7 @@ public class SettingsListener extends BotListener
 		if (newSymbolOption == null)
 		{
 			//Note: This code should be unreachable.
-			embedBuilder.appendDescription("Argomento non fornito.");
+			embedBuilder.appendDescription(SerpensBot.getMessage("settings_command_symbol_missing_argument_error"));
 			messageBuilder.setEmbed(embedBuilder.build());
 			
 			event.reply(messageBuilder.build()).setEphemeral(true).queue();
@@ -207,7 +213,7 @@ public class SettingsListener extends BotListener
 		String newSymbol = newSymbolOption.getAsString();
 		if (newSymbol.length() > 6 || pattern.matcher(newSymbol).find())
 		{
-			embedBuilder.appendDescription("Il simbolo dei comandi non può superare i 6 caratteri e non può contenere i caratteri di markdown.");
+			embedBuilder.appendDescription(SerpensBot.getMessage("settings_command_symbol_format_error"));
 			messageBuilder.setEmbed(embedBuilder.build());
 			
 			event.reply(messageBuilder.build()).setEphemeral(true).queue();
@@ -217,7 +223,7 @@ public class SettingsListener extends BotListener
 		SerpensBot.setCommandSymbol(guild.getId(), newSymbol);
 		SerpensBot.saveSettings(guild.getId());
 		
-		embedBuilder.appendDescription("Simbolo per i comandi impostato a `" + newSymbol + "`.");
+		embedBuilder.appendDescription(SerpensBot.getMessage("settings_command_symbol_set_info", newSymbol));
 		messageBuilder.setEmbed(embedBuilder.build());
 		
 		event.reply(messageBuilder.build()).setEphemeral(false).queue();

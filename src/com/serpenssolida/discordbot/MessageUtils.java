@@ -53,7 +53,6 @@ public class MessageUtils
 		MessageBuilder messageBuilder = new MessageBuilder();
 		messageBuilder.setEmbed(embedBuilder.build());
 		
-		//		event.reply(messageBuilder.build()).setEphemeral(true).queue();
 		return messageBuilder.build();
 	}
 	
@@ -79,7 +78,6 @@ public class MessageUtils
 		MessageBuilder messageBuilder = new MessageBuilder();
 		messageBuilder.setEmbed(embedBuilder.build());
 		
-		//		event.reply(messageBuilder.build()).setEphemeral(true).queue();
 		return messageBuilder.build();
 	}
 	
@@ -115,6 +113,6 @@ public class MessageUtils
 	public static EmbedBuilder getDefaultEmbed(String title, User author)
 	{
 		return MessageUtils.getDefaultEmbed(title)
-				.setFooter("Richiesto da " + author.getName(), author.getAvatarUrl());
+				.setFooter(SerpensBot.getMessage("requested", author.getName()), author.getAvatarUrl());
 	}
 }
