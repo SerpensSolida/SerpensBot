@@ -1,6 +1,6 @@
 package com.serpenssolida.discordbot.module.connect4;
 
-import com.serpenssolida.discordbot.ButtonGroup;
+import com.serpenssolida.discordbot.module.ButtonGroup;
 import com.serpenssolida.discordbot.MessageUtils;
 import com.serpenssolida.discordbot.module.BotCommand;
 import com.serpenssolida.discordbot.module.BotListener;
@@ -171,7 +171,7 @@ public class Connect4Listener extends BotListener
 	
 	private ButtonGroup generateGameCallback()
 	{
-		com.serpenssolida.discordbot.ButtonGroup buttonGroup = new ButtonGroup();
+		ButtonGroup buttonGroup = new ButtonGroup();
 		for (int i = 0; i < Connect4Game.FIELD_WIDTH; i++)
 		{
 			int x = i;

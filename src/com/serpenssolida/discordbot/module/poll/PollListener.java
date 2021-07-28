@@ -1,6 +1,6 @@
 package com.serpenssolida.discordbot.module.poll;
 
-import com.serpenssolida.discordbot.ButtonGroup;
+import com.serpenssolida.discordbot.module.ButtonGroup;
 import com.serpenssolida.discordbot.MessageUtils;
 import com.serpenssolida.discordbot.module.BotCommand;
 import com.serpenssolida.discordbot.module.BotListener;

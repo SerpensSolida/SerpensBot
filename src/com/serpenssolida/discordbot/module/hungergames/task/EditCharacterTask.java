@@ -1,6 +1,6 @@
 package com.serpenssolida.discordbot.module.hungergames.task;
 
-import com.serpenssolida.discordbot.ButtonGroup;
+import com.serpenssolida.discordbot.module.ButtonGroup;
 import com.serpenssolida.discordbot.MessageUtils;
 import com.serpenssolida.discordbot.module.ButtonCallback;
 import com.serpenssolida.discordbot.module.Task;

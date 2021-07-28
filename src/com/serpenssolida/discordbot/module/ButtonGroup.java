@@ -1,6 +1,4 @@
-package com.serpenssolida.discordbot;
-
-import com.serpenssolida.discordbot.module.ButtonCallback;
+package com.serpenssolida.discordbot.module;
 
 import java.util.HashMap;
 

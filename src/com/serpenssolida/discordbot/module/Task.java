@@ -1,6 +1,5 @@
 package com.serpenssolida.discordbot.module;
 
-import com.serpenssolida.discordbot.ButtonGroup;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
