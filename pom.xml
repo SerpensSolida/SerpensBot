@@ -42,7 +42,7 @@
                     <archive>
                         <manifest>
                             <!-- Jar file entry point -->
-                            <mainClass>com.serpenssolida.discordbot.BotMain</mainClass>
+                            <mainClass>com.serpenssolida.discordbot.SerpensBot</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

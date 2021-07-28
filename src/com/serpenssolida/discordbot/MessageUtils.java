@@ -98,7 +98,7 @@ public class MessageUtils
 		
 		//Add footer
 		embedBuilder.setTitle(title);
-		embedBuilder.setAuthor(BotMain.api.getSelfUser().getName(), "https://github.com/SerpensSolida/SerpensBot", BotMain.api.getSelfUser().getAvatarUrl());
+		embedBuilder.setAuthor(SerpensBot.api.getSelfUser().getName(), "https://github.com/SerpensSolida/SerpensBot", SerpensBot.api.getSelfUser().getAvatarUrl());
 		
 		return embedBuilder;
 	}

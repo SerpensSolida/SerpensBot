@@ -1,6 +1,6 @@
 package com.serpenssolida.discordbot.module.hungergames;
 
-import com.serpenssolida.discordbot.BotMain;
+import com.serpenssolida.discordbot.SerpensBot;
 import com.serpenssolida.discordbot.RandomChoice;
 import com.serpenssolida.discordbot.module.hungergames.inventory.Inventory;
 import com.serpenssolida.discordbot.module.hungergames.inventory.Weapon;
@@ -23,7 +23,7 @@ public class Player
 	{
 		this.character = character;
 		this.health = this.getMaxHealth();
-		this.owner = BotMain.api.retrieveUserById(this.character.getOwnerID()).complete();
+		this.owner = SerpensBot.api.retrieveUserById(this.character.getOwnerID()).complete();
 	}
 	
 	public int getMaxHealth()

@@ -1,6 +1,6 @@
 package com.serpenssolida.discordbot.module;
 
-import com.serpenssolida.discordbot.BotMain;
+import com.serpenssolida.discordbot.SerpensBot;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -131,7 +131,7 @@ public class UnlistedBotCommand
 	
 	public String getArgumentsDescription(String guildID)
 	{
-		return (BotMain.getCommandSymbol(guildID) + this.getModulePrefix(guildID) + " " + this.id + " " + this.argumentsDescription).strip();
+		return (SerpensBot.getCommandSymbol(guildID) + this.getModulePrefix(guildID) + " " + this.id + " " + this.argumentsDescription).strip();
 	}
 	
 	public void setArgumentsDescription(String argumentsDescription)

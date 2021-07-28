@@ -1,6 +1,6 @@
 package com.serpenssolida.discordbot.module.owner;
 
-import com.serpenssolida.discordbot.BotMain;
+import com.serpenssolida.discordbot.SerpensBot;
 import com.serpenssolida.discordbot.MessageUtils;
 import com.serpenssolida.discordbot.module.BotListener;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -30,11 +30,11 @@ public class OwnerListener extends BotListener
 		String message = event.getMessage().getContentDisplay();
 		
 		//If the author of the message is the bot ignore it.
-		if (BotMain.api.getSelfUser().equals(user))
+		if (SerpensBot.api.getSelfUser().equals(user))
 			return;
 		
 		//Check if the author of the message is the owner of the bot.
-		if (!BotMain.ownerId.equals(user.getId()))
+		if (!SerpensBot.ownerId.equals(user.getId()))
 		{
 			channel.sendMessage(MessageUtils.buildErrorMessage("Mi dispiace!", user, "Rispondo solo al mio creatore.")).queue();
 			return;
@@ -61,7 +61,7 @@ public class OwnerListener extends BotListener
 			return;
 		}
 		
-		MessageChannel messageChannel = BotMain.api.getTextChannelById(channelId);
+		MessageChannel messageChannel = SerpensBot.api.getTextChannelById(channelId);
 		
 		if (messageChannel == null)
 		{

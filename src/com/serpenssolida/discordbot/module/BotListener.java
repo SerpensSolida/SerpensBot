@@ -1,6 +1,6 @@
 package com.serpenssolida.discordbot.module;
 
-import com.serpenssolida.discordbot.BotMain;
+import com.serpenssolida.discordbot.SerpensBot;
 import com.serpenssolida.discordbot.MessageUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
@@ -66,13 +66,13 @@ public class BotListener extends ListenerAdapter
 		Guild guild = event.getGuild();
 		User author = event.getAuthor(); //Author of the message.
 		MessageChannel channel = event.getChannel(); //Channel where the message was sent.
-		String commandPrefix = BotMain.getCommandSymbol(guild.getId()) + this.getModulePrefix(guild.getId()); //Command prefix of the module.
+		String commandPrefix = SerpensBot.getCommandSymbol(guild.getId()) + this.getModulePrefix(guild.getId()); //Command prefix of the module.
 		
 		//Get the task the author is currently running.
 		Task task = this.getTask(guild.getId(), author);
 		
 		//If the author of the message is the bot, ignore the message.
-		if (BotMain.api.getSelfUser().getId().equals(author.getId())) return;
+		if (SerpensBot.api.getSelfUser().getId().equals(author.getId())) return;
 		
 		if (message.startsWith(commandPrefix) && !commandPrefix.equals(message.strip())) //The message is a command.
 		{
@@ -104,7 +104,7 @@ public class BotListener extends ListenerAdapter
 				boolean deleteMessage = command.doAction(guild, channel, event.getMessage(), author, arguments); //Run the command.
 				
 				//Delete command message if the command was successfully ran.
-				if (BotMain.getDeleteCommandMessages(guild.getId()) && deleteMessage)
+				if (SerpensBot.getDeleteCommandMessages(guild.getId()) && deleteMessage)
 				{
 					channel.deleteMessageById(event.getMessageId()).queue();
 				}
@@ -143,7 +143,7 @@ public class BotListener extends ListenerAdapter
 			return;
 		
 		//Ignore bot reaction.
-		if (BotMain.api.getSelfUser().getId().equals(author.getId()))
+		if (SerpensBot.api.getSelfUser().getId().equals(author.getId()))
 			return;
 		
 		//Pass the reaction and the author to the task the user is running.
@@ -211,7 +211,7 @@ public class BotListener extends ListenerAdapter
 			return;
 		
 		//Ignore bot reaction.
-		if (BotMain.api.getSelfUser().getId().equals(author.getId()))
+		if (SerpensBot.api.getSelfUser().getId().equals(author.getId()))
 			return;
 		
 		if (button == null)
@@ -238,7 +238,7 @@ public class BotListener extends ListenerAdapter
 					//task.deleteButtons();
 					
 					//Delete message that has the clicked button if it should be deleted.
-					if (BotMain.getDeleteCommandMessages(guild.getId()) && deleteMessage)
+					if (SerpensBot.getDeleteCommandMessages(guild.getId()) && deleteMessage)
 					{
 						event.getHook().deleteOriginal().queue();
 					}
@@ -268,7 +268,7 @@ public class BotListener extends ListenerAdapter
 				boolean deleteMessage = buttonCallback.doAction(event);
 				
 				//Delete message that has the clicked button if it should be deleted.
-				if (BotMain.getDeleteCommandMessages(guild.getId()) && deleteMessage)
+				if (SerpensBot.getDeleteCommandMessages(guild.getId()) && deleteMessage)
 				{
 					event.getHook().deleteOriginal().queue();
 				}
@@ -337,7 +337,7 @@ public class BotListener extends ListenerAdapter
 		
 		//Add footer
 		embedBuilder.setFooter("Richiesto da " + author.getName(), author.getAvatarUrl());
-		embedBuilder.setAuthor(BotMain.api.getSelfUser().getName(), "https://github.com/SerpensSolida/SerpensBot", BotMain.api.getSelfUser().getAvatarUrl());
+		embedBuilder.setAuthor(SerpensBot.api.getSelfUser().getName(), "https://github.com/SerpensSolida/SerpensBot", SerpensBot.api.getSelfUser().getAvatarUrl());
 		
 		OptionMapping commandName = event.getOption("command-name");
 		if (commandName == null)
@@ -426,7 +426,7 @@ public class BotListener extends ListenerAdapter
 	{
 		if (!this.modulePrefix.containsKey(guildID))
 		{
-			BotMain.loadSettings(guildID); //Try loading the settings.
+			SerpensBot.loadSettings(guildID); //Try loading the settings.
 			
 			if (!this.modulePrefix.containsKey(guildID)) //Settings for this guild not found.
 				this.modulePrefix.put(guildID, this.internalID);

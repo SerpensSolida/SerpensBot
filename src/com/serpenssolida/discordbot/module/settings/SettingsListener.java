@@ -1,6 +1,6 @@
 package com.serpenssolida.discordbot.module.settings;
 
-import com.serpenssolida.discordbot.BotMain;
+import com.serpenssolida.discordbot.SerpensBot;
 import com.serpenssolida.discordbot.MessageUtils;
 import com.serpenssolida.discordbot.module.BotCommand;
 import com.serpenssolida.discordbot.module.BotListener;
@@ -67,7 +67,7 @@ public class SettingsListener extends BotListener
 		OptionMapping argument = event.getOption("value");
 		
 		//Check in the user has permission to run this command.
-		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
+		if (!SerpensBot.isAdmin(authorMember) && !authorMember.isOwner())
 		{
 			Message message = MessageUtils.buildErrorMessage("Cancellazione messaggi", author, "Devi essere il proprietario o moderatore del server per modificare questa impostazione.");
 			event.reply(message).setEphemeral(true).queue();
@@ -83,8 +83,8 @@ public class SettingsListener extends BotListener
 		
 		//Update option.
 		boolean value = argument.getAsBoolean();
-		BotMain.setDeleteCommandMessages(guild.getId(), value);
-		BotMain.saveSettings(guild.getId());
+		SerpensBot.setDeleteCommandMessages(guild.getId(), value);
+		SerpensBot.saveSettings(guild.getId());
 		
 		Message message = MessageUtils.buildSimpleMessage("Cancellazione dei messaggi", author, (value ? "Cancellerò" : "Lascerò") + " i comandi che sono stati inviati in chat.");
 		event.reply(message).setEphemeral(false).queue(); //Set ephemeral if the user didn't put the argument.
@@ -105,7 +105,7 @@ public class SettingsListener extends BotListener
 			//Send the list of modules and their prefixes.
 			embedBuilder.setTitle("Lista dei moduli e dei loro prefissi");
 			
-			for (BotListener listener : BotMain.getModules())
+			for (BotListener listener : SerpensBot.getModules())
 			{
 				embedBuilder.addField("Modulo " + listener.getModuleName(), String.format("ID modulo: `%s`\nPrefisso: `%s`", listener.getInternalID(), listener.getModulePrefix(guild.getId()).isBlank() ? " " : listener.getModulePrefix(guild.getId())), true);
 			}
@@ -115,7 +115,7 @@ public class SettingsListener extends BotListener
 		else if (argumentCount == 1 && moduleID != null)
 		{
 			//Get the listener by the id passed as parameter.
-			BotListener listener = BotMain.getModuleById(moduleID.getAsString());
+			BotListener listener = SerpensBot.getModuleById(moduleID.getAsString());
 			
 			//Print the result.
 			if (listener == null)
@@ -130,11 +130,11 @@ public class SettingsListener extends BotListener
 		else if (argumentCount == 2 && moduleID != null && modulePrefix != null)
 		{
 			//Get the listener by the id passed as parameter.
-			BotListener listener = BotMain.getModuleById(moduleID.getAsString());
+			BotListener listener = SerpensBot.getModuleById(moduleID.getAsString());
 			String newPrefix = modulePrefix.getAsString();
 			
 			//Check in the user has permission to run this command.
-			if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
+			if (!SerpensBot.isAdmin(authorMember) && !authorMember.isOwner())
 			{
 				Message message = MessageUtils.buildErrorMessage("Prefissi dei comandi", author, "Devi essere il proprietario o moderatore del server per modificare il prefisso di un modulo.");
 				event.reply(message).setEphemeral(true).queue();
@@ -158,8 +158,8 @@ public class SettingsListener extends BotListener
 			
 			//Set the new prefix to the module.
 			listener.setModulePrefix(guild.getId(), newPrefix);
-			BotMain.updateGuildCommands(guild);
-			BotMain.saveSettings(guild.getId());
+			SerpensBot.updateGuildCommands(guild);
+			SerpensBot.saveSettings(guild.getId());
 			
 			embedBuilder.setDescription("Prefisso del modulo `" + listener.getInternalID() + "` è stato impostato a `" + listener.getModulePrefix(guild.getId()) + "`.");
 		}
@@ -184,7 +184,7 @@ public class SettingsListener extends BotListener
 		Pattern pattern = Pattern.compile("[_*~>`@]"); //Regex containing illegal characters.
 
 		//Check in the user has permission to run this command.
-		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
+		if (!SerpensBot.isAdmin(authorMember) && !authorMember.isOwner())
 		{
 			embedBuilder.appendDescription("Devi essere il proprietario o moderatore del server per resettare il simbolo dei comandi.");
 			messageBuilder.setEmbed(embedBuilder.build());
@@ -214,8 +214,8 @@ public class SettingsListener extends BotListener
 			return;
 		}
 		
-		BotMain.setCommandSymbol(guild.getId(), newSymbol);
-		BotMain.saveSettings(guild.getId());
+		SerpensBot.setCommandSymbol(guild.getId(), newSymbol);
+		SerpensBot.saveSettings(guild.getId());
 		
 		embedBuilder.appendDescription("Simbolo per i comandi impostato a `" + newSymbol + "`.");
 		messageBuilder.setEmbed(embedBuilder.build());

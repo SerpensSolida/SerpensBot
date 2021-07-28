@@ -1,6 +1,6 @@
 package com.serpenssolida.discordbot.module.base;
 
-import com.serpenssolida.discordbot.BotMain;
+import com.serpenssolida.discordbot.SerpensBot;
 import com.serpenssolida.discordbot.MessageUtils;
 import com.serpenssolida.discordbot.module.BotListener;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -49,7 +49,7 @@ public class BaseListener extends BotListener
 		MessageChannel channel = event.getChannel(); //Channel where the message was sent.
 		
 		//If the author of the message is the bot, ignore the message.
-		if (BotMain.api.getSelfUser().getId().equals(author.getId())) return;
+		if (SerpensBot.api.getSelfUser().getId().equals(author.getId())) return;
 		
 		//Parse special commands.
 		if ("!!reset symbol".equals(message))
@@ -79,15 +79,15 @@ public class BaseListener extends BotListener
 		Member authorMember = guild.retrieveMember(author).complete();
 		
 		//Check in the user has permission to run this command.
-		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
+		if (!SerpensBot.isAdmin(authorMember) && !authorMember.isOwner())
 		{
 			Message message = MessageUtils.buildErrorMessage("Reset del simbolo dei comandi", author, "Devi essere il proprietario o moderatore del server per resettare il simbolo per comandi non listati.");
 			channel.sendMessage(message).queue();
 			return;
 		}
 		
-		BotMain.setCommandSymbol(guild.getId(), "/");
-		BotMain.saveSettings(guild.getId());
+		SerpensBot.setCommandSymbol(guild.getId(), "/");
+		SerpensBot.saveSettings(guild.getId());
 		
 		Message message = MessageUtils.buildSimpleMessage("Reset del simbolo dei comandi", author, "Simbolo per i comandi non listati impostato a `/`.");
 		channel.sendMessage(message).queue();
@@ -101,20 +101,20 @@ public class BaseListener extends BotListener
 		Member authorMember = guild.retrieveMember(author).complete();
 		
 		//Check in the user has permission to run this command.
-		if (!BotMain.isAdmin(authorMember) && !authorMember.isOwner())
+		if (!SerpensBot.isAdmin(authorMember) && !authorMember.isOwner())
 		{
 			Message message = MessageUtils.buildErrorMessage("Reset dei prefissi dei comandi", author, "Devi essere il proprietario o moderatore del server per resettare i prefissi.");
 			channel.sendMessage(message).queue();
 			return;
 		}
 		
-		for (BotListener listener : BotMain.getModules())
+		for (BotListener listener : SerpensBot.getModules())
 		{
 			listener.setModulePrefix(guild.getId(), listener.getInternalID());
 		}
 		
-		BotMain.updateGuildCommands(guild);
-		BotMain.saveSettings(guild.getId());
+		SerpensBot.updateGuildCommands(guild);
+		SerpensBot.saveSettings(guild.getId());
 		
 		Message message = MessageUtils.buildSimpleMessage("Reset dei prefissi dei comandi", author, "Prefisso dei moduli resettato correttamente.");
 		channel.sendMessage(message).queue();
@@ -134,10 +134,10 @@ public class BaseListener extends BotListener
 		//Add footer
 		embedBuilder.setTitle("Lista moduli disponibili");
 		embedBuilder.setFooter("Richiesto da " + author.getName(), author.getAvatarUrl());
-		embedBuilder.setAuthor(BotMain.api.getSelfUser().getName(), "https://github.com/SerpensSolida/SerpensBot", BotMain.api.getSelfUser().getAvatarUrl());
+		embedBuilder.setAuthor(SerpensBot.api.getSelfUser().getName(), "https://github.com/SerpensSolida/SerpensBot", SerpensBot.api.getSelfUser().getAvatarUrl());
 		
 		//Add module list to the embed.
-		for (BotListener listener : BotMain.getModules())
+		for (BotListener listener : SerpensBot.getModules())
 		{
 			/*//Don't add this listener to the list.
 			if (listener instanceof BaseListener)
@@ -150,7 +150,7 @@ public class BaseListener extends BotListener
 			
 			//Add listener to the list.
 			builderList.append("Modulo " + listener.getModuleName() + "\n");
-			builderCommands.append("`" + BotMain.getCommandSymbol(guild.getId()) + modulePrefix + " help`\n");
+			builderCommands.append("`" + SerpensBot.getCommandSymbol(guild.getId()) + modulePrefix + " help`\n");
 		}
 		
 		embedBuilder.addField("Moduli", builderList.toString(), true);

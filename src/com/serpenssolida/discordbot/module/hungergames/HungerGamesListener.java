@@ -1,6 +1,6 @@
 package com.serpenssolida.discordbot.module.hungergames;
 
-import com.serpenssolida.discordbot.BotMain;
+import com.serpenssolida.discordbot.SerpensBot;
 import com.serpenssolida.discordbot.MessageUtils;
 import com.serpenssolida.discordbot.module.BotCommand;
 import com.serpenssolida.discordbot.module.BotListener;
@@ -129,7 +129,7 @@ public class HungerGamesListener extends BotListener
 		
 		if (character != null)
 		{
-			User owner = BotMain.api.retrieveUserById(character.getOwnerID()).complete();
+			User owner = SerpensBot.api.retrieveUserById(character.getOwnerID()).complete();
 			String ownerName = (owner != null) ? owner.getName() : null;
 			
 			String[] statsName = {"Vitalità", "Forza", "Abilità", "Special", "Velocità", "Resistenza", "Gusto"};
