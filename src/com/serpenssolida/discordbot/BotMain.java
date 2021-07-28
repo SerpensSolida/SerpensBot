@@ -291,8 +291,14 @@ public class BotMain
 			System.out.println("Nessun file dei impostazioni da caricare.");
 			System.out.println("Creazione impostazioni di default.");
 			
+			//Initialize default values.
 			BotMain.commandSymbol.put(guildID, "/");
 			BotMain.deleteCommandMessages.put(guildID, false);
+			
+			for (BotListener module : getModules())
+			{
+				module.setModulePrefix(guildID, module.getInternalID());
+			}
 			
 			BotMain.saveSettings(guildID);
 		}
