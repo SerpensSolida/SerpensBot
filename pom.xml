@@ -69,7 +69,7 @@
         <repository>
             <id>serpenssolida</id>
             <name>serpensbot-library</name>
-            <url>http://fmistri.it:10666</url>
+            <url>http://serpensbot.fmistri.it</url>
         </repository>
 
         <repository>
