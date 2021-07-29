@@ -69,7 +69,7 @@
         <repository>
             <id>serpenssolida</id>
             <name>serpensbot-library</name>
-            <url>https://maven.fmistri.it/releases</url>
+            <url>https://maven.fmistri.it</url>
         </repository>
 
         <repository>
