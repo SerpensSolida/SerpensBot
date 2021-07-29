@@ -25,6 +25,7 @@
 
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -44,7 +45,7 @@
                     <archive>
                         <manifest>
                             <!-- Jar file entry point -->
-                            <mainClass>com.serpenssolida.discordbot.SerpensBot</mainClass>
+                            <mainClass>com.serpenssolida.discordbot.BotMain</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
