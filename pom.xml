@@ -60,9 +60,15 @@
 
     <repositories>
         <repository>
-            <id>jcenter</id>
-            <name>jcenter-bintray</name>
-            <url>https://jcenter.bintray.com</url>
+            <id>local-serpenssolida</id>
+            <name>serpensbot-library</name>
+            <url>file://${user.home}/.m2/repository/</url>
+        </repository>
+
+        <repository>
+            <id>serpenssolida</id>
+            <name>serpensbot-library</name>
+            <url>http://fmistri.it:10666</url>
         </repository>
 
         <repository>
@@ -72,15 +78,9 @@
         </repository>
 
         <repository>
-            <id>local-serpenssolida</id>
-            <name>serpensbot-library</name>
-            <url>file://${user.home}/.m2/repository/</url>
-        </repository>
-
-        <repository>
-            <id>serpenssolida</id>
-            <name>serpensbot-library</name>
-            <url>https://www.fmistri.it:10666</url>
+            <id>jcenter</id>
+            <name>jcenter-bintray</name>
+            <url>https://jcenter.bintray.com</url>
         </repository>
     </repositories>
 
