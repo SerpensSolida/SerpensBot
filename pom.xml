@@ -96,7 +96,7 @@
         <dependency>
             <groupId>com.serpenssolida.discordbot</groupId>
             <artifactId>serpensbot-library</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
 
         <dependency>

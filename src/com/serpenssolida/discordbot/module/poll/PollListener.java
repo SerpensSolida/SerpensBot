@@ -38,11 +38,7 @@ public class PollListener extends BotListener
 		
 		//Command for creating a poll.
 		BotCommand command = new BotCommand("create", "Crea un nuovo sondaggio");
-		command.setAction((event, guild, channel, author) ->
-		{
-			this.createNewPoll(event, guild, channel, author);
-			return true;
-		});
+		command.setAction(this::createNewPoll);
 		SubcommandData subCommand = command.getSubcommand();
 		subCommand
 				.addOption(OptionType.STRING, "question", "La domanda del sondaggio", true)
@@ -57,22 +53,14 @@ public class PollListener extends BotListener
 		
 		//Command for deleting a poll.
 		command = new BotCommand("stop", "Ferma un sondaggio in corso.");
-		command.setAction((event, guild, channel, author) ->
-		{
-			this.removePoll(event, guild, channel, author);
-			return true;
-		});
+		command.setAction(this::removePoll);
 		command.getSubcommand()
 				.addOption(OptionType.STRING, "poll-id", "Identificatore univoco del sondaggio", true);
 		this.addBotCommand(command);
 		
 		//Command for deleting a poll.
 		command = new BotCommand("edit", "Modifica la descrizione di un sondaggio.");
-		command.setAction((event, guild, channel, author) ->
-		{
-			this.editPollDescription(event, guild, channel, author);
-			return true;
-		});
+		command.setAction(this::editPollDescription);
 		command.getSubcommand()
 				.addOption(OptionType.STRING, "poll-id", "Identificatore univoco del sondaggio", true)
 				.addOption(OptionType.STRING, "description", "Nuova descrizione del sondaggio", true);
@@ -80,11 +68,7 @@ public class PollListener extends BotListener
 		
 		//Command for adding an option to the pool.
 		command = new BotCommand("add", "Aggiunge un opzione al sondaggio.");
-		command.setAction((event, guild, channel, author) ->
-		{
-			this.addOption(event, guild, channel, author);
-			return true;
-		});
+		command.setAction(this::addOption);
 		command.getSubcommand()
 				.addOption(OptionType.STRING, "poll-id", "Identificatore univoco del sondaggio", true)
 				.addOption(OptionType.STRING, "description", "Testo dell'opzione da aggiungere", true);
@@ -93,22 +77,14 @@ public class PollListener extends BotListener
 		
 		//Command for removing a vote from the pool.
 		command = new BotCommand("remove-vote", "Rimuove il proprio voto da un sondaggio.");
-		command.setAction((event, guild, channel, author) ->
-		{
-			this.removeVote(event, guild, channel, author);
-			return true;
-		});
+		command.setAction(this::removeVote);
 		command.getSubcommand()
 				.addOption(OptionType.STRING, "poll-id", "Identificatore univoco del sondaggio", true);
 		this.addBotCommand(command);
 		
 		//Command for removing an option from the pool.
 		command = new BotCommand("remove-option", "Rimuove un opzione dal sondaggio.");
-		command.setAction((event, guild, channel, author) ->
-		{
-			this.removeOption(event, guild, channel, author);
-			return true;
-		});
+		command.setAction(this::removeOption);
 		command.getSubcommand()
 				.addOption(OptionType.STRING, "poll-id", "Identificatore univoco del sondaggio", true)
 				.addOption(OptionType.STRING, "position", "Posizione dell'opzione da rimuovere (parte da 1)", true);
