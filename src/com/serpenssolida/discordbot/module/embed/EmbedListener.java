@@ -1,7 +1,7 @@
 package com.serpenssolida.discordbot.module.embed;
 
 import com.serpenssolida.discordbot.MessageUtils;
-import com.serpenssolida.discordbot.module.BotCommand;
+import com.serpenssolida.discordbot.command.BotCommand;
 import com.serpenssolida.discordbot.module.BotListener;
 import com.serpenssolida.discordbot.module.poll.Poll;
 import net.dv8tion.jda.api.EmbedBuilder;

@@ -1,8 +1,8 @@
 package com.serpenssolida.discordbot.module.hungergames;
 
-import com.serpenssolida.discordbot.SerpensBot;
 import com.serpenssolida.discordbot.MessageUtils;
-import com.serpenssolida.discordbot.module.BotCommand;
+import com.serpenssolida.discordbot.SerpensBot;
+import com.serpenssolida.discordbot.command.BotCommand;
 import com.serpenssolida.discordbot.module.BotListener;
 import com.serpenssolida.discordbot.module.hungergames.task.CreateCharacterTask;
 import com.serpenssolida.discordbot.module.hungergames.task.EditCharacterTask;

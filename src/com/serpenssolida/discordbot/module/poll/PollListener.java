@@ -1,10 +1,10 @@
 package com.serpenssolida.discordbot.module.poll;
 
-import com.serpenssolida.discordbot.module.ButtonGroup;
 import com.serpenssolida.discordbot.MessageUtils;
-import com.serpenssolida.discordbot.module.BotCommand;
+import com.serpenssolida.discordbot.command.BotCommand;
+import com.serpenssolida.discordbot.interaction.InteractionCallback;
+import com.serpenssolida.discordbot.interaction.InteractionGroup;
 import com.serpenssolida.discordbot.module.BotListener;
-import com.serpenssolida.discordbot.module.ButtonCallback;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -124,7 +124,7 @@ public class PollListener extends BotListener
 		
 		//Create the poll message.
 		MessageBuilder messageBuilder = PollListener.generatePollMessage(poll, author);
-		ButtonGroup buttonGroup = PollListener.generateButtonCallback(poll);
+		InteractionGroup interactionGroup = PollListener.generateButtonCallback(poll);
 		
 		//Send the pool and get the message id.
 		InteractionHook hook = event.reply(messageBuilder.build())
@@ -134,7 +134,7 @@ public class PollListener extends BotListener
 		String messageId = message.getId();
 		
 		poll.setMessageId(messageId); //Set poll message.
-		this.addButtonGroup(guild.getId(), messageId, buttonGroup); //Register button group.
+		this.addInteractionGroup(guild.getId(), messageId, interactionGroup); //Register button group.
 		this.polls.put(messageId, poll); //Add poll to the list.
 		
 		//Refresh message after sending it.
@@ -179,20 +179,6 @@ public class PollListener extends BotListener
 		
 		message = MessageUtils.buildSimpleMessage("Rimozione voto", author, "Voto rimosso con successo.");
 		event.reply(message).setEphemeral(true).queue();
-		
-		/*//Stop the poll if the user is the author of the poll.
-		if (author.equals(poll.getAuthor()))
-		{
-			this.stopPoll(poll, guild, channel);
-			
-			Message message = MessageUtils.buildSimpleMessage("Arresto sondaggio", author, "Sondaggio fermato correttamente.");
-			event.reply(message).setEphemeral(false).queue();
-		}
-		else
-		{
-			Message message = MessageUtils.buildErrorMessage("Arresto sondaggio", author, "Non sei il proprietario del sondaggio.");
-			event.reply(message).setEphemeral(true).queue();
-		}*/
 	}
 	
 	private void editPollDescription(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
@@ -229,8 +215,8 @@ public class PollListener extends BotListener
 		Message pollMessage = channel.retrieveMessageById(poll.getMessageId()).complete();
 		PollListener.refreshPollMessage(poll, pollMessage);
 		
-		ButtonGroup buttonGroup = PollListener.generateButtonCallback(poll);
-		this.addButtonGroup(guild.getId(), poll.getMessageId(), buttonGroup);
+		InteractionGroup interactionGroup = PollListener.generateButtonCallback(poll);
+		this.addInteractionGroup(guild.getId(), poll.getMessageId(), interactionGroup);
 		
 		Message message = MessageUtils.buildSimpleMessage("Modifica descrizione del sondaggio", author, "Descrizione cambiata con successo.");
 		event.reply(message).setEphemeral(false).queue();
@@ -280,8 +266,8 @@ public class PollListener extends BotListener
 		Message pollMessage = channel.retrieveMessageById(poll.getMessageId()).complete();
 		PollListener.refreshPollMessage(poll, pollMessage);
 		
-		ButtonGroup buttonGroup = PollListener.generateButtonCallback(poll);
-		this.addButtonGroup(guild.getId(), poll.getMessageId(), buttonGroup);
+		InteractionGroup interactionGroup = PollListener.generateButtonCallback(poll);
+		this.addInteractionGroup(guild.getId(), poll.getMessageId(), interactionGroup);
 		
 		Message message = MessageUtils.buildSimpleMessage("Aggiunta opzione al sondaggio", author, "Aggiunta l'opzione \"" + option.getText() + "\" al sondaggio.");
 		event.reply(message).setEphemeral(false).queue();
@@ -401,7 +387,7 @@ public class PollListener extends BotListener
 		removedPoll.setFinished(true);
 		Message message = channel.retrieveMessageById(poll.getMessageId()).complete();
 		PollListener.refreshPollMessage(poll, message);
-		this.removeButtonGroup(guild.getId(), poll.getMessageId());
+		this.removeInteractionGroup(guild.getId(), poll.getMessageId());
 	}
 	
 	private static ArrayList<ActionRow> buildPollMessageButtons(Poll poll)
@@ -428,14 +414,14 @@ public class PollListener extends BotListener
 		return rows;
 	}
 	
-	private static ButtonGroup generateButtonCallback(Poll poll)
+	private static InteractionGroup generateButtonCallback(Poll poll)
 	{
-		ButtonGroup buttonGroup = new ButtonGroup();
+		InteractionGroup interactionGroup = new InteractionGroup();
 		
 		//For each option create a callback that the listener will call.
 		for (Poll.PollOption option : poll.getOptions())
 		{
-			buttonGroup.addButton(new ButtonCallback(option.getId(), (event, guild, messageChannel, message, author) ->
+			interactionGroup.addButtonCallback(option.getId(), (event, guild, messageChannel, message, author) ->
 			{
 				//If the user already voted try to switch vote.
 				if (poll.hasUserVoted(author))
@@ -446,12 +432,12 @@ public class PollListener extends BotListener
 					if (!switched)
 					{
 						event.reply(MessageUtils.buildErrorMessage("Votazione sondaggio", author, "Hai già votato per l'opzione: *" + option.getId() + "*")).setEphemeral(true).queue();
-						return ButtonCallback.LEAVE_MESSAGE;
+						return InteractionCallback.LEAVE_MESSAGE;
 					}
 					
 					event.deferEdit().queue();
 					PollListener.refreshPollMessage(poll, message);
-					return ButtonCallback.LEAVE_MESSAGE;
+					return InteractionCallback.LEAVE_MESSAGE;
 				}
 				
 				event.deferEdit().queue();
@@ -460,16 +446,16 @@ public class PollListener extends BotListener
 				boolean voteAdded = poll.addVote(option.getId(), author);
 				
 				if (!voteAdded)
-					return ButtonCallback.LEAVE_MESSAGE;
+					return InteractionCallback.LEAVE_MESSAGE;
 				
 				//Refresh the message.
 				PollListener.refreshPollMessage(poll, message);
 				
-				return ButtonCallback.LEAVE_MESSAGE;
-			}));
+				return InteractionCallback.LEAVE_MESSAGE;
+			});
 		}
 		
-		return buttonGroup;
+		return interactionGroup;
 	}
 	
 	private static MessageBuilder generatePollMessage(Poll poll, User author)

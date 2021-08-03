@@ -1,10 +1,11 @@
 package com.serpenssolida.discordbot.module.connect4;
 
-import com.serpenssolida.discordbot.module.ButtonGroup;
 import com.serpenssolida.discordbot.MessageUtils;
-import com.serpenssolida.discordbot.module.BotCommand;
+import com.serpenssolida.discordbot.command.BotCommand;
+import com.serpenssolida.discordbot.interaction.ButtonAction;
+import com.serpenssolida.discordbot.interaction.InteractionCallback;
+import com.serpenssolida.discordbot.interaction.InteractionGroup;
 import com.serpenssolida.discordbot.module.BotListener;
-import com.serpenssolida.discordbot.module.ButtonCallback;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -73,7 +74,7 @@ public class Connect4Listener extends BotListener
 		//Set the game id, register it and refresh the game message.
 		game.setMessageId(messageId);
 		this.games.put(messageId, game);
-		this.addButtonGroup(guild.getId(), messageId, this.generateGameCallback());
+		this.addInteractionGroup(guild.getId(), messageId, this.generateGameCallback());
 		Connect4Listener.refreshGameMessage(game, message, author);
 		
 		//Set a timer of 5 minutes to stop the game.
@@ -123,7 +124,7 @@ public class Connect4Listener extends BotListener
 		Connect4Listener.refreshGameMessage(game, gameMessage, game.getPlayer(0));
 		
 		this.games.remove(game.getMessageId());
-		this.removeButtonGroup(guild.getId(), game.getMessageId());
+		this.removeInteractionGroup(guild.getId(), game.getMessageId());
 	}
 	
 	private static void addConnect4Buttons(MessageBuilder messageBuilder, Connect4Game game)
@@ -158,21 +159,21 @@ public class Connect4Listener extends BotListener
 		messageBuilder.setActionRows(actionRows);
 	}
 	
-	private ButtonGroup generateGameCallback()
+	private InteractionGroup generateGameCallback()
 	{
-		ButtonGroup buttonGroup = new ButtonGroup();
+		InteractionGroup interactionGroup = new InteractionGroup();
 		for (int i = 0; i < Connect4Game.FIELD_WIDTH; i++)
 		{
 			int x = i;
 			
-			ButtonCallback button = new ButtonCallback("" + i, (event, guild, channel, message, author) ->
+			ButtonAction button = (event, guild, channel, message, author) ->
 			{
 				Connect4Game game = this.games.get(message.getId());
 				
 				if (game == null)
 				{
 					event.reply(MessageUtils.buildErrorMessage("Connect4", author, "Si è verificato un errore.")).setEphemeral(true).queue();
-					return ButtonCallback.DELETE_MESSAGE;
+					return InteractionCallback.DELETE_MESSAGE;
 				}
 				
 				//Let discord know the bot received the interaction.
@@ -180,7 +181,7 @@ public class Connect4Listener extends BotListener
 				
 				//Check if is the turn of the player to play.
 				if (!author.equals(game.getCurrentUser()))
-					return ButtonCallback.LEAVE_MESSAGE;
+					return InteractionCallback.LEAVE_MESSAGE;
 				
 				//Place the piece.
 				int turn = game.getCurrentTurn();
@@ -188,7 +189,7 @@ public class Connect4Listener extends BotListener
 				
 				//Check if it is a valid move.
 				if (height < 0 || height >= Connect4Game.FIELD_WIDTH)
-					return ButtonCallback.LEAVE_MESSAGE;
+					return InteractionCallback.LEAVE_MESSAGE;
 				
 				game.setCell(game.getCurrentTurn(), x, height);
 				game.incrementTurn();
@@ -210,19 +211,19 @@ public class Connect4Listener extends BotListener
 				if (game.isFinished())
 				{
 					this.games.remove(message.getId());
-					this.removeButtonGroup(guild.getId(), message.getId());
+					this.removeInteractionGroup(guild.getId(), message.getId());
 				}
 				
 				//Refresh the message.
 				Connect4Listener.refreshGameMessage(game, message, author);
 				
-				return ButtonCallback.LEAVE_MESSAGE;
-			});
+				return InteractionCallback.LEAVE_MESSAGE;
+			};
 			
-			buttonGroup.addButton(button);
+			interactionGroup.addButtonCallback("" + i, button);
 		}
 		
-		return buttonGroup;
+		return interactionGroup;
 	}
 	
 	private static void refreshGameMessage(Connect4Game game, Message message, User author)

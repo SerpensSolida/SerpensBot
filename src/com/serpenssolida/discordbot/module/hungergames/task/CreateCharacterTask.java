@@ -42,7 +42,7 @@ public class CreateCharacterTask extends Task
 			//this.sendMessage(builder.build());
 			
 			this.setInterrupted(true);
-			this.running = false;
+			this.setRunning(false);
 			return true;
 		}
 		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Creazione del personaggio", this.getUser())
@@ -52,7 +52,7 @@ public class CreateCharacterTask extends Task
 		this.addCancelButton(messageBuilder);
 		
 		this.state = State.NAME_CHARACTER;
-		this.character = new Character(this.user.getId());
+		this.character = new Character(this.getUser().getId());
 		return false;
 	}
 	
@@ -74,7 +74,7 @@ public class CreateCharacterTask extends Task
 			
 			this.sendMessage(messageBuilder.build());
 			
-			this.running = false;
+			this.setRunning(false);
 			return;
 		}
 		
@@ -90,7 +90,7 @@ public class CreateCharacterTask extends Task
 		
 		//This state is not possible, you broke my FSM :(
 		receivedMessage.getChannel().sendMessage("Stato illegale, fai schifo con le MSF.").queue();
-		this.running = false;
+		this.setRunning(false);
 	}
 	
 	public void reactionAdded(Message message, String reaction) {}
@@ -200,10 +200,10 @@ public class CreateCharacterTask extends Task
 		MessageBuilder messageBuilder = new MessageBuilder()
 				.setEmbed(embedBuilder.build());
 		
-		this.channel.sendMessage(messageBuilder.build()).queue();
+		this.getChannel().sendMessage(messageBuilder.build()).queue();
 		
 		this.state = State.FINISHED;
-		this.running = false;
+		this.setRunning(false);
 	}
 	
 	public Character getCharacter()

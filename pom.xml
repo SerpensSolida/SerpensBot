@@ -96,20 +96,13 @@
         <dependency>
             <groupId>com.serpenssolida.discordbot</groupId>
             <artifactId>serpensbot-library</artifactId>
-            <version>1.0.2</version>
+            <version>1.1.0</version>
         </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.7.32</version>
-        </dependency>
-
-
-        <dependency>
-            <groupId>net.dv8tion</groupId>
-            <artifactId>JDA</artifactId>
-            <version>4.3.0_277</version>
         </dependency>
 
         <dependency>

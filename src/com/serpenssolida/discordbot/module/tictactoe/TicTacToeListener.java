@@ -1,13 +1,17 @@
 package com.serpenssolida.discordbot.module.tictactoe;
 
-import com.serpenssolida.discordbot.module.ButtonGroup;
 import com.serpenssolida.discordbot.MessageUtils;
-import com.serpenssolida.discordbot.module.BotCommand;
+import com.serpenssolida.discordbot.command.BotCommand;
+import com.serpenssolida.discordbot.interaction.ButtonAction;
+import com.serpenssolida.discordbot.interaction.InteractionCallback;
+import com.serpenssolida.discordbot.interaction.InteractionGroup;
 import com.serpenssolida.discordbot.module.BotListener;
-import com.serpenssolida.discordbot.module.ButtonCallback;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -70,7 +74,7 @@ public class TicTacToeListener extends BotListener
 		//Set the game id, register it and refresh the game message.
 		game.setMessageId(messageId);
 		this.games.put(messageId, game);
-		this.addButtonGroup(guild.getId(), messageId, this.generateGameCallback());
+		this.addInteractionGroup(guild.getId(), messageId, this.generateGameCallback());
 		TicTacToeListener.refreshGameMessage(game, message, author);
 		
 		//Set a timer of 5 minutes to stop the game.
@@ -120,7 +124,7 @@ public class TicTacToeListener extends BotListener
 		TicTacToeListener.refreshGameMessage(game, gameMessage, game.getPlayer(0));
 		
 		this.games.remove(game.getMessageId());
-		this.removeButtonGroup(guild.getId(), game.getMessageId());
+		this.removeInteractionGroup(guild.getId(), game.getMessageId());
 	}
 	
 	private static void addTicTacToeButtons(MessageBuilder messageBuilder, TicTacToeGame game)
@@ -158,16 +162,17 @@ public class TicTacToeListener extends BotListener
 		messageBuilder.setActionRows(actionRows);
 	}
 	
-	private ButtonGroup generateGameCallback()
+	private InteractionGroup generateGameCallback()
 	{
-		ButtonGroup buttonGroup = new ButtonGroup();
+		InteractionGroup interactionGroup = new InteractionGroup();
 		for (int i = 0; i < TicTacToeGame.FIELD_SIZE; i++)
 		{
 			for (int j = 0; j < TicTacToeGame.FIELD_SIZE; j++)
 			{
 				int x = i;
 				int y = j;
-				ButtonCallback button = new ButtonCallback("" + (i + j * TicTacToeGame.FIELD_SIZE), (event, guild, channel, message, author) ->
+				
+				ButtonAction button = (event, guild, channel, message, author) ->
 				{
 					TicTacToeGame game = this.games.get(message.getId());
 					
@@ -175,7 +180,7 @@ public class TicTacToeListener extends BotListener
 					if (game == null)
 					{
 						event.reply(MessageUtils.buildErrorMessage("TicTacToe", author, "Si è verificato un errore.")).setEphemeral(true).queue();
-						return ButtonCallback.DELETE_MESSAGE;
+						return InteractionCallback.DELETE_MESSAGE;
 					}
 					
 					//Let discord know the bot received the interaction.
@@ -183,11 +188,11 @@ public class TicTacToeListener extends BotListener
 					
 					//Check if is the turn of the user.
 					if (!author.equals(game.getCurrentUser()))
-						return ButtonCallback.LEAVE_MESSAGE;
+						return InteractionCallback.LEAVE_MESSAGE;
 					
 					//Check if the cell is empty.
 					if (!game.isCellEmpty(x, y))
-						return ButtonCallback.LEAVE_MESSAGE;
+						return InteractionCallback.LEAVE_MESSAGE;
 					
 					//Execute player move.
 					int turn = game.getCurrentTurn();
@@ -214,17 +219,17 @@ public class TicTacToeListener extends BotListener
 					if (game.isFinished())
 					{
 						this.games.remove(message.getId());
-						this.removeButtonGroup(guild.getId(), message.getId());
+						this.removeInteractionGroup(guild.getId(), message.getId());
 					}
 					
-					return ButtonCallback.LEAVE_MESSAGE;
-				});
+					return InteractionCallback.LEAVE_MESSAGE;
+				};
 				
-				buttonGroup.addButton(button);
+				interactionGroup.addButtonCallback("" + (i + j * TicTacToeGame.FIELD_SIZE), button);
 			}
 		}
 		
-		return buttonGroup;
+		return interactionGroup;
 	}
 	
 	private static void refreshGameMessage(TicTacToeGame game, Message message, User author)

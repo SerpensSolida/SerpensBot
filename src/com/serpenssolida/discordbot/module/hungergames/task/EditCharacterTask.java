@@ -1,8 +1,8 @@
 package com.serpenssolida.discordbot.module.hungergames.task;
 
-import com.serpenssolida.discordbot.module.ButtonGroup;
 import com.serpenssolida.discordbot.MessageUtils;
-import com.serpenssolida.discordbot.module.ButtonCallback;
+import com.serpenssolida.discordbot.interaction.InteractionCallback;
+import com.serpenssolida.discordbot.interaction.InteractionGroup;
 import com.serpenssolida.discordbot.module.Task;
 import com.serpenssolida.discordbot.module.hungergames.Character;
 import com.serpenssolida.discordbot.module.hungergames.HungerGamesController;
@@ -46,13 +46,13 @@ public class EditCharacterTask extends Task
 			messageBuilder.setEmbed(embedBuilder.build());
 			
 			this.setInterrupted(true);
-			this.running = false;
+			this.setRunning(false);
 			return true;
 		}
 		
 		//Initialize task.
 		this.state = State.MENU;
-		this.character = HungerGamesController.getCharacter(this.getGuild().getId(), this.user.getId());
+		this.character = HungerGamesController.getCharacter(this.getGuild().getId(), this.getUser().getId());
 		
 		if (this.character == null)
 		{
@@ -61,7 +61,7 @@ public class EditCharacterTask extends Task
 			messageBuilder.setEmbed(embedBuilder.build());
 
 			this.setInterrupted(true);
-			this.running = false;
+			this.setRunning(false);
 			return true;
 		}
 		
@@ -86,9 +86,9 @@ public class EditCharacterTask extends Task
 			MessageBuilder messageBuilder = new MessageBuilder()
 					.setEmbed(embedBuilder.build());
 			
-			this.channel.sendMessage(messageBuilder.build()).queue();
+			this.getChannel().sendMessage(messageBuilder.build()).queue();
 			
-			this.running = false;
+			this.setRunning(false);
 			return;
 		}
 		
@@ -105,10 +105,10 @@ public class EditCharacterTask extends Task
 		}
 		
 		//This state is not possible, you broke my FSM :(
-		this.channel.sendMessage("Stato illegale, fai schifo con le MSF.").queue();
+		this.getChannel().sendMessage("Stato illegale, fai schifo con le MSF.").queue();
 		this.deleteButtons();
 		
-		this.running = false;
+		this.setRunning(false);
 	}
 	
 	public void reactionAdded(Message message, String reaction) {}
@@ -147,7 +147,7 @@ public class EditCharacterTask extends Task
 				.setEmbed(embedBuilder.build());
 		
 		this.getChannel().sendMessage(messageBuilder.build()).queue();
-		this.channel.sendMessage(this.createMenuMessage().build()).queue();
+		this.getChannel().sendMessage(this.createMenuMessage().build()).queue();
 	}
 	
 	private void manageAssignStatsState(Message receivedMessage)
@@ -230,7 +230,7 @@ public class EditCharacterTask extends Task
 		this.state = State.MENU;
 		
 		//Send the menu.
-		this.channel.sendMessage(this.createMenuMessage().build()).queue();
+		this.getChannel().sendMessage(this.createMenuMessage().build()).queue();
 	}
 	
 	/**
@@ -320,9 +320,8 @@ public class EditCharacterTask extends Task
 		Button editStats = Button.primary("edit-stats", "Modifica le caratteristiche");
 		Button cancelTask = Button.danger("cancel-task", "Esci");
 		
-		this.buttonGroup = new ButtonGroup();
-		
-		this.buttonGroup.addButton(new ButtonCallback("edit-name", (event, guild, channel, message, author) ->
+		this.setInteractionGroup(new InteractionGroup());
+		this.getInteractionGroup().addButtonCallback("edit-name", (event, guild, channel, message, author) ->
 		{
 			this.state = State.NAME_CHARACTER;
 			
@@ -335,13 +334,13 @@ public class EditCharacterTask extends Task
 			event.deferEdit().queue();
 			event.getHook().deleteOriginal().queue(); //Remove the original message.
 			
-			this.buttonGroup = null;
+			this.clearInteractionGroup();
 			this.sendWithCancelButton(messageB);
 			
-			return ButtonCallback.LEAVE_MESSAGE;
-		}));
+			return InteractionCallback.LEAVE_MESSAGE;
+		});
 		
-		this.buttonGroup.addButton(new ButtonCallback("edit-stats", (event, guild, channel, message, author) ->
+		this.getInteractionGroup().addButtonCallback("edit-stats", (event, guild, channel, message, author) ->
 		{
 			this.state = State.ASSIGN_STATS;
 			MessageBuilder b = new MessageBuilder();
@@ -359,26 +358,16 @@ public class EditCharacterTask extends Task
 			MessageBuilder messageB = new MessageBuilder()
 					.setEmbed(embedB.build());
 			
-			this.buttonGroup = null;
+			this.clearInteractionGroup();
 			this.sendWithCancelButton(messageB);
 			
-			return ButtonCallback.LEAVE_MESSAGE;
-		}));
+			return InteractionCallback.LEAVE_MESSAGE;
+		});
 		
 		this.registerCancelButton();
 		
 		//Add button to the message.
 		messageBuilder.setActionRows(ActionRow.of(editName, editStats, cancelTask));
-		//this.getChannel().sendMessage(builder.build()).queue();
-
-		/*//Add the reaction to the menu.
-		messageAction.queue(message ->
-		{
-			this.reactionCheckMessage = message; //This message is the one used for checking the reaction.
-			message.addReaction("🇦").queue();
-			message.addReaction("🇧").queue();
-			message.addReaction("❌").queue();
-		});*/
 	}
 	
 	public Character getCharacter()
