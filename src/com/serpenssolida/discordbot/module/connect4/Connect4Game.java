@@ -17,6 +17,7 @@ public class Connect4Game
 	private User[] players = new User[2];
 	private User winner;
 	private int currentTurn = 0;
+	private int lastMove;
 	private boolean interrupted = false;
 	private boolean finished = false;
 	
@@ -134,6 +135,14 @@ public class Connect4Game
 				g.fillOval( x + 2,   y + 2, cellWidth - 4, cellHeight - 4);
 				g.setColor(darkPawnColor[value]);
 				g.fillOval(x + 10,   y + 10, cellWidth - 20, cellHeight - 20);
+				
+				//Draw last move.
+				int h = this.getHeight(this.lastMove) - 1;
+				if (i == this.lastMove && j == h)
+				{
+					g.setColor(new Color(255, 255, 255, 100));
+					g.fillOval(x + 25,   y + 25, cellWidth - 50, cellHeight - 50);
+				}
 			}
 		}
 		
@@ -290,5 +299,15 @@ public class Connect4Game
 	public void setWinner(User winner)
 	{
 		this.winner = winner;
+	}
+	
+	public int getLastMove()
+	{
+		return this.lastMove;
+	}
+	
+	public void setLastMove(int lastMove)
+	{
+		this.lastMove = lastMove;
 	}
 }

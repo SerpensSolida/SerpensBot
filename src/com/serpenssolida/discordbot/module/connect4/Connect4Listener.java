@@ -192,6 +192,7 @@ public class Connect4Listener extends BotListener
 					return InteractionCallback.LEAVE_MESSAGE;
 				
 				game.setCell(game.getCurrentTurn(), x, height);
+				game.setLastMove(x);
 				game.incrementTurn();
 				
 				//Check if it was a winning move.
