@@ -235,7 +235,7 @@ public class Connect4Listener extends BotListener
 		editMessage.retainFiles(new ArrayList<>());
 		
 		//If there are votes in the poll we can generate an image.
-		editMessage.addFile(game.generateFieldImage().toByteArray(), "field.png");
+		editMessage.addFile(Connect4GameDrawer.generateFieldImage(game), "field.png");
 		
 		editMessage.queue();
 	}

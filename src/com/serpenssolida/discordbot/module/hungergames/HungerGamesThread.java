@@ -3,7 +3,6 @@ package com.serpenssolida.discordbot.module.hungergames;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.serpenssolida.discordbot.RandomChoice;
-import com.serpenssolida.discordbot.avatar.AvatarCache;
 import com.serpenssolida.discordbot.module.hungergames.event.*;
 import com.serpenssolida.discordbot.module.hungergames.inventory.Weapon;
 import com.serpenssolida.discordbot.module.hungergames.io.ItemData;
@@ -13,7 +12,6 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.utils.AttachmentOption;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.HashSet;
@@ -199,7 +197,7 @@ public class HungerGamesThread extends Thread
 		}
 		
 		//Set the status image of the message.
-		ByteArrayOutputStream statusImage = this.generateStatusImage();
+		byte[] statusImage = HungerGameStatusImageDrawer.generateStatusImage(this.hg);
 		
 		//Send the turn description.
 		embedBuilder.setTitle("Hunger Games - " + this.hg.getDay() + "° giorno.")
@@ -209,7 +207,7 @@ public class HungerGamesThread extends Thread
 		messageBuilder.setEmbed(embedBuilder.build());
 		
 		this.channel.sendMessage(messageBuilder.build())
-				.addFile(statusImage.toByteArray(), "status.png", new AttachmentOption[0])
+				.addFile(statusImage, "status.png", new AttachmentOption[0])
 				.queue();
 		
 		//Clear all lists used by events.
@@ -269,76 +267,6 @@ public class HungerGamesThread extends Thread
 			e.printStackTrace();
 		}
 		return data;
-	}
-	
-	/**
-	 * @return The status image of the turn.
-	 */
-	public ByteArrayOutputStream generateStatusImage()
-	{
-		BufferedImage tombImage = this.getTombImage(); //Tombstone image.
-		
-		//List of players that participated to the turn.
-		HashSet<Player> involvedPlayers = this.hg.getInvolvedPlayers();
-		
-		int avatarSize = 64; //Size of the avatrs.
-		int avatarNum = involvedPlayers.size(); //Count of the avatars.
-		
-		//Calculate image dimensions.
-		int imageWidth = (avatarNum > 6) ? (6 * avatarSize) : (avatarNum * avatarSize);
-		int imageHeight = (avatarNum / 6 + ((avatarNum % 6 == 0) ? 0 : 1)) * avatarSize;
-		
-		//Create the image and get its Graphics.
-		BufferedImage statusImage = new BufferedImage(imageWidth, imageHeight, 6);
-		Graphics g = statusImage.getGraphics();
-		
-		int i = 0;
-		
-		for (Player involvedPlayer : involvedPlayers)
-		{
-			BufferedImage avatar = AvatarCache.getAvatar(involvedPlayer.getOwner());
-			
-			//Position of the avatar.
-			int posX = i % 6 * avatarSize;
-			int posY = i / 6 * avatarSize;
-			
-			//Place the avatar into the image.
-			Image avatarImage = avatar.getScaledInstance(avatarSize, avatarSize, 4);
-			g.drawImage(avatarImage, posX, posY, null);
-			
-			//Paint the avatar red if the player died during this turn.
-			if (involvedPlayer.isDead())
-			{
-				g.setColor(new Color(255, 0, 0, 100));
-				g.fillRect(posX, posY, avatarSize, avatarSize);
-				
-				Image tomb = tombImage.getScaledInstance(avatarSize / 2, avatarSize / 2, 4);
-				g.drawImage(tomb, posX, posY + avatarSize - avatarSize / 2 - avatarSize / 5, null);
-			}
-			
-			//Draw HP remaining.
-			g.setColor(new Color(197, 197, 197, 160));
-			g.fillRect(posX, posY + avatarSize - avatarSize / 5, avatarSize, avatarSize / 5);
-			g.setColor(Color.black);
-			g.setFont(HungerGamesController.font);
-			g.drawString("HP: " + (int) involvedPlayer.getHealth(), posX + 4, posY + avatarSize - avatarSize / 10 + 5);
-			
-			i++;
-		}
-		
-		ByteArrayOutputStream outputStream = null;
-		
-		try
-		{
-			outputStream = new ByteArrayOutputStream();
-			ImageIO.write(statusImage, "png", outputStream);
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-		
-		return outputStream;
 	}
 	
 	private BufferedImage getTombImage()
