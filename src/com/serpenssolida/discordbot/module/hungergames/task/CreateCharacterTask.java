@@ -62,7 +62,7 @@ public class CreateCharacterTask extends Task
 			return;
 		
 		//Remove buttons from last message.
-		this.deleteButtons();
+		this.deleteLastMessageComponents();
 		
 		//Abort task if there is an HungerGames running.
 		if (HungerGamesController.isHungerGamesRunning(this.getGuild().getId()))
@@ -72,7 +72,7 @@ public class CreateCharacterTask extends Task
 			MessageBuilder messageBuilder = new MessageBuilder()
 					.setEmbed(embedBuilder.build());
 			
-			this.sendMessage(messageBuilder.build());
+			this.getChannel().sendMessage(messageBuilder.build()).queue();
 			
 			this.setRunning(false);
 			return;

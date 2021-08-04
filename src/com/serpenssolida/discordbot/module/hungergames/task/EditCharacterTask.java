@@ -2,7 +2,6 @@ package com.serpenssolida.discordbot.module.hungergames.task;
 
 import com.serpenssolida.discordbot.MessageUtils;
 import com.serpenssolida.discordbot.interaction.InteractionCallback;
-import com.serpenssolida.discordbot.interaction.InteractionGroup;
 import com.serpenssolida.discordbot.module.Task;
 import com.serpenssolida.discordbot.module.hungergames.Character;
 import com.serpenssolida.discordbot.module.hungergames.HungerGamesController;
@@ -79,7 +78,7 @@ public class EditCharacterTask extends Task
 		//Abort task if there is an HungerGames running.
 		if (HungerGamesController.isHungerGamesRunning(this.getGuild().getId()))
 		{
-			this.deleteButtons();
+			this.deleteLastMessageComponents();
 			
 			EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Modifica del personaggio", this.getUser())
 					.setDescription("Non puoi completare la procedura perchè è in corso un HungerGames.");
@@ -106,7 +105,7 @@ public class EditCharacterTask extends Task
 		
 		//This state is not possible, you broke my FSM :(
 		this.getChannel().sendMessage("Stato illegale, fai schifo con le MSF.").queue();
-		this.deleteButtons();
+		this.deleteLastMessageComponents();
 		
 		this.setRunning(false);
 	}
@@ -119,7 +118,7 @@ public class EditCharacterTask extends Task
 		String name = message.strip();
 		
 		//Remove buttons from last message.
-		this.deleteButtons();
+		this.deleteLastMessageComponents();
 		
 		//Check if the name is empty or its length is greater than 16.
 		if (name.length() <= 0 || name.length() > 16)
@@ -158,7 +157,7 @@ public class EditCharacterTask extends Task
 		int sum = 0;
 		
 		//Remove buttons from last message.
-		this.deleteButtons();
+		this.deleteLastMessageComponents();
 		
 		//Check number of ability sent with the message.
 		if (abilities.length != 7)
@@ -224,7 +223,7 @@ public class EditCharacterTask extends Task
 				.appendDescription("Caratteristiche impostate correttamente");
 		
 		MessageBuilder messageBuilder = new MessageBuilder()
-				.setEmbed(embedBuilder.build());
+				.setEmbeds(embedBuilder.build());
 		
 		this.getChannel().sendMessage(messageBuilder.build()).queue();
 		this.state = State.MENU;
@@ -314,13 +313,13 @@ public class EditCharacterTask extends Task
 		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Modifica del personaggio", this.getUser())
 				.appendDescription("Seleziona cosa vuoi modificare del tuo personaggio.\n");
 		
-		messageBuilder.setEmbed(embedBuilder.build());
+		messageBuilder.setEmbeds(embedBuilder.build());
 		
 		Button editName = Button.primary("edit-name", "Modifica il nome");
 		Button editStats = Button.primary("edit-stats", "Modifica le caratteristiche");
 		Button cancelTask = Button.danger("cancel-task", "Esci");
 		
-		this.setInteractionGroup(new InteractionGroup());
+		this.clearInteractionGroup();
 		this.getInteractionGroup().addButtonCallback("edit-name", (event, guild, channel, message, author) ->
 		{
 			this.state = State.NAME_CHARACTER;
@@ -356,7 +355,7 @@ public class EditCharacterTask extends Task
 					.appendDescription("\nLa somma dei valori delle caratteristiche deve essere " + HungerGamesController.SUM_STATS + " punti e ogni carateristica deve essere compresa tra 0 e 10.");
 			
 			MessageBuilder messageB = new MessageBuilder()
-					.setEmbed(embedB.build());
+					.setEmbeds(embedB.build());
 			
 			this.clearInteractionGroup();
 			this.sendWithCancelButton(messageB);
