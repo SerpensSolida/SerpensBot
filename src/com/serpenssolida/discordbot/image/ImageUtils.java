@@ -22,6 +22,6 @@ public class ImageUtils
 			e.printStackTrace();
 		}
 		
-		return outputStream.toByteArray();
+		return outputStream != null ? outputStream.toByteArray() : null;
 	}
 }

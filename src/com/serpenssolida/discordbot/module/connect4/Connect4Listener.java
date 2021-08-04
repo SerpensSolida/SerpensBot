@@ -231,11 +231,17 @@ public class Connect4Listener extends BotListener
 	{
 		MessageAction editMessage = message.editMessage(Connect4Listener.generateGameMessage(game, author).build());
 		
-		//Remove all old attachments to create new ones.
-		editMessage.retainFiles(new ArrayList<>());
+		byte[] fieldImage = Connect4GameDrawer.generateFieldImage(game);
 		
-		//If there are votes in the poll we can generate an image.
-		editMessage.addFile(Connect4GameDrawer.generateFieldImage(game), "field.png");
+		//Check if the image was generated correctly.
+		if (fieldImage != null)
+		{
+			//Remove all old attachments to create new ones.
+			editMessage.retainFiles(new ArrayList<>());
+			
+			//Add field imaged to the message.
+			editMessage.addFile(fieldImage, "field.png");
+		}
 		
 		editMessage.queue();
 	}

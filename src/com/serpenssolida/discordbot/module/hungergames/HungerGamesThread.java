@@ -206,9 +206,11 @@ public class HungerGamesThread extends Thread
 					.setImage("attachment://status.png");
 		messageBuilder.setEmbed(embedBuilder.build());
 		
-		this.channel.sendMessage(messageBuilder.build())
-				.addFile(statusImage, "status.png", new AttachmentOption[0])
-				.queue();
+		//Check if the image was generate correctly.
+		if (statusImage != null)
+			this.channel.sendMessage(messageBuilder.build())
+					.addFile(statusImage, "status.png", new AttachmentOption[0])
+					.queue();
 		
 		//Clear all lists used by events.
 		this.hg.getInvolvedPlayers().clear();
