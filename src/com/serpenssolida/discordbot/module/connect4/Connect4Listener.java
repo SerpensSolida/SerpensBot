@@ -188,7 +188,7 @@ public class Connect4Listener extends BotListener
 				int height = game.getHeight(x);
 				
 				//Check if it is a valid move.
-				if (height < 0 || height >= Connect4Game.FIELD_WIDTH)
+				if ((height < 0 || height >= Connect4Game.FIELD_HEIGHT) || !game.isCellEmpty(x, height))
 					return InteractionCallback.LEAVE_MESSAGE;
 				
 				game.setCell(game.getCurrentTurn(), x, height);

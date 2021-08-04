@@ -167,8 +167,6 @@ public class Connect4Game
 			return;
 		
 		this.field[x][y] = playerIndex;
-		
-		return;
 	}
 	
 	public int getHeight(int x)
