@@ -93,10 +93,10 @@ public class Connect4Game
 			height++;
 			
 			if (this.isCellEmpty(x, i))
-				break;
+				return height;
 		}
 		
-		return height;
+		return FIELD_HEIGHT;
 	}
 	
 	public int getCell(int x, int y)
