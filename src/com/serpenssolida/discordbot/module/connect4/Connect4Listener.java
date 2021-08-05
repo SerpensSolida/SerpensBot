@@ -1,6 +1,7 @@
 package com.serpenssolida.discordbot.module.connect4;
 
 import com.serpenssolida.discordbot.MessageUtils;
+import com.serpenssolida.discordbot.SerpensBot;
 import com.serpenssolida.discordbot.command.BotCommand;
 import com.serpenssolida.discordbot.interaction.ButtonAction;
 import com.serpenssolida.discordbot.interaction.InteractionCallback;
@@ -23,6 +24,7 @@ import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class Connect4Listener extends BotListener
 {
@@ -48,6 +50,11 @@ public class Connect4Listener extends BotListener
 		command.setAction(this::removeGame);
 		command.getSubcommand()
 				.addOption(OptionType.STRING, "game-id", "Id della partita", true);
+		this.addBotCommand(command);
+		
+		//Command for displaying the leader board.
+		command = new BotCommand("leaderboard", "Mostra la classifica di Connect4.");
+		command.setAction(this::sendLeaderboard);
 		this.addBotCommand(command);
 	}
 	
@@ -127,6 +134,47 @@ public class Connect4Listener extends BotListener
 		this.removeInteractionGroup(guild.getId(), game.getMessageId());
 	}
 	
+	
+	private void sendLeaderboard(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	{
+		event.deferReply().queue();
+		
+		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Classifica Connect4", author);
+		
+		StringBuilder names = new StringBuilder();
+		StringBuilder values = new StringBuilder();
+		
+		Connect4Leaderboard leaderboard = Connect4Controller.getLeaderboard(guild.getId());
+		
+		//Sort leaderboard
+		ArrayList<Map.Entry<String, Connect4UserData>> sortedLeaderboard = new ArrayList<>(leaderboard.getDataAsList());
+		sortedLeaderboard.sort((data1, data2) ->
+		{
+			Connect4UserData userData1 = data1.getValue();
+			Connect4UserData userData2 = data2.getValue();
+			return (userData2.getWins() - userData1.getWins()) * 100 - (userData2.getLoses() - userData1.getLoses()) * 10 + (userData2.getLoses() - userData1.getLoses());
+		});
+		
+		for (Map.Entry<String, Connect4UserData> data : sortedLeaderboard)
+		{
+			User user = SerpensBot.api.getUserById(data.getKey());
+			
+			if (user != null)
+			{
+				names.append(String.format("%s", user.getName()));
+				values.append(String.format("%s\n", data.getValue().getWins()));
+			}
+		}
+		
+		embedBuilder.addField("Nome", names.toString(), true);
+		embedBuilder.addField("Vittorie", values.toString(), true);
+		
+		MessageBuilder messageBuilder = new MessageBuilder();
+		messageBuilder.setEmbeds(embedBuilder.build());
+		
+		event.getHook().editOriginal(messageBuilder.build()).queue();
+	}
+	
 	private static void addConnect4Buttons(MessageBuilder messageBuilder, Connect4Game game)
 	{
 		ArrayList<Button> buttons = new ArrayList<>();
@@ -202,9 +250,34 @@ public class Connect4Listener extends BotListener
 				{
 					game.setFinished(true);
 					game.setWinner(game.getPlayer(turn));
+					
+					//Update player statistics.
+					for (User player : game.getPlayers())
+					{
+						Connect4UserData data = Connect4Controller.getUserData(guild.getId(), player.getId());
+						
+						if (player.equals(game.getWinner()))
+						{
+							data.setWins(data.getWins() + 1);
+						}
+						else
+						{
+							data.setLoses(data.getLoses() + 1);
+						}
+						
+						Connect4Controller.setUserData(guild.getId(), player.getId(), data);
+					}
 				}
 				else if (game.isFieldFull()) //Check if the field is full.
 				{
+					//Update player statistics.
+					for (User player : game.getPlayers())
+					{
+						Connect4UserData data = Connect4Controller.getUserData(guild.getId(), player.getId());
+						data.setDraws(data.getDraws() + 1);
+						Connect4Controller.setUserData(guild.getId(), player.getId(), data);
+					}
+					
 					game.setFinished(true);
 				}
 				
