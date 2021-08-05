@@ -331,7 +331,7 @@ public class PollListener extends BotListener
 		}
 		
 		MessageBuilder messageBuilder = new MessageBuilder();
-		messageBuilder.setEmbed(embedBuilder.build());
+		messageBuilder.setEmbeds(embedBuilder.build());
 		
 		event.reply(messageBuilder.build()).setEphemeral(!success).queue();
 	}
@@ -473,7 +473,7 @@ public class PollListener extends BotListener
 		if (poll.getVotesCount() > 0)
 			embedBuilder.setImage("attachment://pie_chart.png");
 		
-		messageBuilder.setEmbed(embedBuilder.build());
+		messageBuilder.setEmbeds(embedBuilder.build());
 		
 		return messageBuilder;
 	}

@@ -155,7 +155,7 @@ public class HungerGamesListener extends BotListener
 			embedBuilder.setThumbnail((owner != null) ? owner.getEffectiveAvatarUrl() : null);
 			embedBuilder.setFooter("Creato da " + ownerName);
 			
-			event.reply(new MessageBuilder().setEmbed(embedBuilder.build()).build()).setEphemeral(false).queue();
+			event.reply(new MessageBuilder().setEmbeds(embedBuilder.build()).build()).setEphemeral(false).queue();
 		}
 		else
 		{
@@ -200,7 +200,7 @@ public class HungerGamesListener extends BotListener
 		}
 		
 		MessageBuilder messageBuilder = new MessageBuilder()
-				.setEmbed(embedBuilder.build());
+				.setEmbeds(embedBuilder.build());
 		event.reply(messageBuilder.build()).setEphemeral(character == null || valueArg == null ).queue();
 	}
 	
@@ -224,7 +224,7 @@ public class HungerGamesListener extends BotListener
 		}
 		
 		MessageBuilder messageBuilder = new MessageBuilder()
-				.setEmbed(embedBuilder.build());
+				.setEmbeds(embedBuilder.build());
 		
 		event.reply(messageBuilder.build()).setEphemeral(secondsArg == null || secondsArg.getAsLong() < 1.0f).queue();
 	}
@@ -284,7 +284,7 @@ public class HungerGamesListener extends BotListener
 		
 		embedBuilder.addField("Nome", names.toString(), true);
 		embedBuilder.addField(fieldName, values.toString(), true);
-		messageBuilder.setEmbed(embedBuilder.build());
+		messageBuilder.setEmbeds(embedBuilder.build());
 		
 		event.reply(messageBuilder.build()).setEphemeral(true).queue();
 	}
@@ -308,7 +308,7 @@ public class HungerGamesListener extends BotListener
 		}
 		
 		MessageBuilder messageBuilder = new MessageBuilder()
-				.setEmbed(embedBuilder.build());
+				.setEmbeds(embedBuilder.build());
 		
 		event.reply(messageBuilder.build()).setEphemeral(!isRunning).queue();
 	}

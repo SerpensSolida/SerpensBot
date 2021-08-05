@@ -265,7 +265,7 @@ public class TicTacToeListener extends BotListener
 			TicTacToeListener.addTicTacToeButtons(messageBuilder, game);
 		}
 		
-		messageBuilder.setEmbed(embedBuilder.build());
+		messageBuilder.setEmbeds(embedBuilder.build());
 		
 		return messageBuilder;
 	}

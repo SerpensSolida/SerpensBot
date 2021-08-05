@@ -140,7 +140,7 @@ public class EmbedListener extends BotListener
 		
 		//Build and send the message with the embed..
 		MessageBuilder messageBuilder = new MessageBuilder();
-		messageBuilder.setEmbed(embedBuilder.build());
+		messageBuilder.setEmbeds(embedBuilder.build());
 		
 		event.reply(messageBuilder.build()).queue();
 	}
@@ -263,7 +263,7 @@ public class EmbedListener extends BotListener
 		
 		//Build the message with the embed.
 		MessageBuilder messageBuilder = new MessageBuilder();
-		messageBuilder.setEmbed(embedBuilder.build());
+		messageBuilder.setEmbeds(embedBuilder.build());
 		
 		//Delete the original message if specified.
 		if (deleteOriginalArg != null && deleteOriginalArg.getAsBoolean())

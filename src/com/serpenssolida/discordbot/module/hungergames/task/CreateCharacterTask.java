@@ -41,7 +41,7 @@ public class CreateCharacterTask extends Task
 		{
 			EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Creazione del personaggio", this.getUser())
 					.setDescription("Non puoi usare questo comando perchè è in corso un HungerGames.");
-			messageBuilder.setEmbed(embedBuilder.build());
+			messageBuilder.setEmbeds(embedBuilder.build());
 
 			//this.sendMessage(builder.build());
 			
@@ -51,7 +51,7 @@ public class CreateCharacterTask extends Task
 		}
 		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Creazione del personaggio", this.getUser())
 				.setDescription("Stai creando un personaggio! Inserisci il nome del tuo personaggio. (max 16 caratteri)");
-		messageBuilder.setEmbed(embedBuilder.build());
+		messageBuilder.setEmbeds(embedBuilder.build());
 
 		this.addCancelButton(messageBuilder);
 		
@@ -74,7 +74,7 @@ public class CreateCharacterTask extends Task
 			EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Creazione del personaggio", this.getUser())
 					.setDescription("Non puoi completare la procedura perchè è in corso un HungerGames.");
 			MessageBuilder messageBuilder = new MessageBuilder()
-					.setEmbed(embedBuilder.build());
+					.setEmbeds(embedBuilder.build());
 			
 			this.getChannel().sendMessage(messageBuilder.build()).queue();
 			
@@ -109,7 +109,7 @@ public class CreateCharacterTask extends Task
 			EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Creazione del personaggio", this.getUser())
 					.setDescription((name.length() <= 0) ? "Devi inserire un nome!" : "Il nome non può essere più lungo di 15 caratteri!");
 			MessageBuilder messageBuilder = new MessageBuilder()
-					.setEmbed(embedBuilder.build());
+					.setEmbeds(embedBuilder.build());
 			
 			this.sendWithCancelButton(messageBuilder);
 			return;
@@ -130,7 +130,7 @@ public class CreateCharacterTask extends Task
 				.appendDescription("\nLa somma dei valori delle caratteristiche deve essere " + HungerGamesController.SUM_STATS + " punti e ogni caratteristica deve essere compresa tra 0 e 10!");
 		
 		MessageBuilder messageBuilder = new MessageBuilder()
-				.setEmbed(embedBuilder.build());
+				.setEmbeds(embedBuilder.build());
 		this.sendWithCancelButton(messageBuilder);
 	}
 	
@@ -151,7 +151,7 @@ public class CreateCharacterTask extends Task
 					.appendDescription("\nLa somma dei valori delle caratteristiche deve essere " + HungerGamesController.SUM_STATS + " punti e ogni caratteristica deve essere compresa tra 0 e 10!");
 			
 			MessageBuilder messageBuilder = new MessageBuilder()
-					.setEmbed(embedBuilder.build());
+					.setEmbeds(embedBuilder.build());
 			this.sendWithCancelButton(messageBuilder);
 			return;
 		}
@@ -176,7 +176,7 @@ public class CreateCharacterTask extends Task
 				.appendDescription("Formato delle caratteristiche errato. Inserisci solo numeri tra 0 e 10!");
 			
 			MessageBuilder messageBuilder = new MessageBuilder()
-					.setEmbed(embedBuilder.build());
+					.setEmbeds(embedBuilder.build());
 			
 			this.sendWithCancelButton(messageBuilder);
 			return;
@@ -188,7 +188,7 @@ public class CreateCharacterTask extends Task
 					.appendDescription("La somma dei valori delle caratteristiche deve essere " +  HungerGamesController.SUM_STATS + " punti! Somma dei valori inseriti: " + sum);
 			
 			MessageBuilder messageBuilder = new MessageBuilder()
-					.setEmbed(embedBuilder.build());
+					.setEmbeds(embedBuilder.build());
 			
 			this.sendWithCancelButton(messageBuilder);
 			return;

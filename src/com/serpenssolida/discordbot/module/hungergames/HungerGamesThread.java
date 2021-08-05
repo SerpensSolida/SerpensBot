@@ -92,7 +92,7 @@ public class HungerGamesThread extends Thread
 		
 		embedBuilder//.setDescription(stringBuilder.toString())
 				.setTitle("**Partecipanti alla " + (HungerGamesController.getCount(this.guildID) + 1) + "° edizione degli Hunger Games!**");
-		messageBuilder.setEmbed(embedBuilder.build());
+		messageBuilder.setEmbeds(embedBuilder.build());
 		
 		this.channel.sendMessage(messageBuilder.build()).queue();
 		
@@ -134,7 +134,7 @@ public class HungerGamesThread extends Thread
 				
 				messageBuilder = new MessageBuilder();
 				embedBuilder = (new EmbedBuilder()).setTitle("Il vincitore è **" + winner + "**!").setThumbnail(winner.getOwner().getAvatarUrl());
-				messageBuilder.setEmbed(embedBuilder.build());
+				messageBuilder.setEmbeds(embedBuilder.build());
 				
 				//Update player statistics.
 				winner.getCharacter().incrementWins();
@@ -149,7 +149,7 @@ public class HungerGamesThread extends Thread
 				embedBuilder.setTitle("Nessun vincitore!");
 				embedBuilder.setDescription("Sono morti tutti i giocatori.");
 				
-				messageBuilder.setEmbed(embedBuilder.build());
+				messageBuilder.setEmbeds(embedBuilder.build());
 				HungerGamesController.getWinners(this.guildID).add(null);
 			}
 			
@@ -208,7 +208,7 @@ public class HungerGamesThread extends Thread
 					.setDescription(stringBuilder.toString())
 					.setFooter("Giocatori ancora in vita: " + this.hg.getAlivePlayers().size())
 					.setImage("attachment://status.png");
-		messageBuilder.setEmbed(embedBuilder.build());
+		messageBuilder.setEmbeds(embedBuilder.build());
 		
 		//Check if the image was generate correctly.
 		if (statusImage != null)

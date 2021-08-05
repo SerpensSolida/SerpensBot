@@ -42,7 +42,7 @@ public class EditCharacterTask extends Task
 		{
 			EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Modifica del personaggio", this.getUser())
 					.setDescription("Non puoi usare questo comando perchè è in corso un HungerGames.");
-			messageBuilder.setEmbed(embedBuilder.build());
+			messageBuilder.setEmbeds(embedBuilder.build());
 			
 			this.setInterrupted(true);
 			this.setRunning(false);
@@ -57,7 +57,7 @@ public class EditCharacterTask extends Task
 		{
 			EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Modifica del personaggio", this.getUser())
 					.setDescription("Non è stato trovato nessun personaggio.");
-			messageBuilder.setEmbed(embedBuilder.build());
+			messageBuilder.setEmbeds(embedBuilder.build());
 
 			this.setInterrupted(true);
 			this.setRunning(false);
@@ -83,7 +83,7 @@ public class EditCharacterTask extends Task
 			EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Modifica del personaggio", this.getUser())
 					.setDescription("Non puoi completare la procedura perchè è in corso un HungerGames.");
 			MessageBuilder messageBuilder = new MessageBuilder()
-					.setEmbed(embedBuilder.build());
+					.setEmbeds(embedBuilder.build());
 			
 			this.getChannel().sendMessage(messageBuilder.build()).queue();
 			
@@ -127,7 +127,7 @@ public class EditCharacterTask extends Task
 					.appendDescription((name.length() <= 0) ? "Devi inserire un nome!" : "Il nome non può essere più lungo di 16 caratteri!");
 			
 			MessageBuilder messageBuilder = new MessageBuilder()
-					.setEmbed(embedBuilder.build());
+					.setEmbeds(embedBuilder.build());
 			
 			this.sendWithCancelButton(messageBuilder);
 			return;
@@ -143,7 +143,7 @@ public class EditCharacterTask extends Task
 				.appendDescription("Nuovo nome del personaggio: " + this.character.getDisplayName());
 		
 		MessageBuilder messageBuilder = new MessageBuilder()
-				.setEmbed(embedBuilder.build());
+				.setEmbeds(embedBuilder.build());
 		
 		this.getChannel().sendMessage(messageBuilder.build()).queue();
 		this.getChannel().sendMessage(this.createMenuMessage().build()).queue();
@@ -170,7 +170,7 @@ public class EditCharacterTask extends Task
 			
 			
 			MessageBuilder messageBuilder = new MessageBuilder()
-					.setEmbed(embedBuilder.build());
+					.setEmbeds(embedBuilder.build());
 			
 			this.sendWithCancelButton(messageBuilder);
 			return;
@@ -196,7 +196,7 @@ public class EditCharacterTask extends Task
 					.appendDescription("Formato delle caratteristiche errato. Inserisci solo numeri tra 0 e 10!");
 			
 			MessageBuilder messageBuilder = new MessageBuilder()
-					.setEmbed(embedBuilder.build());
+					.setEmbeds(embedBuilder.build());
 			
 			this.sendWithCancelButton(messageBuilder);
 			return;
@@ -209,7 +209,7 @@ public class EditCharacterTask extends Task
 					.appendDescription("La somma dei valori delle caratteristiche deve essere " + HungerGamesController.SUM_STATS + " punti! Somma dei valori inseriti: " + sum);
 			
 			MessageBuilder messageBuilder = new MessageBuilder()
-					.setEmbed(embedBuilder.build());
+					.setEmbeds(embedBuilder.build());
 			
 			this.sendWithCancelButton(messageBuilder);
 			return;
@@ -328,7 +328,7 @@ public class EditCharacterTask extends Task
 					.appendDescription("Inserisci il nuovo nome del tuo personaggio. (max 15 caratteri)");
 			
 			MessageBuilder messageB = new MessageBuilder()
-					.setEmbed(embedB.build());
+					.setEmbeds(embedB.build());
 			
 			event.deferEdit().queue();
 			event.getHook().deleteOriginal().queue(); //Remove the original message.

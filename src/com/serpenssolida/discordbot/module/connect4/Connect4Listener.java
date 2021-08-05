@@ -349,7 +349,7 @@ public class Connect4Listener extends BotListener
 		//Add game immage.
 		embedBuilder.setImage("attachment://field.png");
 		
-		messageBuilder.setEmbed(embedBuilder.build());
+		messageBuilder.setEmbeds(embedBuilder.build());
 		
 		return messageBuilder;
 	}
