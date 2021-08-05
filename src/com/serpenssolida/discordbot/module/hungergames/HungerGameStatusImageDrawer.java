@@ -20,8 +20,6 @@ public class HungerGameStatusImageDrawer
 	 */
 	public static byte[] generateStatusImage(HungerGames hg)
 	{
-		BufferedImage tombImage = HungerGameStatusImageDrawer.getTombImage(); //Tombstone image.
-		
 		//List of players that participated in the turn.
 		HashSet<Player> involvedPlayers = hg.getInvolvedPlayers();
 		int avatarNum = involvedPlayers.size(); //Count of the avatars.
