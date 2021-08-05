@@ -10,6 +10,8 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.utils.AttachmentOption;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -21,6 +23,8 @@ public class HungerGamesThread extends Thread
 	private String guildID;
 	private MessageChannel channel;
 	private HungerGames hg;
+	
+	private static final Logger logger = LoggerFactory.getLogger(HungerGamesThread.class);
 	
 	private static HungerGamesEvent[] events = {
 			new BattleEvent(),
@@ -49,7 +53,7 @@ public class HungerGamesThread extends Thread
 		}
 		catch (InterruptedException e)
 		{
-			System.out.println("Gli HungerGames sono stati fermati.");
+			logger.info("Gli HungerGames sono stati fermati.");
 			Thread.currentThread().interrupt();
 		}
 	}
@@ -262,7 +266,7 @@ public class HungerGamesThread extends Thread
 		}
 		catch (FileNotFoundException e)
 		{
-			System.out.println("Nessun file degli oggetti da caricare.");
+			logger.info("Nessun file degli oggetti da caricare.");
 		}
 		catch (IOException e)
 		{
@@ -385,14 +389,14 @@ public class HungerGamesThread extends Thread
 		float strengthAv = strengthValue / strengthNum;
 		float abilityAv = abilityValue / abilityNum;
 		float specialAv = specialValue / specialNum;
-		System.out.println("Forza");
-		System.out.println("\tNumero:" + strengthNum);
-		System.out.println("\tMedia:" + strengthAv);
-		System.out.println("Abilità");
-		System.out.println("\tNumero:" + abilityNum);
-		System.out.println("\tMedia:" + abilityAv);
-		System.out.println("Special:");
-		System.out.println("\tNumero:" + specialNum);
-		System.out.println("\tMedia:" + specialAv);
+		logger.info("Forza");
+		logger.info("\tNumero:" + strengthNum);
+		logger.info("\tMedia:" + strengthAv);
+		logger.info("Abilità");
+		logger.info("\tNumero:" + abilityNum);
+		logger.info("\tMedia:" + abilityAv);
+		logger.info("Special:");
+		logger.info("\tNumero:" + specialNum);
+		logger.info("\tMedia:" + specialAv);
 	}
 }

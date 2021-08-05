@@ -2,6 +2,8 @@ package com.serpenssolida.discordbot.module.connect4;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Paths;
@@ -11,6 +13,8 @@ public class Connect4Controller
 {
 	public static HashMap<String, Connect4Controller> instance = new HashMap<>(); //Singleton data.
 	public static String folder = "connect4";
+	
+	private static final Logger logger = LoggerFactory.getLogger(Connect4Controller.class);
 	
 	private Connect4Leaderboard leaderboard = new Connect4Leaderboard();
 	
@@ -34,7 +38,7 @@ public class Connect4Controller
 	{
 		File fileCharacters = new File(Paths.get("server_data", guildID, Connect4Controller.folder,  "leaderboard.json").toString());
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		System.out.println("Cariamento dati Connect4.");
+		logger.info("Cariamento dati Connect4.");
 		
 		try (BufferedReader reader = new BufferedReader(new FileReader(fileCharacters)))
 		{
@@ -45,7 +49,7 @@ public class Connect4Controller
 		}
 		catch (FileNotFoundException e)
 		{
-			System.out.println("Nessun file leaderboard da caricare.");
+			logger.info("Nessun file leaderboard da caricare.");
 		}
 		catch (IOException e)
 		{
@@ -57,7 +61,7 @@ public class Connect4Controller
 	{
 		File fileCharacters = new File(Paths.get("server_data", guildID, Connect4Controller.folder, "leaderboard.json").toString());
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		System.out.println("Salvataggio dati Connect4.");
+		logger.info("Salvataggio dati Connect4.");
 		
 		try (PrintWriter writer = new PrintWriter(new FileWriter(fileCharacters)))
 		{

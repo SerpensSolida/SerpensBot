@@ -10,11 +10,15 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CreateCharacterTask extends Task
 {
 	private Character character;
 	private State state;
+	
+	private static final Logger logger = LoggerFactory.getLogger(CreateCharacterTask.class);
 	
 	public enum State
 	{
@@ -114,7 +118,7 @@ public class CreateCharacterTask extends Task
 		this.character.setName(name);
 		this.state = State.ASSIGN_STATS;
 		
-		System.out.println("Nome assegnato: " + name);
+		logger.info("Nome assegnato: " + name);
 		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Creazione del personaggio", this.getUser());
 		
 		embedBuilder

@@ -6,6 +6,8 @@ import com.serpenssolida.discordbot.module.hungergames.io.CharacterData;
 import com.serpenssolida.discordbot.module.hungergames.io.HungerGamesData;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.io.*;
@@ -19,6 +21,8 @@ public class HungerGamesController
 	public static String folder = "hungergames";
 	public static int SUM_STATS = 40;
 	public static Font font;
+	
+	private static final Logger logger = LoggerFactory.getLogger(HungerGamesController.class);
 	
 	private boolean running = false; //Whether or not the HungerGames is running.
 	private int count = 0; //Number of editions of the HungerGames.
@@ -72,7 +76,7 @@ public class HungerGamesController
 	{
 		File fileCharacters = new File(Paths.get("server_data", guildID, HungerGamesController.folder,  "characters.json").toString());
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		System.out.println("Cariamento dati HungerGames.");
+		logger.info("Cariamento dati HungerGames.");
 		
 		try (BufferedReader reader = new BufferedReader(new FileReader(fileCharacters)))
 		{
@@ -81,7 +85,7 @@ public class HungerGamesController
 		}
 		catch (FileNotFoundException e)
 		{
-			System.out.println("Nessun file dei personaggi da caricare.");
+			logger.info("Nessun file dei personaggi da caricare.");
 		}
 		catch (IOException e)
 		{
@@ -95,7 +99,7 @@ public class HungerGamesController
 	{
 		File fileCharacters = new File(Paths.get("server_data", guildID, HungerGamesController.folder, "characters.json").toString());
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		System.out.println("Salvataggio dati HungerGames.");
+		logger.info("Salvataggio dati HungerGames.");
 		
 		try (PrintWriter writer = new PrintWriter(new FileWriter(fileCharacters)))
 		{
@@ -140,7 +144,7 @@ public class HungerGamesController
 		}
 		catch (FileNotFoundException e)
 		{
-			System.out.println("Nessun file degli HungerGames da caricare.");
+			logger.info("Nessun file degli HungerGames da caricare.");
 		}
 		catch (IOException e)
 		{
