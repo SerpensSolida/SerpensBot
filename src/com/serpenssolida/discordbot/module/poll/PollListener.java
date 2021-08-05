@@ -510,7 +510,10 @@ public class PollListener extends BotListener
 		//If there are votes in the poll we can generate an image.
 		if (poll.getVotesCount() > 0)
 		{
-			editMessage.addFile(poll.generatePieChart().toByteArray(), "pie_chart.png");
+			byte[] pollChart = PollDrawer.generatePieChart(poll);
+			
+			if (pollChart != null)
+				editMessage.addFile(pollChart, "pie_chart.png");
 		}
 		
 		editMessage.queue();

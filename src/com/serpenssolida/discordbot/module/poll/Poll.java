@@ -1,15 +1,7 @@
 package com.serpenssolida.discordbot.module.poll;
 
 import net.dv8tion.jda.api.entities.User;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartRenderingInfo;
-import org.jfree.chart.JFreeChart;
-import org.jfree.data.general.DefaultPieDataset;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -61,42 +53,6 @@ public class Poll
 		}
 		
 		return winners;
-	}
-	
-	/**
-	 * Generate a pie chart picture displaying options and their votes.
-	 * @return The picture generated as {@link ByteArrayOutputStream}.
-	 */
-	public ByteArrayOutputStream generatePieChart() //TODO: find a better one.
-	{
-		//Get dataset values.
-		DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
-		
-		for (PollOption option : this.getOptions())
-		{
-			dataset.setValue(option.getText() + "\n" +( this.getPercent(option.getId()) * 100) + "% (voti: " + option.getVotesCount() + ")", this.getPercent(option.getId()));
-		}
-		
-		//Create pie chart image.
-		JFreeChart chart = ChartFactory.createPieChart(null, dataset, false, true, false);
-		chart.setBorderVisible(false);
-		chart.setBackgroundPaint(null);
-		BufferedImage pieChartImage = chart.createBufferedImage(512, 512, 512, 512, new ChartRenderingInfo());
-		
-		//Convert it to bytes.
-		ByteArrayOutputStream outputStream = null;
-		
-		try
-		{
-			outputStream = new ByteArrayOutputStream();
-			ImageIO.write(pieChartImage, "png", outputStream);
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-		
-		return outputStream;
 	}
 	
 	/**
