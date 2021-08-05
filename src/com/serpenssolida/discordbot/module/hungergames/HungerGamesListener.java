@@ -62,7 +62,7 @@ public class HungerGamesListener extends BotListener
 		command.setAction((event, guild, channel, author) ->
 		{
 			event.reply(MessageUtils.buildSimpleMessage("Hunger Games", author, "Gli Hunger Games stanno per iniziare!")).queue();
-			HungerGamesController.startHungerGames(guild.getId(), channel);
+			HungerGamesController.startHungerGames(guild.getId(), channel, author);
 		});
 		this.addBotCommand(command);
 		
@@ -104,64 +104,68 @@ public class HungerGamesListener extends BotListener
 			character = HungerGamesController.getCharacter(guild.getId(), user.getId());
 		}
 		
-		if (character != null)
-		{
-			User owner = SerpensBot.api.retrieveUserById(character.getOwnerID()).complete();
-			String ownerName = (owner != null) ? owner.getName() : null;
-			
-			String[] statsName = {"Vitalità", "Forza", "Abilità", "Special", "Velocità", "Resistenza", "Gusto"};
-			String[] statsValue = {
-					"" + character.getVitality(),
-					"" + character.getStrength(),
-					"" + character.getAbility(),
-					"" + character.getSpecial(),
-					"" + character.getSpeed(),
-					"" + character.getEndurance(),
-					"" + character.getTaste()
-			};
-			
-			//Names of the characteristics of the player.
-			StringBuilder nameColumn = new StringBuilder();
-			
-			for (String s : statsName)
-			{
-				nameColumn.append(s + "\n");
-			}
-			
-			//Values of the characteristics of the player.
-			StringBuilder valueColumn = new StringBuilder();
-			
-			for (String s : statsValue)
-			{
-				valueColumn.append(s + "\n");
-			}
-			
-			//Stats of the player.
-			StringBuilder stats = new StringBuilder()
-					.append("HungerGames vinti: " + character.getWins() + "\n")
-					.append("Uccisioni totali: " + character.getKills() + "\n");
-			
-			EmbedBuilder embedBuilder = new EmbedBuilder();
-			embedBuilder.setTitle(character.getDisplayName());
-			
-			//Add characteristic table.
-			embedBuilder.addField("Caratteristiche", nameColumn.toString(), true);
-			embedBuilder.addField("", valueColumn.toString(), true);
-			
-			//Add player stats.
-			embedBuilder.addField("Statistiche", stats.toString(), false);
-			
-			embedBuilder.setColor(0);
-			embedBuilder.setThumbnail((owner != null) ? owner.getEffectiveAvatarUrl() : null);
-			embedBuilder.setFooter("Creato da " + ownerName);
-			
-			event.reply(new MessageBuilder().setEmbeds(embedBuilder.build()).build()).setEphemeral(false).queue();
-		}
-		else
+		//Check if a character was found.
+		if (character == null)
 		{
 			Message message = MessageUtils.buildErrorMessage("Creazione personaggio", author, "L'utente non ha creato nessun personaggio.");
 			event.reply(message).setEphemeral(true).queue();
+			return;
 		}
+		
+		User owner = SerpensBot.api.retrieveUserById(character.getOwnerID()).complete();
+		String ownerName = (owner != null) ? owner.getName() : null;
+		
+		String[] statsName = {"Vitalità", "Forza", "Abilità", "Special", "Velocità", "Resistenza", "Gusto"};
+		String[] statsValue = {
+				"" + character.getVitality(),
+				"" + character.getStrength(),
+				"" + character.getAbility(),
+				"" + character.getSpecial(),
+				"" + character.getSpeed(),
+				"" + character.getEndurance(),
+				"" + character.getTaste()
+		};
+		
+		//Names of the characteristics of the player.
+		StringBuilder nameColumn = new StringBuilder();
+		
+		for (String s : statsName)
+		{
+			nameColumn.append(s + "\n");
+		}
+		
+		//Values of the characteristics of the player.
+		StringBuilder valueColumn = new StringBuilder();
+		
+		for (String s : statsValue)
+		{
+			valueColumn.append(s + "\n");
+		}
+		
+		//Stats of the player.
+		StringBuilder stats = new StringBuilder()
+				.append("HungerGames vinti: " + character.getWins() + "\n")
+				.append("Uccisioni totali: " + character.getKills() + "\n");
+		
+		EmbedBuilder embedBuilder = new EmbedBuilder();
+		embedBuilder.setTitle(character.getDisplayName());
+		
+		//Add characteristic table.
+		embedBuilder.addField("Caratteristiche", nameColumn.toString(), true);
+		embedBuilder.addField("", valueColumn.toString(), true);
+		
+		//Add player stats.
+		embedBuilder.addField("Statistiche", stats.toString(), false);
+		
+		embedBuilder.setColor(0);
+		embedBuilder.setThumbnail((owner != null) ? owner.getEffectiveAvatarUrl() : null);
+		embedBuilder.setFooter("Creato da " + ownerName);
+		
+		//Add the embed to the message.
+		MessageBuilder messageBuilder = new MessageBuilder();
+		messageBuilder.setEmbeds(embedBuilder.build());
+		
+		event.reply(messageBuilder.build()).setEphemeral(false).queue();
 	}
 	
 	private void setCharacterEnabled(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
@@ -177,139 +181,136 @@ public class HungerGamesListener extends BotListener
 			return;
 		}
 		
-		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Attivazione/disattivazione personaggio", author);
-		
-		if (character != null)
+		//Check if the user has a character.
+		if (character == null)
 		{
-			if (valueArg != null)
-			{
-				boolean enable = valueArg.getAsBoolean();
-				
-				embedBuilder.setDescription("**" + character.getDisplayName() + "** è stato " + (enable ? "abilitato." : "disabilitato."));
-				character.setEnabled(enable);
-				HungerGamesController.save(guild.getId());
-			}
-			else
-			{
-				embedBuilder.setDescription("L'argomento deve essere (true|false).");
-			}
-		}
-		else
-		{
-			embedBuilder.setDescription("Nessun personaggio trovato, crea il tuo personaggio.");
+			Message message = MessageUtils.buildErrorMessage("Attivazione/disattivazione personaggio", author, "Nessun personaggio trovato, crea il tuo personaggio.");
+			event.reply(message).setEphemeral(true).queue();
+			return;
 		}
 		
-		MessageBuilder messageBuilder = new MessageBuilder()
-				.setEmbeds(embedBuilder.build());
-		event.reply(messageBuilder.build()).setEphemeral(character == null || valueArg == null ).queue();
+		//Check the argument.
+		if (valueArg == null)
+		{
+			Message message = MessageUtils.buildErrorMessage("Attivazione/disattivazione personaggio", author, "L'argomento deve essere (true|false).");
+			event.reply(message).setEphemeral(true).queue();
+			return;
+		}
+		
+		//Enable character.
+		character.setEnabled(valueArg.getAsBoolean());
+		HungerGamesController.save(guild.getId());
+		
+		//Send info message.
+		String embedDescrition = "**" + character.getDisplayName() + "** è stato " + (valueArg.getAsBoolean() ? "abilitato." : "disabilitato.");
+		Message message = MessageUtils.buildSimpleMessage("Attivazione/disattivazione personaggio", author, embedDescrition);
+		
+		event.reply(message).setEphemeral(false).queue();
 	}
 	
 	private void setPlaybackSpeed(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping secondsArg = event.getOption("seconds");
 		
-		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Velocità degli Hunger Games", author);
-		
-		if (secondsArg != null && secondsArg.getAsLong() >= 1.0f)
+		//Check argument format.
+		if (secondsArg == null || secondsArg.getAsLong() < 1.0f)
 		{
-			float playbackSpeed = secondsArg.getAsLong();
-			
-			HungerGamesController.setMessageSpeed(guild.getId(), playbackSpeed * 1000);
-			HungerGamesController.saveSettings(guild.getId());
-			embedBuilder.setDescription("Velocità di riproduzione degli HungerGames settata a " + playbackSpeed + " secondi.");
+			Message message = MessageUtils.buildErrorMessage("Velocità degli Hunger Games", author, "L'argomento seconds non è stato inviato oppure il suo valore è minore di 1 secondo.");
+			event.reply(message).setEphemeral(true).queue();
+			return;
 		}
-		else
-		{
-			embedBuilder.setDescription("L'argomento seconds non è stato inviato oppure il suo valore è minore di 1 secondo.");
-		}
+
+		//Set the playback speed.
+		float playbackSpeed = secondsArg.getAsLong();
+		HungerGamesController.setMessageSpeed(guild.getId(), playbackSpeed * 1000);
+		HungerGamesController.saveSettings(guild.getId());
 		
-		MessageBuilder messageBuilder = new MessageBuilder()
-				.setEmbeds(embedBuilder.build());
-		
-		event.reply(messageBuilder.build()).setEphemeral(secondsArg == null || secondsArg.getAsLong() < 1.0f).queue();
+		//Send info message.
+		Message message = MessageUtils.buildSimpleMessage("Velocità degli Hunger Games", author, "Velocità di riproduzione degli HungerGames settata a " + playbackSpeed + " secondi.");
+		event.reply(message).setEphemeral(false).queue();
 	}
 	
 	private void sendLeaderboard(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
+		OptionMapping typeArg = event.getOption("type");
 		String fieldName = "Bug";
 		
-		EmbedBuilder embedBuilder = new EmbedBuilder();
-		MessageBuilder messageBuilder = new MessageBuilder();
-		StringBuilder names = new StringBuilder();
-		StringBuilder values = new StringBuilder();
-		
-		ArrayList<Character> leaderboard = new ArrayList<>(HungerGamesController.getCharacters(guild.getId()).values());
-		OptionMapping typeArg = event.getOption("type");
-		
-		if (typeArg != null)
+		//Check argument.
+		if (typeArg == null)
 		{
-			switch (typeArg.getAsString())
-			{
-				case "wins":
-					embedBuilder.setTitle("Classifica vittorie Hunger Games");
-					leaderboard.sort((character1, character2) -> character2.getWins() - character1.getWins());
-					
-					for (Character character : leaderboard)
-					{
-						values.append("" + character.getWins() + "\n");
-					}
-					
-					fieldName = "Vittorie";
-					break;
-				
-				case "kills":
-					embedBuilder.setTitle("Classifica uccisioni Hunger Games");
-					leaderboard.sort((character1, character2) -> character2.getKills() - character1.getKills());
-					
-					for (Character character : leaderboard)
-					{
-						values.append("" + character.getKills() + "\n");
-					}
-					
-					fieldName = "Uccisioni";
-					break;
-			}
-		}
-		else
-		{
-			messageBuilder.append("> L'argomento deve essere (wins|kills).");
-			event.reply(messageBuilder.build()).setEphemeral(false).queue();
+			Message message = MessageUtils.buildErrorMessage("Classifiche Hunger Games", author, "L'argomento deve essere (wins|kills).");
+			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
 		
+		EmbedBuilder embedBuilder = new EmbedBuilder();
+		
+		StringBuilder names = new StringBuilder();
+		StringBuilder values = new StringBuilder();
+		ArrayList<Character> leaderboard = new ArrayList<>(HungerGamesController.getCharacters(guild.getId()).values());
+		
+		//Get leaderboard values.
+		switch (typeArg.getAsString())
+		{
+			case "wins":
+				embedBuilder.setTitle("Classifica vittorie Hunger Games");
+				leaderboard.sort((character1, character2) -> character2.getWins() - character1.getWins());
+				
+				for (Character character : leaderboard)
+				{
+					values.append("" + character.getWins() + "\n");
+				}
+				
+				fieldName = "Vittorie";
+				break;
+			
+			case "kills":
+				embedBuilder.setTitle("Classifica uccisioni Hunger Games");
+				leaderboard.sort((character1, character2) -> character2.getKills() - character1.getKills());
+				
+				for (Character character : leaderboard)
+				{
+					values.append("" + character.getKills() + "\n");
+				}
+				
+				fieldName = "Uccisioni";
+				break;
+		}
+		
+		//Get leaderboard names.
 		for (Character character : leaderboard)
 		{
 			names.append(character.getDisplayName() + "\n");
 		}
 		
+		//Add the field to the embed.
 		embedBuilder.addField("Nome", names.toString(), true);
 		embedBuilder.addField(fieldName, values.toString(), true);
+		
+		//Send the leaderboard.
+		MessageBuilder messageBuilder = new MessageBuilder();
 		messageBuilder.setEmbeds(embedBuilder.build());
 		
-		event.reply(messageBuilder.build()).setEphemeral(true).queue();
+		event.reply(messageBuilder.build()).setEphemeral(false).queue();
 	}
 	
 	private void stopHungerGames(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
-		//MessageBuilder messageBuilder = new MessageBuilder();
-		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Hunger Games", author);
-		
 		boolean isRunning = HungerGamesController.isHungerGamesRunning(guild.getId());
 		
-		if (isRunning)
+		//Check if there is a Hunger Games running.
+		if (!isRunning)
 		{
-			HungerGamesController.stopHungerGames(guild.getId());
-			
-			embedBuilder.appendDescription("Gli HungerGames sono stati fermati da " + author.getName() + ".");
-		}
-		else
-		{
-			embedBuilder.appendDescription("Nessun HungerGames in esecuzione.");
+			Message message = MessageUtils.buildErrorMessage("Hunger Games", author, "Nessun HungerGames in esecuzione.");
+			event.reply(message).setEphemeral(true).queue();
+			return;
 		}
 		
-		MessageBuilder messageBuilder = new MessageBuilder()
-				.setEmbeds(embedBuilder.build());
+		//Stop the currently running hunger games.
+		HungerGamesController.stopHungerGames(guild.getId());
 		
-		event.reply(messageBuilder.build()).setEphemeral(!isRunning).queue();
+		//Send message info.
+		Message message = MessageUtils.buildSimpleMessage("Hunger Games", author, "Gli HungerGames sono stati fermati da " + author.getName() + ".");
+		event.reply(message).setEphemeral(false).queue();
 	}
 }

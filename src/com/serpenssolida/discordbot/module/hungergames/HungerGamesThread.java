@@ -2,13 +2,16 @@ package com.serpenssolida.discordbot.module.hungergames;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.serpenssolida.discordbot.MessageUtils;
 import com.serpenssolida.discordbot.RandomChoice;
 import com.serpenssolida.discordbot.module.hungergames.event.*;
 import com.serpenssolida.discordbot.module.hungergames.inventory.Weapon;
 import com.serpenssolida.discordbot.module.hungergames.io.ItemData;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.utils.AttachmentOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +26,7 @@ public class HungerGamesThread extends Thread
 	private String guildID;
 	private MessageChannel channel;
 	private HungerGames hg;
+	private User author;
 	
 	private static final Logger logger = LoggerFactory.getLogger(HungerGamesThread.class);
 	
@@ -37,11 +41,12 @@ public class HungerGamesThread extends Thread
 			new RelationshipEvent()
 	};
 	
-	public HungerGamesThread(String guildID, MessageChannel channel)
+	public HungerGamesThread(String guildID, MessageChannel channel, User author)
 	{
 		RandomChoice.resetRandom();
 		this.guildID = guildID;
 		this.channel = channel;
+		this.author = author;
 		this.hg = new HungerGames(this.guildID, this.loadItems());
 	}
 	
@@ -68,8 +73,8 @@ public class HungerGamesThread extends Thread
 		//Check if there are enough player to play the game.
 		if (alivePlayers.size() < 2)
 		{
-			messageBuilder.append("> Numero giocatori insufficenti. Chiedi a qualcuno di creare o abilitare il suo personaggio.");
-			this.channel.sendMessage(messageBuilder.build()).queue();
+			Message message = MessageUtils.buildErrorMessage("Connect4", this.author, "Numero giocatori insufficenti. Chiedi a qualcuno di creare o abilitare il suo personaggio.");
+			this.channel.sendMessage(message).queue();
 			HungerGamesController.setRunning(this.guildID,false);
 			return;
 		}
@@ -107,7 +112,7 @@ public class HungerGamesThread extends Thread
 			embedBuilder = new EmbedBuilder()
 					.setTitle("Alba del " + this.hg.getDay() + "° giorno.");
 			
-			this.channel.sendMessage(embedBuilder.build()).queue();
+			this.channel.sendMessageEmbeds(embedBuilder.build()).queue();
 			
 			//Process the turns.
 			for (int i = 0; i < turnsNum && this.isHungerGamesRunning(); i++)
@@ -120,7 +125,7 @@ public class HungerGamesThread extends Thread
 			if (this.isHungerGamesRunning())
 			{
 				embedBuilder = (new EmbedBuilder()).setTitle("Alleanze e rivalità").setDescription(this.getRelationships());
-				this.channel.sendMessage(embedBuilder.build()).queue();
+				this.channel.sendMessageEmbeds(embedBuilder.build()).queue();
 			}
 			
 			this.hg.incrementDay();

@@ -43,16 +43,17 @@ public class CreateCharacterTask extends Task
 					.setDescription("Non puoi usare questo comando perchè è in corso un HungerGames.");
 			messageBuilder.setEmbeds(embedBuilder.build());
 
-			//this.sendMessage(builder.build());
-			
 			this.setInterrupted(true);
 			this.setRunning(false);
 			return true;
 		}
+		
+		//Create message.
 		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Creazione del personaggio", this.getUser())
 				.setDescription("Stai creando un personaggio! Inserisci il nome del tuo personaggio. (max 16 caratteri)");
 		messageBuilder.setEmbeds(embedBuilder.build());
 
+		//Add cancel button to the message.
 		this.addCancelButton(messageBuilder);
 		
 		this.state = State.NAME_CHARACTER;
@@ -71,12 +72,8 @@ public class CreateCharacterTask extends Task
 		//Abort task if there is an HungerGames running.
 		if (HungerGamesController.isHungerGamesRunning(this.getGuild().getId()))
 		{
-			EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Creazione del personaggio", this.getUser())
-					.setDescription("Non puoi completare la procedura perchè è in corso un HungerGames.");
-			MessageBuilder messageBuilder = new MessageBuilder()
-					.setEmbeds(embedBuilder.build());
-			
-			this.getChannel().sendMessage(messageBuilder.build()).queue();
+			Message message = MessageUtils.buildErrorMessage("Creazione del personaggio", this.getUser(), "Non puoi completare la procedura perchè è in corso un HungerGames.");
+			this.getChannel().sendMessage(message).queue();
 			
 			this.setRunning(false);
 			return;

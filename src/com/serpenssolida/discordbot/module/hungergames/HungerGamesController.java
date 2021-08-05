@@ -6,6 +6,7 @@ import com.serpenssolida.discordbot.module.hungergames.io.CharacterData;
 import com.serpenssolida.discordbot.module.hungergames.io.HungerGamesData;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,8 +53,9 @@ public class HungerGamesController
 	 *
 	 * @param channel
 	 * 		The channel where to send the messages.
+	 * @param author
 	 */
-	public static void startHungerGames(String guildID, MessageChannel channel)
+	public static void startHungerGames(String guildID, MessageChannel channel, User author)
 	{
 		//Cannot start a new HungerGames if there is already one running.
 		if (HungerGamesController.isHungerGamesRunning(guildID))
@@ -66,7 +68,7 @@ public class HungerGamesController
 		
 		HungerGamesController.setRunning(guildID, true);
 		
-		Thread t = new HungerGamesThread(guildID, channel);
+		Thread t = new HungerGamesThread(guildID, channel, author);
 		t.start();
 		
 		HungerGamesController.getInstance(guildID).gameThread = t;

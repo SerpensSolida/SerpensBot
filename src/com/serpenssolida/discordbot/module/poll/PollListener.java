@@ -312,28 +312,21 @@ public class PollListener extends BotListener
 		int optionIndex = (int) indexArg.getAsLong();
 		boolean success = poll.removeOption("option" + optionIndex);
 		
-		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Rimozione opzione dal sondaggio", author);
-		
-		if (success)
+		//Check if the option was succesfully deleted.
+		if (!success)
 		{
-			//The option was succesfully removed.
-			
-			//Refresh the poll message.
-			Message message = channel.retrieveMessageById(poll.getMessageId()).complete();
-			PollListener.refreshPollMessage(poll, message);
-			
-			embedBuilder.setDescription("Opzione rimossa con successo.");
-		}
-		else
-		{
-			embedBuilder.setDescription("Non è stata trovata nessun opzione con id: " + optionIndex);
-			
+			Message message = MessageUtils.buildErrorMessage("Rimozione opzione dal sondaggio", author, "Non è stata trovata nessun opzione con id: " + optionIndex);
+			event.reply(message).setEphemeral(true).queue();
+			return;
 		}
 		
-		MessageBuilder messageBuilder = new MessageBuilder();
-		messageBuilder.setEmbeds(embedBuilder.build());
+		//Refresh the poll message.
+		Message message = channel.retrieveMessageById(poll.getMessageId()).complete();
+		PollListener.refreshPollMessage(poll, message);
 		
-		event.reply(messageBuilder.build()).setEphemeral(!success).queue();
+		//Send message info.
+		Message messageInfo = MessageUtils.buildSimpleMessage("Rimozione opzione dal sondaggio", author, "Opzione rimossa con successo.");
+		event.reply(messageInfo).setEphemeral(false).queue();
 	}
 	
 	private void removePoll(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)

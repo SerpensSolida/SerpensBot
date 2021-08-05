@@ -103,21 +103,24 @@ public class Connect4Listener extends BotListener
 		//Check if a game was found.
 		if (game == null)
 		{
-			event.reply(MessageUtils.buildErrorMessage("Connect4", author, "Nessuna partita trovata con l'id:" + gameIdArg.getAsString())).setEphemeral(true).queue();
+			Message message = MessageUtils.buildErrorMessage("Connect4", author, "Nessuna partita trovata con l'id:" + gameIdArg.getAsString());
+			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
 		
 		//Check if the user is one of the players.
 		if (!game.getPlayers().contains(author))
 		{
-			event.reply(MessageUtils.buildErrorMessage("Connect4", author, "Non puoi fermare una partita di cui non sei il partecipante")).setEphemeral(true).queue();
+			Message message = MessageUtils.buildErrorMessage("Connect4", author, "Non puoi fermare una partita di cui non sei il partecipante");
+			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
 		
 		//Stop the game.
 		this.stopGame(game, guild, channel);
 		
-		event.reply(MessageUtils.buildSimpleMessage("Connect4", author, "La partita è stata interrotta con successo.")).setEphemeral(false).queue();
+		Message message = MessageUtils.buildSimpleMessage("Connect4", author, "La partita è stata interrotta con successo.");
+		event.reply(message).setEphemeral(false).queue();
 	}
 	
 	private void stopGame(Connect4Game game, Guild guild, MessageChannel channel)
@@ -134,7 +137,6 @@ public class Connect4Listener extends BotListener
 		this.removeInteractionGroup(guild.getId(), game.getMessageId());
 	}
 	
-	
 	private void sendLeaderboard(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		//Get the leaderboard.
@@ -149,7 +151,7 @@ public class Connect4Listener extends BotListener
 			return (userData2.getWins() - userData1.getWins()) * 100 - (userData2.getLoses() - userData1.getLoses()) * 10 + (userData2.getLoses() - userData1.getLoses());
 		});
 		
-		//Create embend fields.
+		//Create embed fields.
 		StringBuilder names = new StringBuilder();
 		StringBuilder values = new StringBuilder();
 		
@@ -168,6 +170,7 @@ public class Connect4Listener extends BotListener
 		embedBuilder.addField("Nome", names.toString(), true);
 		embedBuilder.addField("Vittorie", values.toString(), true);
 		
+		//Send the leaderboard.
 		MessageBuilder messageBuilder = new MessageBuilder();
 		messageBuilder.setEmbeds(embedBuilder.build());
 		
@@ -197,11 +200,9 @@ public class Connect4Listener extends BotListener
 			}
 		}
 		
+		//Check if there are remaining buttons to add.
 		if (buttons.size() > 0)
-		{
 			actionRows.add(ActionRow.of(buttons));
-			buttons.clear();
-		}
 		
 		messageBuilder.setActionRows(actionRows);
 	}
