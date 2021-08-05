@@ -137,13 +137,7 @@ public class Connect4Listener extends BotListener
 	
 	private void sendLeaderboard(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
-		event.deferReply().queue();
-		
-		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Classifica Connect4", author);
-		
-		StringBuilder names = new StringBuilder();
-		StringBuilder values = new StringBuilder();
-		
+		//Get the leaderboard.
 		Connect4Leaderboard leaderboard = Connect4Controller.getLeaderboard(guild.getId());
 		
 		//Sort leaderboard
@@ -154,6 +148,10 @@ public class Connect4Listener extends BotListener
 			Connect4UserData userData2 = data2.getValue();
 			return (userData2.getWins() - userData1.getWins()) * 100 - (userData2.getLoses() - userData1.getLoses()) * 10 + (userData2.getLoses() - userData1.getLoses());
 		});
+		
+		//Create embend fields.
+		StringBuilder names = new StringBuilder();
+		StringBuilder values = new StringBuilder();
 		
 		for (Map.Entry<String, Connect4UserData> data : sortedLeaderboard)
 		{
@@ -166,13 +164,14 @@ public class Connect4Listener extends BotListener
 			}
 		}
 		
+		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Classifica Connect4", author);
 		embedBuilder.addField("Nome", names.toString(), true);
 		embedBuilder.addField("Vittorie", values.toString(), true);
 		
 		MessageBuilder messageBuilder = new MessageBuilder();
 		messageBuilder.setEmbeds(embedBuilder.build());
 		
-		event.getHook().editOriginal(messageBuilder.build()).queue();
+		event.reply(messageBuilder.build()).queue();
 	}
 	
 	private static void addConnect4Buttons(MessageBuilder messageBuilder, Connect4Game game)
