@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.serpenssolida.discordbot.module.hungergames.io.CharacterData;
 import com.serpenssolida.discordbot.module.hungergames.io.HungerGamesData;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import org.slf4j.Logger;
@@ -59,12 +58,7 @@ public class HungerGamesController
 	{
 		//Cannot start a new HungerGames if there is already one running.
 		if (HungerGamesController.isHungerGamesRunning(guildID))
-		{
-			MessageBuilder messageBuilder = new MessageBuilder();
-			messageBuilder.append("> Non puoi usare questo comando mentre è in corso un HungerGames.");
-			channel.sendMessage(messageBuilder.build()).queue();
 			return;
-		}
 		
 		HungerGamesController.setRunning(guildID, true);
 		

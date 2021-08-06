@@ -59,11 +59,7 @@ public class HungerGamesListener extends BotListener
 		
 		//Command for starting a new HungerGames.
 		command = new BotCommand("start", "Inizia un edizione degli Hunger Games!");
-		command.setAction((event, guild, channel, author) ->
-		{
-			event.reply(MessageUtils.buildSimpleMessage("Hunger Games", author, "Gli Hunger Games stanno per iniziare!")).queue();
-			HungerGamesController.startHungerGames(guild.getId(), channel, author);
-		});
+		command.setAction(HungerGamesListener::startHungerGames);
 		this.addBotCommand(command);
 		
 		//Command for editing playback speed of the HungerGames.
@@ -87,6 +83,23 @@ public class HungerGamesListener extends BotListener
 		command = new BotCommand("stop", "Interrompe l'esecuzione degli HungerGames.");
 		command.setAction(this::stopHungerGames);
 		this.addBotCommand(command);
+	}
+	
+	private static void startHungerGames(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	{
+		//Check if no Hunger Games is running.
+		if (HungerGamesController.isHungerGamesRunning(guild.getId()))
+		{
+			Message message = MessageUtils.buildErrorMessage("Hunger Games", author, "Non puoi usare questo comando mentre è in corso un HungerGames.");
+			event.reply(message).queue();
+			return;
+		}
+		
+		//Start the Hunger Games.
+		HungerGamesController.startHungerGames(guild.getId(), channel, author);
+		
+		//Send message info.
+		event.reply(MessageUtils.buildSimpleMessage("Hunger Games", author, "Gli Hunger Games stanno per iniziare!")).queue();
 	}
 	
 	private void sendCharacterCard(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
