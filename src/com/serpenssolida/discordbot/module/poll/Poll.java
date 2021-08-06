@@ -8,12 +8,12 @@ import java.util.stream.Stream;
 
 public class Poll
 {
-	private String messageId; //Id of the message the poll is in.
+	private final User author; //The author of the poll.
+	private final HashSet<User> users = new HashSet<>(); //Users that added a vote in the poll.
+	private String messageId; //ID of the message the poll is in.
 	private String question; //Question of the poll.
-	private boolean finished; //If the poll is finished.
-	private User author; //The author of the poll.
 	private LinkedHashMap<String, PollOption> options = new LinkedHashMap<>(); //Options of the poll.
-	private HashSet<User> users = new HashSet<>(); //Users that added a vote in the poll.
+	private boolean finished; //If the poll is finished.
 
 	public Poll(String question, User author)
 	{
@@ -110,7 +110,7 @@ public class Poll
 	/**
 	 * Remove the option with the given id from the poll.
 	 * @param optionId The id of the option to remove from the poll.
-	 * @return Whether or not the option was removed.
+	 * @return Whether the option was removed.
 	 */
 	public boolean removeOption(String optionId)
 	{
@@ -140,7 +140,7 @@ public class Poll
 	 * Adds the vote of the given user to the given option.
 	 * @param optionId The option to add the vote to.
 	 * @param user The user who voted for the option.
-	 * @return Whether or not the vote was correctly added.
+	 * @return Whether the vote was correctly added.
 	 */
 	public boolean addVote(String optionId, User user)
 	{
@@ -242,10 +242,10 @@ public class Poll
 	
 	public static class PollOption
 	{
-		private String text;
+		private final String text;
 		private String id;
 		private int votesCount = 0;
-		private HashSet<User> users = new HashSet<>();
+		private final HashSet<User> users = new HashSet<>();
 		
 		public PollOption(String id, String text)
 		{
@@ -253,24 +253,22 @@ public class Poll
 			this.id = id;
 		}
 		
-		public boolean addVote(User user)
+		public void addVote(User user)
 		{
 			if (this.users.contains(user))
-				return false;
+				return;
 			
 			this.votesCount++;
 			this.users.add(user);
-			return true;
 		}
 		
-		public boolean removeVote(User user)
+		public void removeVote(User user)
 		{
 			boolean removed = this.users.remove(user);
 			
 			if (removed)
 				this.votesCount--;
 			
-			return removed;
 		}
 		
 		public int getVotesCount()

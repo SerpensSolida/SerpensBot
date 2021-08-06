@@ -11,8 +11,8 @@ import java.util.HashMap;
 
 public class Connect4Controller
 {
-	public static HashMap<String, Connect4Controller> instance = new HashMap<>(); //Singleton data.
-	public static String folder = "connect4";
+	public static final HashMap<String, Connect4Controller> instance = new HashMap<>(); //Singleton data.
+	public static final String folder = "connect4";
 	
 	private static final Logger logger = LoggerFactory.getLogger(Connect4Controller.class);
 	

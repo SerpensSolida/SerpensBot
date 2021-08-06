@@ -17,7 +17,7 @@ public class Character implements Serializable
 	private String ownerID; //ID of the user that own this character.
 	private int wins = 0; //Number of times the character won the HungerGames.
 	private int kills = 0; //Number of kills
-	private boolean enabled = true; //If the player participate to the HungerGames or no.
+	private boolean enabled = true; //If the player participate in the HungerGames or no.
 	
 	public Character(String ownerID)
 	{

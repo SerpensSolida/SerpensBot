@@ -45,9 +45,9 @@ public class OwnerListener extends BotListener
 		
 		message = message.substring(1);
 		String[] content = message.split("::");
-		String channelId = "";
-		String title = "";
-		String text = "";
+		String channelId;
+		String title;
+		String text;
 		
 		try
 		{

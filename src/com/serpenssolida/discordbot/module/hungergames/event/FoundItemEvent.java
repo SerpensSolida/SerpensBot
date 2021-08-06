@@ -10,7 +10,7 @@ import java.util.HashSet;
 
 public class FoundItemEvent extends HungerGamesEvent
 {
-	String[] foundMessage = new String[]
+	private final String[] foundMessage = new String[]
 			{
 					"user trova item rovistando nella spazzatura.",
 					"user inciampa e cade, girandosi vede che è inciampato su item,",

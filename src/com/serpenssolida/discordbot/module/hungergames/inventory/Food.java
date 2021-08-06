@@ -2,7 +2,7 @@ package com.serpenssolida.discordbot.module.hungergames.inventory;
 
 public class Food extends Item
 {
-	private float hpRestored;
+	private final float hpRestored;
 	
 	public Food(float hpRestored, String name)
 	{

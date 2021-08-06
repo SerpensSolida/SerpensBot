@@ -7,21 +7,21 @@ import java.util.HashSet;
 
 public class TicTacToeGame
 {
+	private final int[][] field = new int[FIELD_SIZE][FIELD_SIZE];
+	private final User[] players = new User[2];
 	private String messageId;
-	private int[][] field = new int[FIELD_SIZE][FIELD_SIZE];
-	private User[] players = new User[2];
 	private User winner;
 	private int currentTurn = 0;
 	private boolean interrupted = false;
 	private boolean finished = false;
 	
 	//Variable for win condition checking.
-	private int[] rowSum = new int[FIELD_SIZE];
-	private int[] columnSum = new int[FIELD_SIZE];
+	private final int[] rowSum = new int[FIELD_SIZE];
+	private final int[] columnSum = new int[FIELD_SIZE];
 	private int diagonalSum = 0;
 	private int antiDiagonalSum = 0;
 
-	public static int FIELD_SIZE = 3;
+	public static final int FIELD_SIZE = 3;
 	
 	public TicTacToeGame(User player1, User player2)
 	{
@@ -40,7 +40,7 @@ public class TicTacToeGame
 	
 	public void setCell(int playerIndex, int x, int y)
 	{
-		if (!this.isCellEmpty(x, y))
+		if (this.isCellFull(x, y))
 			return;
 		
 		this.field[x][y] = playerIndex;
@@ -55,9 +55,9 @@ public class TicTacToeGame
 			this.antiDiagonalSum += playerIndex;
 	}
 	
-	public boolean isCellEmpty(int x, int y)
+	public boolean isCellFull(int x, int y)
 	{
-		return this.field[x][y] == -1;
+		return this.field[x][y] != -1;
 	}
 	
 	public User getCurrentUser()

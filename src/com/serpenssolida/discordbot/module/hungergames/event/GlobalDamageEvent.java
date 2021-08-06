@@ -8,7 +8,7 @@ import java.util.HashSet;
 
 public class GlobalDamageEvent extends HungerGamesEvent
 {
-	public String[] messages =
+	private final String[] messages =
 			{
 					"Una folata di vento spazza via tutti i giocatori che perdono damageHP.",
 					"Un terremoto magnitudo 9 squote la terra danneggiando tutti i giocatori di damageHP.",
@@ -22,7 +22,7 @@ public class GlobalDamageEvent extends HungerGamesEvent
 		HashSet<Player> deadPlayers = hg.getDeadPlayers();
 		HashSet<Player> involvedPlayers = hg.getInvolvedPlayers();
 		
-		//Damage of the event.
+		//Damage dealt by the event.
 		float damage = (15 + RandomChoice.random.nextInt(30));
 		
 		String eventString = ((String) RandomChoice.getRandom(this.messages)).replaceAll("damage", "" + (int) damage);

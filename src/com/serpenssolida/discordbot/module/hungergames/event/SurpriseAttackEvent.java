@@ -12,7 +12,7 @@ import java.util.HashSet;
 
 public class SurpriseAttackEvent extends HungerGamesEvent
 {
-	String[] messages = new String[]
+	private final String[] messages = new String[]
 			{
 					"user prova a prendere di sorpresa receiver",
 					"user prende alle spalle receiver",

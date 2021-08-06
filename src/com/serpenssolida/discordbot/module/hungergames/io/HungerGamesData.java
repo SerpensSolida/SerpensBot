@@ -1,7 +1,6 @@
 package com.serpenssolida.discordbot.module.hungergames.io;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class HungerGamesData
 {

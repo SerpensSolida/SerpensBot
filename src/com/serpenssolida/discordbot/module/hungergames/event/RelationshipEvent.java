@@ -8,7 +8,7 @@ import java.util.HashSet;
 
 public class RelationshipEvent extends HungerGamesEvent
 {
-	private String[] friendMessages = new String[]
+	private final String[] friendMessages = new String[]
 			{
 					"user e receiver hanno stretto un alleanza.",
 					"user e receiver sono diventati amici per la pelle.",
@@ -21,7 +21,7 @@ public class RelationshipEvent extends HungerGamesEvent
 					"user: \"Niceu niceu, verry niceu receiver-chan\""
 			};
 	
-	private String[] enemyMessages = new String[]
+	private final String[] enemyMessages = new String[]
 			{
 					"user e receiver si guardano male.",
 					"user e receiver si approcciano minacciosamente.",

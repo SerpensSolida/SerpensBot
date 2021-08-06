@@ -4,7 +4,6 @@ import com.serpenssolida.discordbot.RandomChoice;
 import com.serpenssolida.discordbot.module.hungergames.inventory.Food;
 import com.serpenssolida.discordbot.module.hungergames.inventory.Weapon;
 import com.serpenssolida.discordbot.module.hungergames.io.ItemData;
-import net.dv8tion.jda.api.entities.MessageChannel;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -12,8 +11,7 @@ import java.util.Map;
 
 public class HungerGames
 {
-	private MessageChannel channel; //Channel where the HungerGames is running.
-	private String guildID;
+	private final String guildID;
 	private ItemData itemData; //Collection of items of the HungerGames.
 	private HashSet<Weapon> weaponPool; //Pool of weapons that can be found during the HungerGames.
 	private int day; //Current day of the HungerGames.
@@ -117,16 +115,6 @@ public class HungerGames
 		Weapon weapon = (Weapon) RandomChoice.getRandomWithProbability(weaponPool.toArray(), probabilities);
 		weaponPool.remove(weapon);
 		return weapon;
-	}
-	
-	public MessageChannel getChannel()
-	{
-		return this.channel;
-	}
-	
-	public void setChannel(MessageChannel channel)
-	{
-		this.channel = channel;
 	}
 	
 	public ItemData getItemData()

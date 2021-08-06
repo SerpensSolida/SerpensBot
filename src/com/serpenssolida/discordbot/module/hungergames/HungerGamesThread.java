@@ -23,14 +23,14 @@ import java.util.HashSet;
 
 public class HungerGamesThread extends Thread
 {
-	private String guildID;
-	private MessageChannel channel;
-	private HungerGames hg;
-	private User author;
+	private final String guildID;
+	private final MessageChannel channel;
+	private final HungerGames hg;
+	private final User author;
 	
 	private static final Logger logger = LoggerFactory.getLogger(HungerGamesThread.class);
 	
-	private static HungerGamesEvent[] events = {
+	private static final HungerGamesEvent[] events = {
 			new BattleEvent(),
 			new EatFoodEvent(),
 			new FoundItemEvent(),
@@ -215,7 +215,7 @@ public class HungerGamesThread extends Thread
 					.setImage("attachment://status.png");
 		messageBuilder.setEmbeds(embedBuilder.build());
 		
-		//Check if the image was generate correctly.
+		//Check if the image was generated correctly.
 		if (statusImage != null)
 			this.channel.sendMessage(messageBuilder.build())
 					.addFile(statusImage, "status.png", new AttachmentOption[0])
@@ -231,7 +231,7 @@ public class HungerGamesThread extends Thread
 	}
 	
 	/**
-	 * @return Whether or not the HungerGames is not over.
+	 * @return Whether the HungerGames is not over.
 	 */
 	private boolean isHungerGamesRunning()
 	{

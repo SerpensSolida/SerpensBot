@@ -7,17 +7,17 @@ import java.util.HashSet;
 
 public class Connect4Game
 {
-	private int[][] field = new int[FIELD_WIDTH][FIELD_HEIGHT];
+	private final int[][] field = new int[FIELD_WIDTH][FIELD_HEIGHT];
+	private final User[] players = new User[2];
 	private String messageId;
-	private User[] players = new User[2];
 	private User winner;
 	private int currentTurn = 0;
 	private int lastMove;
 	private boolean interrupted = false;
 	private boolean finished = false;
 	
-	public static int FIELD_WIDTH = 7;
-	public static int FIELD_HEIGHT = 6;
+	public static final int FIELD_WIDTH = 7;
+	public static final int FIELD_HEIGHT = 6;
 	
 	public Connect4Game(User player1, User player2)
 	{
@@ -39,15 +39,16 @@ public class Connect4Game
 						{1, 0}, {1, 1}, {0, 1}, {-1, 1}
 				};
 		
-		for (int direction = 0; direction < directions.length; direction++) //Foreach direction
+		//Foreach direction
+		for (int[] direction : directions)
 		{
 			for (int offset = 0; offset < 4; offset++) //4 checks for each direction
 			{
 				int count = 0;
 				for (int i = 0; i < 4; i++) //Check if there is 4 in a row.
 				{
-					int posX = (i - offset) * directions[direction][0];
-					int posY = (i - offset) * directions[direction][1];
+					int posX = (i - offset) * direction[0];
+					int posY = (i - offset) * direction[1];
 					
 					int value;
 					

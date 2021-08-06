@@ -8,7 +8,7 @@ import java.util.HashSet;
 
 public class IncidentEvent extends HungerGamesEvent
 {
-	public String[] messages =
+	private final String[] messages =
 			{
 					"user cade da un dirupo perdendo damageHP.",
 					"user inciampa e si rompe la caviglia facedosi damageHP di danno.",

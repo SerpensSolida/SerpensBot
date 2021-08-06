@@ -30,9 +30,7 @@ public class HungerGamesListener extends BotListener
 		//Command for creating a character.
 		BotCommand command = new BotCommand("create", "Fa partire la procedura per la creazione di un personaggio.");
 		command.setAction((event, guild, channel, author) ->
-		{
-			this.startTask(guild.getId(), new CreateCharacterTask(guild, author, channel), event);
-		});
+				this.startTask(guild.getId(), new CreateCharacterTask(guild, author, channel), event));
 		this.addBotCommand(command);
 		
 		//Command for displaying character info.
@@ -45,9 +43,7 @@ public class HungerGamesListener extends BotListener
 		//Command for editing a character.
 		command = new BotCommand("edit", "Fa partire la procedura di modifica del personaggio.");
 		command.setAction((event, guild, channel, author) ->
-		{
-			this.startTask(guild.getId(), new EditCharacterTask(guild, author, channel), event);
-		});
+				this.startTask(guild.getId(), new EditCharacterTask(guild, author, channel), event));
 		this.addBotCommand(command);
 		
 		//Command for enabling or disabling a character.

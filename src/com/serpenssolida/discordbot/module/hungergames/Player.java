@@ -1,23 +1,22 @@
 package com.serpenssolida.discordbot.module.hungergames;
 
-import com.serpenssolida.discordbot.SerpensBot;
 import com.serpenssolida.discordbot.RandomChoice;
+import com.serpenssolida.discordbot.SerpensBot;
 import com.serpenssolida.discordbot.module.hungergames.inventory.Inventory;
 import com.serpenssolida.discordbot.module.hungergames.inventory.Weapon;
+import net.dv8tion.jda.api.entities.User;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 
-import net.dv8tion.jda.api.entities.User;
-
 public class Player
 {
-	private Character character; //Character of the player.
+	private final Character character; //Character of the player.
+	private final User owner; //User that own this player.
+	private final Inventory inventory = new Inventory(); //Inventory of the player
+	private final HashSet<Player> friends = new HashSet<>(); //List of friends of the player.
+	private final HashSet<Player> enemies = new HashSet<>(); //List of enemies of the player.
 	private float health; //Current health of the player.
-	private User owner; //User that own this player.
-	private Inventory inventory = new Inventory(); //Inventory of the player
-	private HashSet<Player> friends = new HashSet<>(); //List of friends of the player.
-	private HashSet<Player> enemies = new HashSet<>(); //List of enemies of the player.
 	
 	public Player(Character character)
 	{
@@ -41,7 +40,7 @@ public class Player
 		//Chose the weapon with the highest damage.
 		Weapon weapon = this.getEquippedWeapon();
 		
-		//Get the damage of the weapon.
+		//Get the weapon damage.
 		float damage = this.getDamageWithWeapon(weapon);
 		damage += damage * (RandomChoice.random.nextFloat() - 0.5f) * 0.2f;
 		
@@ -56,7 +55,7 @@ public class Player
 		//Chose the weapon with the highest damage.
 		Weapon weapon = this.getEquippedWeapon();
 		
-		//Get the damage of the weapon.
+		//Get the weapon damage.
 		float baseDamage = this.getDamageWithWeapon(weapon);
 		float damage = baseDamage * multiplier;
 		damage += baseDamage * (RandomChoice.random.nextFloat() - 0.5F) * 0.2F;
@@ -111,7 +110,7 @@ public class Player
 	 * @param weapon
 	 * 		The weapon used to calculate the damage.
 	 *
-	 * @return The damgae dealt by the player when he wield the given weapon.
+	 * @return The damgae dealt by the player when he wields the given weapon.
 	 */
 	private float getDamageWithWeapon(Weapon weapon)
 	{
@@ -155,11 +154,6 @@ public class Player
 	{
 		return this.owner;
 	}
-	
-	/*public void setOwner(User owner)
-	{
-		this.owner = owner;
-	}*/
 	
 	public Character getCharacter()
 	{

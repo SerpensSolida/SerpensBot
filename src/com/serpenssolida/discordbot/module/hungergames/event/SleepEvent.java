@@ -8,7 +8,7 @@ import java.util.HashSet;
 
 public class SleepEvent extends HungerGamesEvent
 {
-	public String[] messages = new String[]
+	private final String[] messages = new String[]
 			{
 					"user non si regge più in piedi e decide di fare un sonnellino, user guadagna damageHP.",
 					"user si fa un sonnellino recuperando damageHP.",

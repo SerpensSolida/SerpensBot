@@ -8,7 +8,7 @@ import java.util.HashSet;
 
 public class RandomEvent extends HungerGamesEvent
 {
-	String[] messages =
+	private final String[] messages =
 			{
 					"user ha paura di morire.",
 					"user guarda all'orizzonte cercando di scrutare qualcosa.",

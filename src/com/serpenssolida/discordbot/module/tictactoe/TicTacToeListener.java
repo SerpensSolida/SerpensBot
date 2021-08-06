@@ -25,7 +25,7 @@ import java.util.HashMap;
 
 public class TicTacToeListener extends BotListener
 {
-	private HashMap<String, TicTacToeGame> games = new HashMap<>();
+	private final HashMap<String, TicTacToeGame> games = new HashMap<>();
 	
 	public TicTacToeListener()
 	{
@@ -149,7 +149,7 @@ public class TicTacToeListener extends BotListener
 				
 				Button button = Button.secondary("" + (i + j * TicTacToeGame.FIELD_SIZE), label);
 				
-				if (!game.isCellEmpty(i, j) || game.isFinished())
+				if (game.isCellFull(i, j) || game.isFinished())
 					button = button.asDisabled();
 				
 				buttons.add(button);
@@ -191,7 +191,7 @@ public class TicTacToeListener extends BotListener
 						return InteractionCallback.LEAVE_MESSAGE;
 					
 					//Check if the cell is empty.
-					if (!game.isCellEmpty(x, y))
+					if (game.isCellFull(x, y))
 						return InteractionCallback.LEAVE_MESSAGE;
 					
 					//Execute player move.

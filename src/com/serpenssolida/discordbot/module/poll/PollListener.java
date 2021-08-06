@@ -26,7 +26,7 @@ import java.util.HashMap;
 
 public class PollListener extends BotListener
 {
-	private HashMap<String, Poll> polls = new HashMap<>();
+	private final HashMap<String, Poll> polls = new HashMap<>();
 	
 	public PollListener()
 	{
@@ -200,7 +200,7 @@ public class PollListener extends BotListener
 			return;
 		}
 		
-		//Check if the user trying to edit the poll is also the its author.
+		//Check if the user trying to edit the poll is also its author.
 		if (!author.equals(poll.getAuthor()))
 		{
 			Message message = MessageUtils.buildErrorMessage("Modifica descrizione del sondaggio", author, "Questo sondaggio non appartiene a te.");

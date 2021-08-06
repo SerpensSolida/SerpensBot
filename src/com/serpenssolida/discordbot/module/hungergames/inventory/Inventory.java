@@ -6,8 +6,8 @@ import java.util.Map;
 
 public class Inventory
 {
-	private HashMap<Food, ItemStack<Food>> foods = new HashMap<>();
-	private HashMap<Weapon, ItemStack<Weapon>> weapons = new HashMap<>();
+	private final HashMap<Food, ItemStack<Food>> foods = new HashMap<>();
+	private final HashMap<Weapon, ItemStack<Weapon>> weapons = new HashMap<>();
 	
 	public void removeItem(Item item, int num)
 	{

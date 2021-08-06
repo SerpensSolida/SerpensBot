@@ -10,7 +10,7 @@ import java.util.HashSet;
 
 public class EatFoodEvent extends HungerGamesEvent
 {
-	private String[] noFoodMessages = new String[] {
+	private final String[] noFoodMessages = new String[] {
 			"user sta morendo di fame, amountHP.",
 			"la fame sta assalendo user, amountHP.",
 			"user non ci vede più dalla fame, amountHP.",
@@ -20,7 +20,7 @@ public class EatFoodEvent extends HungerGamesEvent
 			"user è in crisi di astinenza da cibo, amountHP."
 	};
 	
-	private String[] fullhealthMessage = new String[] {
+	private final String[] fullhealthMessage = new String[] {
 			"user si sente sazio.",
 			"user potrebbe stare senza mangiare per giorni.",
 			"user ha la pancia piena.",
@@ -86,7 +86,7 @@ public class EatFoodEvent extends HungerGamesEvent
 		
 		if (player.getHealth() >= player.getMaxHealth())
 		{
-			//The players does not have to heal if he is at full health.
+			//The players do not have to heal if he is at full health.
 			
 			if (RandomChoice.random.nextInt(10) > 0)
 				return new EventResult("", EventResult.State.Successful); //Quit event.

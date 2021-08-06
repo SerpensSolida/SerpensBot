@@ -242,67 +242,6 @@ public class EditCharacterTask extends Task
 		this.insertMenu(messageBuilder);
 		
 		return messageBuilder;
-				//.append("> \t:regional_indicator_a: - Nome.\n")
-				//.append("> \t:regional_indicator_b: - Statistiche.\n")
-				//.append("> \t:x: - Esci.\n");
-		
-		/*Button editName = Button.primary("edit-name", "Modifica il nome");
-		Button editStats = Button.primary("edit-stats", "Modifica le caratteristiche");
-		Button cancelTask = Button.danger("cancel-task", "Esci");
-		
-		this.buttonGroup = new ButtonGroup(this.user);
-		
-		this.buttonGroup.addButton(new ButtonCallback("edit-name", this.user, this.channel, (event, guild, channel, message, author) ->
-		{
-			this.state = State.NAME_CHARACTER;
-			
-			MessageBuilder b = new MessageBuilder()
-					.append("> Inserisci il nuovo nome del tuo personaggio. (max 15 caratteri)");
-			
-			event.deferEdit().queue();
-			event.getHook().deleteOriginal().queue(); //Remove the original message.
-			
-			this.buttonGroup = null;
-			this.sendWithCancelButton(b);
-			
-			return true;
-		}));
-		
-		this.buttonGroup.addButton(new ButtonCallback("edit-stats", this.user, this.channel, (event, guild, channel, message, author) ->
-		{
-			this.state = State.ASSIGN_STATS;
-			MessageBuilder b = new MessageBuilder();
-			
-			event.deferEdit().queue();
-			event.getHook().deleteOriginal().queue(); //Remove the original message.
-			
-			b.appendFormat("> Stai modificando le caratteristiche di **%s**", this.getCharacter().getDisplayName())
-					.append("\n> Assegna le caratteristiche al personaggio. Invia un messaggio con 7 numeri separati da uno spazio che rappresentano le caratteristiche del tuo personaggio.")
-					.append("\n> Le caratteristiche sono: ")
-					.append("Vitalità, Forza, Abilità, Special, Velocità, Resistenza e Gusto. ")
-					.appendFormat("\n> La somma dei valori delle caratteristiche deve essere %d punti e ogni carateristica deve essere compresa tra 0 e 10.", SUM_STATS);
-			
-			this.buttonGroup = null;
-			this.sendWithCancelButton(b);
-
-			return true;
-		}));
-		
-		this.registerCancelButton();
-		
-		//Add button to the message.
-		messageBuilder.setActionRows(ActionRow.of(editName, editStats, cancelTask));
-		//this.getChannel().sendMessage(messageBuilder.build()).queue();
-		return messageBuilder;*/
-
-		/*//Add the reaction to the menu.
-		messageAction.queue(message ->
-		{
-			this.reactionCheckMessage = message; //This message is the one used for checking the reaction.
-			message.addReaction("🇦").queue();
-			message.addReaction("🇧").queue();
-			message.addReaction("❌").queue();
-		});*/
 	}
 	
 	/**

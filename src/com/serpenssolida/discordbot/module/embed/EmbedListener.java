@@ -20,7 +20,7 @@ import java.util.HashMap;
 
 public class EmbedListener extends BotListener
 {
-	private HashMap<String, Poll> polls = new HashMap<>();
+	private final HashMap<String, Poll> polls = new HashMap<>();
 	
 	public EmbedListener()
 	{
@@ -87,7 +87,7 @@ public class EmbedListener extends BotListener
 		if (colorArg != null)
 		{
 			String colorString = colorArg.getAsString();
-			int colorValue = 0;
+			int colorValue;
 			
 			//A color is only 6 character long.
 			if (colorString.length() > 6)
@@ -138,7 +138,7 @@ public class EmbedListener extends BotListener
 			}
 		}
 		
-		//Build and send the message with the embed..
+		//Build and send the message with the embed.
 		MessageBuilder messageBuilder = new MessageBuilder();
 		messageBuilder.setEmbeds(embedBuilder.build());
 		

@@ -7,10 +7,10 @@ import com.serpenssolida.discordbot.module.hungergames.inventory.Weapon;
  */
 public class AttackResult
 {
+	private final Player user;
+	private final Player receiver;
 	private float inflictedDamage;
 	private Weapon weapon;
-	private Player user;
-	private Player receiver;
 	
 	public AttackResult(Player user, Player receiver, float inflictedDamage, Weapon weapon)
 	{

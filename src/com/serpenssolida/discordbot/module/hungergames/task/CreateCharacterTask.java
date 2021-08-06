@@ -24,7 +24,6 @@ public class CreateCharacterTask extends Task
 	{
 		NAME_CHARACTER,
 		ASSIGN_STATS,
-		ASSIGN_AVATAR,
 		FINISHED
 	}
 	
@@ -199,7 +198,7 @@ public class CreateCharacterTask extends Task
 				.appendDescription("Creazione personaggio completata");
 		
 		MessageBuilder messageBuilder = new MessageBuilder()
-				.setEmbed(embedBuilder.build());
+				.setEmbeds(embedBuilder.build());
 		
 		this.getChannel().sendMessage(messageBuilder.build()).queue();
 		

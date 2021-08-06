@@ -28,7 +28,7 @@ import java.util.Map;
 
 public class Connect4Listener extends BotListener
 {
-	private HashMap<String, Connect4Game> games = new HashMap<>();
+	private final HashMap<String, Connect4Game> games = new HashMap<>();
 	
 	public Connect4Listener()
 	{
@@ -185,10 +185,9 @@ public class Connect4Listener extends BotListener
 		//Generate the buttons.
 		for (int i = 0; i < Connect4Game.FIELD_WIDTH; i++)
 		{
-			int x = i;
 			Button button = Button.secondary("" + i, "" + (i + 1));
 			
-			if (game.getHeight(x) >= Connect4Game.FIELD_HEIGHT || game.isFinished())
+			if (game.getHeight(i) >= Connect4Game.FIELD_HEIGHT || game.isFinished())
 				button = button.asDisabled();
 			
 			buttons.add(button);

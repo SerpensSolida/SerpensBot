@@ -17,14 +17,14 @@ import java.util.HashMap;
 
 public class HungerGamesController
 {
-	public static HashMap<String, HungerGamesController> instance = new HashMap<>(); //Singleton data.
-	public static String folder = "hungergames";
-	public static int SUM_STATS = 40;
+	public static final HashMap<String, HungerGamesController> instance = new HashMap<>(); //Singleton data.
+	public static final String folder = "hungergames";
+	public static final int SUM_STATS = 40;
 	public static Font font;
 	
 	private static final Logger logger = LoggerFactory.getLogger(HungerGamesController.class);
 	
-	private boolean running = false; //Whether or not the HungerGames is running.
+	private boolean running = false; //Whether the HungerGames is running.
 	private int count = 0; //Number of editions of the HungerGames.
 	private long messageSpeed = 1000; //Speed of the messages.
 	private Thread gameThread;
@@ -53,6 +53,7 @@ public class HungerGamesController
 	 * @param channel
 	 * 		The channel where to send the messages.
 	 * @param author
+	 * 		The user who started the HungerGames.
 	 */
 	public static void startHungerGames(String guildID, MessageChannel channel, User author)
 	{
