@@ -2,6 +2,7 @@ package com.serpenssolida.discordbot.module.connect4;
 
 import net.dv8tion.jda.api.entities.User;
 
+import java.awt.*;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -34,21 +35,24 @@ public class Connect4Game
 	public boolean checkMove(int turn, int x, int y)
 	{
 		//Direction for the check.
-		int[][] directions =
+		Point[] directions =
 				{
-						{1, 0}, {1, 1}, {0, 1}, {-1, 1}
+						new Point(1, 0), //Horizontal.
+						new Point(1, 1), //Diagonal.
+						new Point(0, 1), //Vertical.
+						new Point(-1, 1) //Anti diagonal.
 				};
 		
 		//Foreach direction
-		for (int[] direction : directions)
+		for (Point direction : directions)
 		{
 			for (int offset = 0; offset < 4; offset++) //4 checks for each direction
 			{
 				int count = 0;
 				for (int i = 0; i < 4; i++) //Check if there is 4 in a row.
 				{
-					int posX = (i - offset) * direction[0];
-					int posY = (i - offset) * direction[1];
+					int posX = (i - offset) * direction.x;
+					int posY = (i - offset) * direction.y;
 					
 					int value;
 					
