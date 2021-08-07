@@ -161,7 +161,7 @@ public class Connect4Listener extends BotListener
 			
 			if (user != null)
 			{
-				names.append(String.format("%s", user.getName()));
+				names.append(String.format("%s\n", user.getName()));
 				values.append(String.format("%s\n", data.getValue().getWins()));
 			}
 		}
