@@ -40,7 +40,7 @@ public class Weapon extends Item
 	
 	public enum WeaponType implements Serializable
 	{
-		Strength, Ability, Special
+		STRENGTH, ABILITY, SPECIAL
 	}
 	
 	public Weapon(String name, int damage, int chance, WeaponType type)

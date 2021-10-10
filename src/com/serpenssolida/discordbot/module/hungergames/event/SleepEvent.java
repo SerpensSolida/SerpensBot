@@ -6,7 +6,7 @@ import com.serpenssolida.discordbot.module.hungergames.Player;
 
 import java.util.HashSet;
 
-public class SleepEvent extends HungerGamesEvent
+public class SleepEvent implements HungerGamesEvent
 {
 	private final String[] messages = new String[]
 			{
@@ -33,21 +33,21 @@ public class SleepEvent extends HungerGamesEvent
 		noSleepPlayers.removeAll(sleepPlayers);
 		
 		if (noSleepPlayers.isEmpty())
-			return new EventResult("", EventResult.State.Failed); //Quit the event.
+			return new EventResult("", EventResult.State.FAILED); //Quit the event.
 		
 		//Get a random player.
 		Player player = (Player) RandomChoice.getRandom(noSleepPlayers.toArray());
 		
 		if (player.getHealth() >= player.getMaxHealth())
-			return new EventResult("", EventResult.State.Failed); //Quit the event.
+			return new EventResult("", EventResult.State.FAILED); //Quit the event.
 		
 		//The player sleeps, so he heals.
 		float damage = (15 + RandomChoice.random.nextInt(30));
 		player.setHealth(player.getHealth() + damage);
 		
 		String eventMessage = (String) RandomChoice.getRandom(this.messages);
-		eventMessage = eventMessage.replaceAll("damage", "" + (int) damage);
-		eventMessage = eventMessage.replaceAll("user", "**" + player + "**");
+		eventMessage = eventMessage.replace("damage", "" + (int) damage);
+		eventMessage = eventMessage.replace("user", "**" + player + "**");
 		
 		stringBuilder.append(eventMessage + "\n");
 		
@@ -58,6 +58,6 @@ public class SleepEvent extends HungerGamesEvent
 		healedPlayers.add(player);
 		sleepPlayers.add(player);
 		
-		return new EventResult(stringBuilder.toString(), EventResult.State.Successful);
+		return new EventResult(stringBuilder.toString(), EventResult.State.SUCCESSFUL);
 	}
 }

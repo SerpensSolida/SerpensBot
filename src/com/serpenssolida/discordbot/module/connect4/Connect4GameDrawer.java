@@ -13,6 +13,8 @@ public class Connect4GameDrawer
 	private static final Color[] pawnColor = {new Color(0xE43613), new Color(0xEFCC1C)};
 	private static final Color[] darkPawnColor = {new Color(0x952F15), new Color(0x95771A)};
 	
+	private Connect4GameDrawer(){}
+	
 	public static byte[] generateFieldImage(Connect4Game game)
 	{
 		//Calculate image dimensions.

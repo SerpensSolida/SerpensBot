@@ -43,10 +43,10 @@ public class AttackResult
 	public String toString()
 	{
 		String attackString = this.weapon.getUseMessage();
-		attackString = attackString.replaceAll("user", "**" + this.user + "**");
-		attackString = attackString.replaceAll("receiver", "**" + this.receiver + "**");
-		attackString = attackString.replaceAll("weapon", "*" + this.weapon.getName() + "*");
-		attackString = attackString.replaceAll("damage", String.valueOf((int) this.inflictedDamage));
+		attackString = attackString.replace("user", "**" + this.user + "**");
+		attackString = attackString.replace("receiver", "**" + this.receiver + "**");
+		attackString = attackString.replace("weapon", "*" + this.weapon.getName() + "*");
+		attackString = attackString.replace("damage", String.valueOf((int) this.inflictedDamage));
 		return attackString;
 	}
 }

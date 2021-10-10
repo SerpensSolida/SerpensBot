@@ -101,20 +101,20 @@ public class HungerGames
 	 */
 	public Weapon getRandomWeapon()
 	{
-		HashSet<Weapon> weaponPool = this.getWeaponPool();
+		HashSet<Weapon> pool = this.getWeaponPool();
 		
-		float[] probabilities = new float[weaponPool.size()];
+		float[] probabilities = new float[pool.size()];
 		int i = 0;
 		
-		for (Weapon weapon1 : weaponPool)
+		for (Weapon weapon : pool)
 		{
-			probabilities[i] = (100 - weapon1.getDamage());
+			probabilities[i] = (100 - weapon.getDamage());
 			i++;
 		}
 		
-		Weapon weapon = (Weapon) RandomChoice.getRandomWithProbability(weaponPool.toArray(), probabilities);
-		weaponPool.remove(weapon);
-		return weapon;
+		Weapon choosenWeapon = (Weapon) RandomChoice.getRandomWithProbability(pool.toArray(), probabilities);
+		pool.remove(choosenWeapon);
+		return choosenWeapon;
 	}
 	
 	public ItemData getItemData()

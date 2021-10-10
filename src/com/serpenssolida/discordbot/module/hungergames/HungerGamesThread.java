@@ -5,19 +5,15 @@ import com.google.gson.GsonBuilder;
 import com.serpenssolida.discordbot.MessageUtils;
 import com.serpenssolida.discordbot.RandomChoice;
 import com.serpenssolida.discordbot.module.hungergames.event.*;
-import com.serpenssolida.discordbot.module.hungergames.inventory.Weapon;
 import com.serpenssolida.discordbot.module.hungergames.io.ItemData;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.utils.AttachmentOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.HashSet;
 
@@ -50,6 +46,7 @@ public class HungerGamesThread extends Thread
 		this.hg = new HungerGames(this.guildID, this.loadItems());
 	}
 	
+	@Override
 	public void run()
 	{
 		try
@@ -67,7 +64,6 @@ public class HungerGamesThread extends Thread
 	{
 		MessageBuilder messageBuilder = new MessageBuilder();
 		EmbedBuilder embedBuilder = new EmbedBuilder();
-		StringBuilder stringBuilder = new StringBuilder();
 		HashSet<Player> alivePlayers = this.hg.getAlivePlayers();
 		
 		//Check if there are enough player to play the game.
@@ -133,7 +129,7 @@ public class HungerGamesThread extends Thread
 		
 		if (!this.isInterrupted())
 		{
-			if (alivePlayers.size() > 0)
+			if (!alivePlayers.isEmpty())
 			{
 				Player winner = (Player) alivePlayers.toArray()[0]; //This player is the winner.
 				
@@ -195,10 +191,10 @@ public class HungerGamesThread extends Thread
 					eventResult = event.doEvent(this.hg);
 					tries--;
 				}
-				while (eventResult.getState() == EventResult.State.Failed && tries > 0);
+				while (eventResult.getState() == EventResult.State.FAILED && tries > 0);
 				
 				//Append the result to the message.
-				if (eventResult.getState() != EventResult.State.Failed && !eventResult.getEventMessage().isBlank())
+				if (eventResult.getState() != EventResult.State.FAILED && !eventResult.getEventMessage().isBlank())
 				{
 					stringBuilder.append("" + eventResult + "\n");
 				}
@@ -218,7 +214,7 @@ public class HungerGamesThread extends Thread
 		//Check if the image was generated correctly.
 		if (statusImage != null)
 			this.channel.sendMessage(messageBuilder.build())
-					.addFile(statusImage, "status.png", new AttachmentOption[0])
+					.addFile(statusImage, "status.png")
 					.queue();
 		
 		//Clear all lists used by events.
@@ -245,29 +241,13 @@ public class HungerGamesThread extends Thread
 	 */
 	public ItemData loadItems()
 	{
-		File file = new File(HungerGamesController.folder + "/items.json");
+		File file = new File(HungerGamesController.FOLDER + "/items.json");
 		Gson gson = (new GsonBuilder()).setPrettyPrinting().enableComplexMapKeySerialization().create();
 		ItemData data = new ItemData();
-		try
+		
+		try (BufferedReader reader = new BufferedReader(new FileReader(file)))
 		{
-			BufferedReader reader = new BufferedReader(new FileReader(file));
-			try
-			{
-				data = gson.fromJson(reader, ItemData.class);
-				reader.close();
-			}
-			catch (Throwable throwable)
-			{
-				try
-				{
-					reader.close();
-				}
-				catch (Throwable throwable1)
-				{
-					throwable.addSuppressed(throwable1);
-				}
-				throw throwable;
-			}
+			data = gson.fromJson(reader, ItemData.class);
 		}
 		catch (FileNotFoundException e)
 		{
@@ -278,22 +258,6 @@ public class HungerGamesThread extends Thread
 			e.printStackTrace();
 		}
 		return data;
-	}
-	
-	private BufferedImage getTombImage()
-	{
-		File tombFile = new File(HungerGamesController.folder + "/tombstone.png");
-		
-		try
-		{
-			return ImageIO.read(tombFile);
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-		
-		return new BufferedImage(1, 1, BufferedImage.TYPE_4BYTE_ABGR);
 	}
 	
 	/**
@@ -366,42 +330,5 @@ public class HungerGamesThread extends Thread
 	{
 		float[] probs = {0.35F, 0.25F, 0.05F, 0.05F, 0.05F, 0.05F, 0.1F, 0.1F};
 		return (HungerGamesEvent) RandomChoice.getRandomWithProbability(events, probs);
-	}
-	
-	private void calculate()
-	{
-		float specialNum = 0.0F;
-		float strengthNum = 0.0F;
-		float abilityNum = 0.0F;
-		float specialValue = 0.0F;
-		float strengthValue = 0.0F;
-		float abilityValue = 0.0F;
-		for (Weapon weapon : this.hg.getItemData().getWeapons())
-		{
-			switch (weapon.getType())
-			{
-				case Strength:
-					strengthNum++;
-					strengthValue += weapon.getDamage();
-				case Ability:
-					abilityNum++;
-					abilityValue += weapon.getDamage();
-				case Special:
-					specialNum++;
-					specialValue += weapon.getDamage();
-			}
-		}
-		float strengthAv = strengthValue / strengthNum;
-		float abilityAv = abilityValue / abilityNum;
-		float specialAv = specialValue / specialNum;
-		logger.info("Forza");
-		logger.info("\tNumero:" + strengthNum);
-		logger.info("\tMedia:" + strengthAv);
-		logger.info("Abilità");
-		logger.info("\tNumero:" + abilityNum);
-		logger.info("\tMedia:" + abilityAv);
-		logger.info("Special:");
-		logger.info("\tNumero:" + specialNum);
-		logger.info("\tMedia:" + specialAv);
 	}
 }

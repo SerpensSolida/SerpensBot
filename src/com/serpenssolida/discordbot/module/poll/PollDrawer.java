@@ -11,6 +11,8 @@ import java.io.ByteArrayOutputStream;
 
 public class PollDrawer
 {
+	
+	private PollDrawer() {}
 	/**
 	 * Generate a pie chart picture displaying options and their votes.
 	 * @return The picture generated as {@link ByteArrayOutputStream}.
@@ -32,8 +34,6 @@ public class PollDrawer
 		BufferedImage pieChartImage = chart.createBufferedImage(512, 512, 512, 512, new ChartRenderingInfo());
 		
 		//Convert it to bytes.
-		ByteArrayOutputStream outputStream = null;
-		
 		return ImageUtils.toByteArray(pieChartImage);
 	}
 }

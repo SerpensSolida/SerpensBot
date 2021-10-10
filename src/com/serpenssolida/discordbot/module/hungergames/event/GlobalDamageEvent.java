@@ -6,7 +6,7 @@ import com.serpenssolida.discordbot.module.hungergames.Player;
 
 import java.util.HashSet;
 
-public class GlobalDamageEvent extends HungerGamesEvent
+public class GlobalDamageEvent implements HungerGamesEvent
 {
 	private final String[] messages =
 			{
@@ -25,7 +25,7 @@ public class GlobalDamageEvent extends HungerGamesEvent
 		//Damage dealt by the event.
 		float damage = (15 + RandomChoice.random.nextInt(30));
 		
-		String eventString = ((String) RandomChoice.getRandom(this.messages)).replaceAll("damage", "" + (int) damage);
+		String eventString = ((String) RandomChoice.getRandom(this.messages)).replace("damage", "" + (int) damage);
 		stringBuilder.append(eventString + "\n");
 		
 		//Damage all the players.
@@ -45,6 +45,6 @@ public class GlobalDamageEvent extends HungerGamesEvent
 		involvedPlayers.addAll(alivePlayers);
 		alivePlayers.removeAll(deadPlayers);
 		
-		return new EventResult(stringBuilder.toString(), EventResult.State.Successful);
+		return new EventResult(stringBuilder.toString(), EventResult.State.SUCCESSFUL);
 	}
 }

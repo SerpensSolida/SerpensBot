@@ -86,6 +86,8 @@ public class CreateCharacterTask extends Task
 			case ASSIGN_STATS: //Assigning stas.
 				this.manageAssignStatsState(receivedMessage);
 				return;
+			case FINISHED:
+				break;
 		}
 		
 		//This state is not possible, you broke my FSM :(
@@ -93,7 +95,10 @@ public class CreateCharacterTask extends Task
 		this.setRunning(false);
 	}
 	
-	public void reactionAdded(Message message, String reaction) {}
+	public void reactionAdded(Message message, String reaction)
+	{
+		//No need to intercept reactions.
+	}
 	
 	private void manageNameCharacterState(Message receivedMessage)
 	{
@@ -114,7 +119,7 @@ public class CreateCharacterTask extends Task
 		this.character.setName(name);
 		this.state = State.ASSIGN_STATS;
 		
-		logger.info("Nome assegnato: " + name);
+		logger.info("Nome assegnato: {}", name);
 		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Creazione del personaggio", this.getUser());
 		
 		embedBuilder

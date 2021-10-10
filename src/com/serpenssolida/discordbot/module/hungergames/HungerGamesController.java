@@ -17,10 +17,10 @@ import java.util.HashMap;
 
 public class HungerGamesController
 {
-	public static final HashMap<String, HungerGamesController> instance = new HashMap<>(); //Singleton data.
-	public static final String folder = "hungergames";
+	private static final HashMap<String, HungerGamesController> instance = new HashMap<>(); //Singleton data.
+	protected static final String FOLDER = "hungergames";
 	public static final int SUM_STATS = 40;
-	public static Font font;
+	protected static Font font;
 	
 	private static final Logger logger = LoggerFactory.getLogger(HungerGamesController.class);
 	
@@ -71,7 +71,7 @@ public class HungerGamesController
 	
 	public static void load(String guildID)
 	{
-		File fileCharacters = new File(Paths.get("server_data", guildID, HungerGamesController.folder,  "characters.json").toString());
+		File fileCharacters = new File(Paths.get("server_data", guildID, HungerGamesController.FOLDER,  "characters.json").toString());
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		logger.info("Cariamento dati HungerGames.");
 		
@@ -94,7 +94,7 @@ public class HungerGamesController
 	
 	public static void save(String guildID)
 	{
-		File fileCharacters = new File(Paths.get("server_data", guildID, HungerGamesController.folder, "characters.json").toString());
+		File fileCharacters = new File(Paths.get("server_data", guildID, HungerGamesController.FOLDER, "characters.json").toString());
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		logger.info("Salvataggio dati HungerGames.");
 		
@@ -129,7 +129,7 @@ public class HungerGamesController
 	
 	public static void loadSettings(String guildID)
 	{
-		File fileData = new File(Paths.get("server_data", guildID, HungerGamesController.folder,  "hg_data.json").toString());
+		File fileData = new File(Paths.get("server_data", guildID, HungerGamesController.FOLDER,  "hg_data.json").toString());
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		
 		try (BufferedReader reader = new BufferedReader(new FileReader(fileData)))
@@ -151,7 +151,7 @@ public class HungerGamesController
 	
 	public static void saveSettings(String guildID)
 	{
-		File fileData = new File(Paths.get("server_data", guildID, HungerGamesController.folder,  "hg_data.json").toString());
+		File fileData = new File(Paths.get("server_data", guildID, HungerGamesController.FOLDER,  "hg_data.json").toString());
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		
 		try (PrintWriter writer = new PrintWriter(new FileWriter(fileData)))
@@ -190,7 +190,7 @@ public class HungerGamesController
 			if (HungerGamesController.font == null)
 			{
 				//Create the font.
-				HungerGamesController.font = Font.createFont(Font.TRUETYPE_FONT, new File(HungerGamesController.folder + "/tahoma.ttf"))
+				HungerGamesController.font = Font.createFont(Font.TRUETYPE_FONT, new File(HungerGamesController.FOLDER + "/tahoma.ttf"))
 						.deriveFont(12f);
 			}
 		}

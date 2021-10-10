@@ -3,7 +3,6 @@ package com.serpenssolida.discordbot.module.embed;
 import com.serpenssolida.discordbot.MessageUtils;
 import com.serpenssolida.discordbot.command.BotCommand;
 import com.serpenssolida.discordbot.module.BotListener;
-import com.serpenssolida.discordbot.module.poll.Poll;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -16,12 +15,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 
 import java.awt.*;
-import java.util.HashMap;
 
 public class EmbedListener extends BotListener
 {
-	private final HashMap<String, Poll> polls = new HashMap<>();
-	
 	public EmbedListener()
 	{
 		super("embed");

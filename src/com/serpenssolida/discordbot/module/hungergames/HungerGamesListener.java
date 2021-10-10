@@ -242,7 +242,7 @@ public class HungerGamesListener extends BotListener
 	private void sendLeaderboard(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping typeArg = event.getOption("type");
-		String fieldName = "Bug";
+		String fieldName;
 		
 		//Check argument.
 		if (typeArg == null)
@@ -284,6 +284,11 @@ public class HungerGamesListener extends BotListener
 				
 				fieldName = "Uccisioni";
 				break;
+				
+			default:
+				Message message = MessageUtils.buildErrorMessage("Classifiche Hunger Games", author, "Sei riuscito a mettere un argomento invalido. Bravo.");
+				event.reply(message).setEphemeral(true).queue();
+				return;
 		}
 		
 		//Get leaderboard names.

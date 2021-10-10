@@ -12,8 +12,10 @@ import java.util.HashSet;
 
 public class HungerGameStatusImageDrawer
 {
-	private final static int AVATAR_SIZE = 64; //Size of the avatars.
-	private static BufferedImage TOMB_IMAGE; //Size of the avatars.
+	private static final int AVATAR_SIZE = 64; //Size of the avatars.
+	private static BufferedImage tombImage; //Size of the avatars.
+	
+	private HungerGameStatusImageDrawer() {}
 	
 	/**
 	 * @return The status image of the turn.
@@ -80,17 +82,17 @@ public class HungerGameStatusImageDrawer
 	
 	private static BufferedImage getTombImage()
 	{
-		if (HungerGameStatusImageDrawer.TOMB_IMAGE == null)
+		if (HungerGameStatusImageDrawer.tombImage == null)
 		{
-			HungerGameStatusImageDrawer.TOMB_IMAGE = HungerGameStatusImageDrawer.loadTombImage();
+			HungerGameStatusImageDrawer.tombImage = HungerGameStatusImageDrawer.loadTombImage();
 		}
 		
-		return HungerGameStatusImageDrawer.TOMB_IMAGE;
+		return HungerGameStatusImageDrawer.tombImage;
 	}
 	
 	private static BufferedImage loadTombImage()
 	{
-		File tombFile = new File(HungerGamesController.folder + "/tombstone.png");
+		File tombFile = new File(HungerGamesController.FOLDER + "/tombstone.png");
 		
 		try
 		{

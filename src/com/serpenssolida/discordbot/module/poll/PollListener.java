@@ -72,7 +72,6 @@ public class PollListener extends BotListener
 		command.getSubcommand()
 				.addOption(OptionType.STRING, "poll-id", "Identificatore univoco del sondaggio", true)
 				.addOption(OptionType.STRING, "description", "Testo dell'opzione da aggiungere", true);
-				//.addOption(OptionType.STRING, "option-index", "Indice dell'opzione da rimuovere");
 		this.addBotCommand(command);
 		
 		//Command for removing a vote from the pool.

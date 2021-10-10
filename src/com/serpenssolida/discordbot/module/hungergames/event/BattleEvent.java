@@ -10,7 +10,7 @@ import com.serpenssolida.discordbot.module.hungergames.inventory.Item;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public class BattleEvent extends HungerGamesEvent
+public class BattleEvent implements HungerGamesEvent
 {
 	public EventResult doEvent(HungerGames hg)
 	{
@@ -26,7 +26,7 @@ public class BattleEvent extends HungerGamesEvent
 		availablePlayers.removeAll(combatPlayers);
 		
 		if (availablePlayers.size() < 2)
-			return new EventResult("", EventResult.State.Failed); //Quit event.
+			return new EventResult("", EventResult.State.FAILED); //Quit event.
 		
 		//Chose a random player.
 		Player player1 = (Player) RandomChoice.getRandom(availablePlayers.toArray());
@@ -36,7 +36,7 @@ public class BattleEvent extends HungerGamesEvent
 		HashSet<Player> targetSet = this.getRelationshipSet(player1, alivePlayers, availablePlayers);
 		
 		if (targetSet.isEmpty())
-			return new EventResult("", EventResult.State.Failed); //Quit event.
+			return new EventResult("", EventResult.State.FAILED); //Quit event.
 		
 		//Get a random player from the chosen category.
 		Player player2 = (Player) RandomChoice.getRandom(targetSet.toArray());
@@ -98,7 +98,7 @@ public class BattleEvent extends HungerGamesEvent
 				}
 			}
 			
-			return new EventResult(stringBuilder.toString(), EventResult.State.Successful);
+			return new EventResult(stringBuilder.toString(), EventResult.State.SUCCESSFUL);
 		}
 		
 		result = player2.attack(player1);
@@ -127,7 +127,7 @@ public class BattleEvent extends HungerGamesEvent
 			}
 		}
 		
-		return new EventResult(stringBuilder.toString(), EventResult.State.Successful);
+		return new EventResult(stringBuilder.toString(), EventResult.State.SUCCESSFUL);
 	}
 	
 	private HashSet<Player> getRelationshipSet(Player player, HashSet<Player> alivePlayers, HashSet<Player> availablePlayers)

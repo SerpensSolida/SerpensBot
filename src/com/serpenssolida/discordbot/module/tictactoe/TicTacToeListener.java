@@ -37,7 +37,6 @@ public class TicTacToeListener extends BotListener
 		
 		//Command for creating a game.
 		BotCommand command = new BotCommand("start", "Comincia una partita di tris.");
-		//this.createNewPoll(event, guild, channel, author);
 		command.setAction(this::startGame);
 		command.getSubcommand()
 				.addOption(OptionType.USER, "opponent", "L'avversario della partita", true);
@@ -145,6 +144,9 @@ public class TicTacToeListener extends BotListener
 						break;
 					case 1:
 						label = "⭕";
+						break;
+					default:
+						break;
 				}
 				
 				Button button = Button.secondary("" + (i + j * TicTacToeGame.FIELD_SIZE), label);

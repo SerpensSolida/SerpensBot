@@ -7,6 +7,8 @@ import java.io.IOException;
 
 public class ImageUtils
 {
+	private ImageUtils() {}
+	
 	public static byte[] toByteArray(BufferedImage image)
 	{
 		ByteArrayOutputStream outputStream;

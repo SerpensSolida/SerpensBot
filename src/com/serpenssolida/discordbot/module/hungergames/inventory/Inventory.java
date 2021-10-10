@@ -9,7 +9,7 @@ public class Inventory
 	private final HashMap<Food, ItemStack<Food>> foods = new HashMap<>();
 	private final HashMap<Weapon, ItemStack<Weapon>> weapons = new HashMap<>();
 	
-	public void removeItem(Item item, int num)
+	public void removeItem(Item item)
 	{
 		if (item instanceof Weapon)
 		{

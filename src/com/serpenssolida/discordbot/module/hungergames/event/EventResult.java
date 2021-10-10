@@ -7,7 +7,7 @@ public class EventResult
 	
 	public enum State
 	{
-		Successful, Failed
+		SUCCESSFUL, FAILED
 	}
 	
 	public EventResult(String eventMessage, State state)

@@ -2,7 +2,7 @@ package com.serpenssolida.discordbot.module.hungergames.event;
 
 import com.serpenssolida.discordbot.module.hungergames.HungerGames;
 
-public abstract class HungerGamesEvent
+public interface HungerGamesEvent
 {
-	public abstract EventResult doEvent(HungerGames paramHungerGames);
+	EventResult doEvent(HungerGames paramHungerGames);
 }

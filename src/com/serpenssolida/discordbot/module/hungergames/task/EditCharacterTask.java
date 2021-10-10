@@ -20,7 +20,6 @@ public class EditCharacterTask extends Task
 {
 	private Character character;
 	private State state;
-	private Message reactionCheckMessage;
 	
 	public EditCharacterTask(Guild guild, User user, MessageChannel channel)
 	{
@@ -110,7 +109,10 @@ public class EditCharacterTask extends Task
 		this.setRunning(false);
 	}
 	
-	public void reactionAdded(Message message, String reaction) {}
+	public void reactionAdded(Message message, String reaction)
+	{
+		//No need to intercept reactions.
+	}
 	
 	private void manageNameCharacterState(Message receivedMessage)
 	{
@@ -281,7 +283,6 @@ public class EditCharacterTask extends Task
 		this.getInteractionGroup().addButtonCallback("edit-stats", (event, guild, channel, message, author) ->
 		{
 			this.state = State.ASSIGN_STATS;
-			MessageBuilder b = new MessageBuilder();
 			
 			event.deferEdit().queue();
 			event.getHook().deleteOriginal().queue(); //Remove the original message.

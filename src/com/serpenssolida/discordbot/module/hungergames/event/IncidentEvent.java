@@ -6,7 +6,7 @@ import com.serpenssolida.discordbot.module.hungergames.Player;
 
 import java.util.HashSet;
 
-public class IncidentEvent extends HungerGamesEvent
+public class IncidentEvent implements HungerGamesEvent
 {
 	private final String[] messages =
 			{
@@ -33,7 +33,7 @@ public class IncidentEvent extends HungerGamesEvent
 		noIncidentPlayers.removeAll(involvedPlayers);
 		
 		if (noIncidentPlayers.isEmpty())
-			return new EventResult("", EventResult.State.Failed); //Quit the event.
+			return new EventResult("", EventResult.State.FAILED); //Quit the event.
 		
 		//Chose a random player.
 		Player player = (Player) RandomChoice.getRandom(noIncidentPlayers.toArray());
@@ -43,8 +43,8 @@ public class IncidentEvent extends HungerGamesEvent
 		player.setHealth(player.getHealth() - damage);
 		
 		String eventMessage = (String) RandomChoice.getRandom(this.messages);
-		eventMessage = eventMessage.replaceAll("damage", "" + (int) damage);
-		eventMessage = eventMessage.replaceAll("user", "**" + player + "**");
+		eventMessage = eventMessage.replace("damage", "" + (int) damage);
+		eventMessage = eventMessage.replace("user", "**" + player + "**");
 		stringBuilder.append(eventMessage + "\n");
 		
 		if (player.isDead())
@@ -60,6 +60,6 @@ public class IncidentEvent extends HungerGamesEvent
 		involvedPlayers.add(player);
 		incidentPlayers.add(player);
 		
-		return new EventResult(stringBuilder.toString(), EventResult.State.Successful);
+		return new EventResult(stringBuilder.toString(), EventResult.State.SUCCESSFUL);
 	}
 }

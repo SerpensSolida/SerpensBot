@@ -200,7 +200,7 @@ public class Connect4Listener extends BotListener
 		}
 		
 		//Check if there are remaining buttons to add.
-		if (buttons.size() > 0)
+		if (!buttons.isEmpty())
 			actionRows.add(ActionRow.of(buttons));
 		
 		messageBuilder.setActionRows(actionRows);

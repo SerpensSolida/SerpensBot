@@ -6,7 +6,7 @@ import com.serpenssolida.discordbot.module.hungergames.Player;
 
 import java.util.HashSet;
 
-public class RelationshipEvent extends HungerGamesEvent
+public class RelationshipEvent implements HungerGamesEvent
 {
 	private final String[] friendMessages = new String[]
 			{
@@ -41,7 +41,7 @@ public class RelationshipEvent extends HungerGamesEvent
 		HashSet<Player> availablePlayers = new HashSet<>(alivePlayers);
 		
 		if (availablePlayers.isEmpty())
-			return new EventResult("", EventResult.State.Failed); //Quit the event.
+			return new EventResult("", EventResult.State.FAILED); //Quit the event.
 		
 		//Chose a random player.
 		Player player1 = (Player) RandomChoice.getRandom(availablePlayers.toArray());
@@ -52,7 +52,7 @@ public class RelationshipEvent extends HungerGamesEvent
 		availablePlayers.removeAll(player1.getFriends());
 		
 		if (availablePlayers.isEmpty())
-			return new EventResult("", EventResult.State.Failed); //Quit the event.
+			return new EventResult("", EventResult.State.FAILED); //Quit the event.
 		
 		//Chose the second player.
 		Player player2 = (Player) RandomChoice.getRandom(availablePlayers.toArray());
@@ -79,10 +79,10 @@ public class RelationshipEvent extends HungerGamesEvent
 		involvedPlayers.add(player1);
 		involvedPlayers.add(player2);
 		
-		message = message.replaceAll("user", "**" + player1 + "**");
-		message = message.replaceAll("receiver", "**" + player2 + "**");
+		message = message.replace("user", "**" + player1 + "**");
+		message = message.replace("receiver", "**" + player2 + "**");
 		stringBuilder.append(message + "\n");
 		
-		return new EventResult(stringBuilder.toString(), EventResult.State.Successful);
+		return new EventResult(stringBuilder.toString(), EventResult.State.SUCCESSFUL);
 	}
 }

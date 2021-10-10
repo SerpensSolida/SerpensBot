@@ -6,7 +6,7 @@ import com.serpenssolida.discordbot.module.hungergames.Player;
 
 import java.util.HashSet;
 
-public class RandomEvent extends HungerGamesEvent
+public class RandomEvent implements HungerGamesEvent
 {
 	private final String[] messages =
 			{
@@ -30,17 +30,17 @@ public class RandomEvent extends HungerGamesEvent
 		availablePlayers.removeAll(involvedPlayers);
 		
 		if (availablePlayers.isEmpty())
-			return new EventResult("", EventResult.State.Failed); //Quit the event.
+			return new EventResult("", EventResult.State.FAILED); //Quit the event.
 		
 		//Chose a random player.
 		Player player = (Player) RandomChoice.getRandom(availablePlayers.toArray());
 		
 		String message = (String) RandomChoice.getRandom(this.messages);
-		message = message.replaceAll("user", "**" + player + "**");
+		message = message.replace("user", "**" + player + "**");
 		
 		//Add the player to the list of active players.
 		involvedPlayers.add(player);
 		
-		return new EventResult(message + "\n", EventResult.State.Successful);
+		return new EventResult(message + "\n", EventResult.State.SUCCESSFUL);
 	}
 }

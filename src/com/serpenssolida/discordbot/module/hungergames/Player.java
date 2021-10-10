@@ -87,7 +87,7 @@ public class Player
 		//If the player has no weapon return "fists"
 		if (weapons.isEmpty())
 		{
-			Weapon weapon = new Weapon("Pugni", 15, 20, Weapon.WeaponType.Strength);
+			Weapon weapon = new Weapon("Pugni", 15, 20, Weapon.WeaponType.STRENGTH);
 			weapon.setUseMessage("user tira un pugno a receiver togliendogli damageHP.");
 			return weapon;
 		}
@@ -118,13 +118,13 @@ public class Player
 		
 		switch (weapon.getType())
 		{
-			case Strength:
+			case STRENGTH:
 				statValue = this.character.getStrength();
 				break;
-			case Ability:
+			case ABILITY:
 				statValue = this.character.getAbility();
 				break;
-			case Special:
+			case SPECIAL:
 				statValue = this.character.getSpecial();
 				break;
 		}

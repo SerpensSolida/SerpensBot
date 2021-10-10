@@ -8,7 +8,7 @@ import com.serpenssolida.discordbot.module.hungergames.inventory.Weapon;
 
 import java.util.HashSet;
 
-public class FoundItemEvent extends HungerGamesEvent
+public class FoundItemEvent implements HungerGamesEvent
 {
 	private final String[] foundMessage = new String[]
 			{
@@ -31,7 +31,7 @@ public class FoundItemEvent extends HungerGamesEvent
 		notFoundItemPlayers.removeAll(hg.getFoundItemPlayers());
 		
 		if (notFoundItemPlayers.isEmpty())
-			return new EventResult("", EventResult.State.Failed); //Quit event.
+			return new EventResult("", EventResult.State.FAILED); //Quit event.
 		
 		//Get a random player.
 		Player player = (Player) RandomChoice.getRandom(notFoundItemPlayers.toArray());
@@ -53,13 +53,13 @@ public class FoundItemEvent extends HungerGamesEvent
 		involvedPlayers.add(player);
 		
 		String eventString = this.replace((String) RandomChoice.getRandom(this.foundMessage), item, player) + "\n";
-		return new EventResult(eventString, EventResult.State.Successful);
+		return new EventResult(eventString, EventResult.State.SUCCESSFUL);
 	}
 	
 	private String replace(String message, Item item, Player player)
 	{
-		message = message.replaceAll("user", "**" + player + "**");
-		message = message.replaceAll("item", "*" + item.getName() + "*");
+		message = message.replace("user", "**" + player + "**");
+		message = message.replace("item", "*" + item.getName() + "*");
 		return message;
 	}
 }

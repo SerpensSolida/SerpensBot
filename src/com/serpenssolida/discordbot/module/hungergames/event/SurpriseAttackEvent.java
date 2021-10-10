@@ -10,7 +10,7 @@ import com.serpenssolida.discordbot.module.hungergames.inventory.Item;
 import java.util.ArrayList;
 import java.util.HashSet;
 
-public class SurpriseAttackEvent extends HungerGamesEvent
+public class SurpriseAttackEvent implements HungerGamesEvent
 {
 	private final String[] messages = new String[]
 			{
@@ -35,7 +35,7 @@ public class SurpriseAttackEvent extends HungerGamesEvent
 		availablePlayers.removeAll(combatPlayers);
 		
 		if (availablePlayers.size() < 2)
-			return new EventResult("", EventResult.State.Failed); //Quit event.
+			return new EventResult("", EventResult.State.FAILED); //Quit event.
 		
 		//Chose a random player.
 		Player player1 = (Player) RandomChoice.getRandom(availablePlayers.toArray());
@@ -45,7 +45,7 @@ public class SurpriseAttackEvent extends HungerGamesEvent
 		HashSet<Player> targetSet = this.getRelationshipSet(player1, alivePlayers, availablePlayers);
 		
 		if (targetSet.isEmpty())
-			return new EventResult("", EventResult.State.Failed); //Quit event.
+			return new EventResult("", EventResult.State.FAILED); //Quit event.
 		
 		//Get a random player from the chosen category.
 		Player player2 = (Player) RandomChoice.getRandom(targetSet.toArray());
@@ -54,8 +54,8 @@ public class SurpriseAttackEvent extends HungerGamesEvent
 			stringBuilder.append("L'alleanza tra **" + player1 + "** e **" + player2 + "** è rotta.\n");
 		
 		String message = (String) RandomChoice.getRandom(this.messages);
-		message = message.replaceAll("user", "**" + player1 + "**");
-		message = message.replaceAll("receiver", "**" + player2 + "**");
+		message = message.replace("user", "**" + player1 + "**");
+		message = message.replace("receiver", "**" + player2 + "**");
 		stringBuilder.append(message);
 		
 		involvedPlayers.add(player1);
@@ -102,7 +102,7 @@ public class SurpriseAttackEvent extends HungerGamesEvent
 			}
 		}
 		
-		return new EventResult(stringBuilder.toString(), EventResult.State.Successful);
+		return new EventResult(stringBuilder.toString(), EventResult.State.SUCCESSFUL);
 	}
 	
 	private HashSet<Player> getRelationshipSet(Player player, HashSet<Player> alivePlayers, HashSet<Player> availablePlayers)

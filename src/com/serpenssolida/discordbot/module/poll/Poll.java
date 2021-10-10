@@ -123,15 +123,15 @@ public class Poll
 		}
 		
 		//Rebuild hashmap.
-		LinkedHashMap<String, PollOption> options = new LinkedHashMap<>();
+		LinkedHashMap<String, PollOption> newOptions = new LinkedHashMap<>();
 		int k = 1;
 		for (PollOption option : this.options.values())
 		{
 			option.setId("option" + k);
-			options.put(option.getId(), option);
+			newOptions.put(option.getId(), option);
 			k++;
 		}
-		this.options = options;
+		this.options = newOptions;
 		
 		return removed != null;
 	}
