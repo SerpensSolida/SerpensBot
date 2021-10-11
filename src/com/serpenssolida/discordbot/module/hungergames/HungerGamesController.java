@@ -17,12 +17,11 @@ import java.util.HashMap;
 
 public class HungerGamesController
 {
+	private static final Logger logger = LoggerFactory.getLogger(HungerGamesController.class);
 	private static final HashMap<String, HungerGamesController> instance = new HashMap<>(); //Singleton data.
 	protected static final String FOLDER = "hungergames";
-	public static final int SUM_STATS = 40;
 	protected static Font font;
-	
-	private static final Logger logger = LoggerFactory.getLogger(HungerGamesController.class);
+	public static final int SUM_STATS = 40;
 	
 	private boolean running = false; //Whether the HungerGames is running.
 	private int count = 0; //Number of editions of the HungerGames.

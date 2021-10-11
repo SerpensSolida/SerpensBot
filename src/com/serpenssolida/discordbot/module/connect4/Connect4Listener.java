@@ -103,7 +103,7 @@ public class Connect4Listener extends BotListener
 		//Check if a game was found.
 		if (game == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Connect4", author, "Nessuna partita trovata con l'id:" + gameIdArg.getAsString());
+			Message message = MessageUtils.buildErrorMessage("Connect4", author, "Nessuna partita trovata con l'id: " + gameIdArg.getAsString());
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -111,7 +111,7 @@ public class Connect4Listener extends BotListener
 		//Check if the user is one of the players.
 		if (!game.getPlayers().contains(author))
 		{
-			Message message = MessageUtils.buildErrorMessage("Connect4", author, "Non puoi fermare una partita di cui non sei il partecipante");
+			Message message = MessageUtils.buildErrorMessage("Connect4", author, "Non puoi fermare una partita di cui non sei il partecipante.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}

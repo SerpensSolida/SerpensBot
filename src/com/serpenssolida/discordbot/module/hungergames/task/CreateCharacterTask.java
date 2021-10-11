@@ -49,7 +49,7 @@ public class CreateCharacterTask extends Task
 		
 		//Create message.
 		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Creazione del personaggio", this.getUser())
-				.setDescription("Stai creando un personaggio! Inserisci il nome del tuo personaggio. (max 16 caratteri)");
+				.setDescription("Stai creando un personaggio! Inserisci il nome del tuo personaggio (max 16 caratteri).");
 		messageBuilder.setEmbeds(embedBuilder.build());
 
 		//Add cancel button to the message.

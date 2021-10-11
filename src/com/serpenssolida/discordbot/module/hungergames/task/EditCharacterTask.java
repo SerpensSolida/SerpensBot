@@ -222,7 +222,7 @@ public class EditCharacterTask extends Task
 		HungerGamesController.save(this.getGuild().getId());
 		
 		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Modifica caratteristiche del personaggio", this.getUser())
-				.appendDescription("Caratteristiche impostate correttamente");
+				.appendDescription("Caratteristiche impostate correttamente.");
 		
 		MessageBuilder messageBuilder = new MessageBuilder()
 				.setEmbeds(embedBuilder.build());
