@@ -12,7 +12,7 @@ import java.util.HashMap;
 public class Connect4Controller
 {
 	private static final HashMap<String, Connect4Controller> instance = new HashMap<>(); //Singleton data.
-	private static final String FOLDER_NAME = "connect4";
+	private static final String FOLDER = "connect4";
 	
 	private static final Logger logger = LoggerFactory.getLogger(Connect4Controller.class);
 	
@@ -34,7 +34,7 @@ public class Connect4Controller
 	
 	public static void load(String guildID)
 	{
-		File fileCharacters = new File(Paths.get("server_data", guildID, Connect4Controller.FOLDER_NAME,  "leaderboard.json").toString());
+		File fileCharacters = new File(Paths.get("server_data", guildID, Connect4Controller.FOLDER,  "leaderboard.json").toString());
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		logger.info("Cariamento dati Connect4.");
 		
@@ -57,7 +57,7 @@ public class Connect4Controller
 	
 	public static void save(String guildID)
 	{
-		File fileCharacters = new File(Paths.get("server_data", guildID, Connect4Controller.FOLDER_NAME, "leaderboard.json").toString());
+		File fileCharacters = new File(Paths.get("server_data", guildID, Connect4Controller.FOLDER, "leaderboard.json").toString());
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		logger.info("Salvataggio dati Connect4.");
 		
