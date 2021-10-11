@@ -121,7 +121,7 @@ public class HungerGamesListener extends BotListener
 			return;
 		}
 		
-		User owner = SerpensBot.api.retrieveUserById(character.getOwnerID()).complete();
+		User owner = SerpensBot.getApi().retrieveUserById(character.getOwnerID()).complete();
 		String ownerName = (owner != null) ? owner.getName() : null;
 		
 		String[] statsName = {"Vitalità", "Forza", "Abilità", "Special", "Velocità", "Resistenza", "Gusto"};

@@ -56,7 +56,7 @@ public class BattleEvent implements HungerGamesEvent
 		else if (player2.getCharacter().getSpeed() == player1.getCharacter().getSpeed())
 		{
 			//If they have the same speed choose randomly.
-			if (RandomChoice.random.nextBoolean())
+			if (RandomChoice.getRandom().nextBoolean())
 			{
 				Player temp = player1;
 				player1 = player2;

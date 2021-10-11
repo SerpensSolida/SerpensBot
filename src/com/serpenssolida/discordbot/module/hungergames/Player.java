@@ -22,7 +22,7 @@ public class Player
 	{
 		this.character = character;
 		this.health = this.getMaxHealth();
-		this.owner = SerpensBot.api.retrieveUserById(this.character.getOwnerID()).complete();
+		this.owner = SerpensBot.getApi().retrieveUserById(this.character.getOwnerID()).complete();
 	}
 	
 	public int getMaxHealth()
@@ -42,7 +42,7 @@ public class Player
 		
 		//Get the weapon damage.
 		float damage = this.getDamageWithWeapon(weapon);
-		damage += damage * (RandomChoice.random.nextFloat() - 0.5f) * 0.2f;
+		damage += damage * (RandomChoice.getRandom().nextFloat() - 0.5f) * 0.2f;
 		
 		//Attack the player
 		float trueDamage = player2.hit(damage);
@@ -58,7 +58,7 @@ public class Player
 		//Get the weapon damage.
 		float baseDamage = this.getDamageWithWeapon(weapon);
 		float damage = baseDamage * multiplier;
-		damage += baseDamage * (RandomChoice.random.nextFloat() - 0.5F) * 0.2F;
+		damage += baseDamage * (RandomChoice.getRandom().nextFloat() - 0.5F) * 0.2F;
 		
 		//Attack the player
 		float trueDamage = player2.hit(damage);

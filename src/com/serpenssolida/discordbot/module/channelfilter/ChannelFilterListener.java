@@ -65,7 +65,7 @@ public class ChannelFilterListener extends BotListener
 		//TODO: add support for threads when they are supported.
 		
 		//If the author of the message is the bot, ignore the message.
-		if (SerpensBot.api.getSelfUser().getId().equals(author.getId()))
+		if (SerpensBot.getApi().getSelfUser().getId().equals(author.getId()))
 			return;
 		
 		FilterData filter = this.getFilter(guild.getId(), channel.getId());
@@ -221,7 +221,7 @@ public class ChannelFilterListener extends BotListener
 	{
 		File fitersFile = new File(Paths.get("server_data", guildID, ChannelFilterListener.FOLDER,  "filters.json").toString());
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		Guild guild = SerpensBot.api.getGuildById(guildID);
+		Guild guild = SerpensBot.getApi().getGuildById(guildID);
 		
 		if (guild == null)
 			return;
@@ -251,7 +251,7 @@ public class ChannelFilterListener extends BotListener
 	{
 		File fitersFile = new File(Paths.get("server_data", guildID, ChannelFilterListener.FOLDER,  "filters.json").toString());
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		Guild guild = SerpensBot.api.getGuildById(guildID);
+		Guild guild = SerpensBot.getApi().getGuildById(guildID);
 		
 		if (guild == null)
 			return;

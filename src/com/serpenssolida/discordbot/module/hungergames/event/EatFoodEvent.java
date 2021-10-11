@@ -54,11 +54,11 @@ public class EatFoodEvent implements HungerGamesEvent
 		{
 			//If the players is hungry but does not have any food there is a chance that he'll get damage.
 			
-			if (RandomChoice.random.nextInt(10) > 0)
+			if (RandomChoice.getRandom().nextInt(10) > 0)
 				return new EventResult("", EventResult.State.SUCCESSFUL); //Quit event.
 			
 			//Damage dealt to the player.
-			float f = -(1 + RandomChoice.random.nextInt(5));
+			float f = -(1 + RandomChoice.getRandom().nextInt(5));
 			
 			String message = (String) RandomChoice.getRandom(this.noFoodMessages);
 			message = message.replace("user", "**" + player + "**");
@@ -88,7 +88,7 @@ public class EatFoodEvent implements HungerGamesEvent
 		{
 			//The players do not have to heal if he is at full health.
 			
-			if (RandomChoice.random.nextInt(10) > 0)
+			if (RandomChoice.getRandom().nextInt(10) > 0)
 				return new EventResult("", EventResult.State.SUCCESSFUL); //Quit event.
 			
 			String message = (String) RandomChoice.getRandom(this.fullhealthMessage);
@@ -104,7 +104,7 @@ public class EatFoodEvent implements HungerGamesEvent
 		//Get a random food and its healing value.
 		Food food = (Food) RandomChoice.getRandom(foodList.toArray());
 		float hpHealed = food.getHpRestored() + food.getHpRestored() * player.getCharacter().getTaste() / 20.0F;
-		hpHealed += hpHealed * (RandomChoice.random.nextFloat() - 0.5F) * 0.2F;
+		hpHealed += hpHealed * (RandomChoice.getRandom().nextFloat() - 0.5F) * 0.2F;
 		
 		//Heal the player.
 		player.setHealth(player.getHealth() + hpHealed);

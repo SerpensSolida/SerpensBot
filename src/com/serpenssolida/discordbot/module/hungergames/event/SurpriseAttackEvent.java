@@ -69,7 +69,7 @@ public class SurpriseAttackEvent implements HungerGamesEvent
 		player1.getEnemies().add(player2);
 		player2.getEnemies().add(player1);
 		
-		if (RandomChoice.random.nextInt(10) < 5)
+		if (RandomChoice.getRandom().nextInt(10) < 5)
 		{
 			stringBuilder.append(", ma fallisce.\n");
 		}

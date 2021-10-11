@@ -59,7 +59,7 @@ public class RelationshipEvent implements HungerGamesEvent
 		
 		String message;
 		
-		if (RandomChoice.random.nextBoolean())
+		if (RandomChoice.getRandom().nextBoolean())
 		{
 			//Make the two player friends.
 			player1.getFriends().add(player2);

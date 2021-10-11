@@ -39,7 +39,7 @@ public class IncidentEvent implements HungerGamesEvent
 		Player player = (Player) RandomChoice.getRandom(noIncidentPlayers.toArray());
 		
 		//Damage the player.
-		float damage = (15 + RandomChoice.random.nextInt(30));
+		float damage = (15 + RandomChoice.getRandom().nextInt(30));
 		player.setHealth(player.getHealth() - damage);
 		
 		String eventMessage = (String) RandomChoice.getRandom(this.messages);

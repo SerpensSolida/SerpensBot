@@ -42,7 +42,7 @@ public class SleepEvent implements HungerGamesEvent
 			return new EventResult("", EventResult.State.FAILED); //Quit the event.
 		
 		//The player sleeps, so he heals.
-		float damage = (15 + RandomChoice.random.nextInt(30));
+		float damage = (15 + RandomChoice.getRandom().nextInt(30));
 		player.setHealth(player.getHealth() + damage);
 		
 		String eventMessage = (String) RandomChoice.getRandom(this.messages);

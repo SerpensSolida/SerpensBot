@@ -30,11 +30,11 @@ public class OwnerListener extends BotListener
 		String message = event.getMessage().getContentDisplay();
 		
 		//If the author of the message is the bot ignore it.
-		if (SerpensBot.api.getSelfUser().equals(user))
+		if (SerpensBot.getApi().getSelfUser().equals(user))
 			return;
 		
 		//Check if the author of the message is the owner of the bot.
-		if (!SerpensBot.ownerId.equals(user.getId()))
+		if (!SerpensBot.getOwnerId().equals(user.getId()))
 		{
 			channel.sendMessage(MessageUtils.buildErrorMessage("Mi dispiace!", user, "Rispondo solo al mio creatore.")).queue();
 			return;
@@ -43,6 +43,7 @@ public class OwnerListener extends BotListener
 		if (!message.startsWith("!"))
 			return;
 		
+		//Parse arguments
 		message = message.substring(1);
 		String[] content = message.split("::");
 		String channelId;
@@ -61,8 +62,9 @@ public class OwnerListener extends BotListener
 			return;
 		}
 		
-		MessageChannel messageChannel = SerpensBot.api.getTextChannelById(channelId);
+		MessageChannel messageChannel = SerpensBot.getApi().getTextChannelById(channelId);
 		
+		//Check if the channel exists.
 		if (messageChannel == null)
 		{
 			channel.sendMessage(MessageUtils.buildErrorMessage("Invio messaggio al canale", user, "Non è stato trovato nessun canale con id: " + channelId)).queue();

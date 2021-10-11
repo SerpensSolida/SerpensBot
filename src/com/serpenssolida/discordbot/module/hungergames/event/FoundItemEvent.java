@@ -37,7 +37,7 @@ public class FoundItemEvent implements HungerGamesEvent
 		Player player = (Player) RandomChoice.getRandom(notFoundItemPlayers.toArray());
 		
 		//Chose a random item form item pool.
-		Object[] items = RandomChoice.random.nextBoolean() ? hg.getItemData().getFoods().toArray() : hg.getWeaponPool().toArray();
+		Object[] items = RandomChoice.getRandom().nextBoolean() ? hg.getItemData().getFoods().toArray() : hg.getWeaponPool().toArray();
 		Item item = (Item) RandomChoice.getRandom(items);
 		
 		//Weapon are unique so if the item found is a weapon it must be removed from the weapon pool.

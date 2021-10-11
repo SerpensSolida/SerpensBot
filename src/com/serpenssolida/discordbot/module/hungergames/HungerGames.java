@@ -66,8 +66,8 @@ public class HungerGames
 	 */
 	public void generateInventory(Player player)
 	{
-		int foodNum = RandomChoice.random.nextInt(3);
-		int weaponNum = RandomChoice.random.nextInt(3);
+		int foodNum = RandomChoice.getRandom().nextInt(3);
+		int weaponNum = RandomChoice.getRandom().nextInt(3);
 		
 		for (int i = 0; i < foodNum; i++)
 		{

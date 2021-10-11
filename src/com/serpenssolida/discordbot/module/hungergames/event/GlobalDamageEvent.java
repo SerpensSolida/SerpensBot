@@ -23,7 +23,7 @@ public class GlobalDamageEvent implements HungerGamesEvent
 		HashSet<Player> involvedPlayers = hg.getInvolvedPlayers();
 		
 		//Damage dealt by the event.
-		float damage = (15 + RandomChoice.random.nextInt(30));
+		float damage = (15 + RandomChoice.getRandom().nextInt(30));
 		
 		String eventString = ((String) RandomChoice.getRandom(this.messages)).replace("damage", "" + (int) damage);
 		stringBuilder.append(eventString + "\n");

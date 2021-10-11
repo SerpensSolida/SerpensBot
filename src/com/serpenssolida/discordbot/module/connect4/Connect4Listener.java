@@ -157,7 +157,7 @@ public class Connect4Listener extends BotListener
 		
 		for (Map.Entry<String, Connect4UserData> data : sortedLeaderboard)
 		{
-			User user = SerpensBot.api.getUserById(data.getKey());
+			User user = SerpensBot.getApi().getUserById(data.getKey());
 			
 			if (user != null)
 			{

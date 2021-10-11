@@ -101,7 +101,7 @@ public class HungerGamesThread extends Thread
 		while (this.isHungerGamesRunning() && !this.isInterrupted())
 		{
 			//Chose a random number of turns for the day.
-			int turnsNum = 4 + RandomChoice.random.nextInt(4);
+			int turnsNum = 4 + RandomChoice.getRandom().nextInt(4);
 			
 			Thread.sleep(HungerGamesController.getMessageSpeed(this.guildID));
 			
@@ -178,7 +178,7 @@ public class HungerGamesThread extends Thread
 		else
 		{
 			//Choose a random number of local events and execute them.
-			int eventNum = 6 + RandomChoice.random.nextInt(4);
+			int eventNum = 6 + RandomChoice.getRandom().nextInt(4);
 			int tries = 8; //Number of tries.
 			
 			for (int i = 0; i < eventNum && this.isHungerGamesRunning() && !this.isInterrupted(); i++)
