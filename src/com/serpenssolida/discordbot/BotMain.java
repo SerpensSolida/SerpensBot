@@ -1,5 +1,6 @@
 package com.serpenssolida.discordbot;
 
+import com.serpenssolida.discordbot.module.channelfilter.ChannelFilterListener;
 import com.serpenssolida.discordbot.module.connect4.Connect4Listener;
 import com.serpenssolida.discordbot.module.embed.EmbedListener;
 import com.serpenssolida.discordbot.module.hungergames.HungerGamesListener;
@@ -19,5 +20,6 @@ public class BotMain
 		SerpensBot.addModule(new OwnerListener());
 		SerpensBot.addModule(new EmbedListener());
 		SerpensBot.addModule(new Connect4Listener());
+		SerpensBot.addModule(new ChannelFilterListener());
 	}
 }
