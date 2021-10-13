@@ -33,6 +33,9 @@ public class ChannelFilterListener extends BotListener
 		super("channelfilter");
 		this.setModuleName("Channel filter");
 		
+		//This module has no task.
+		this.removeBotCommand("cancel");
+		
 		//Command for creating a game.
 		BotCommand command = new BotCommand("set", "Setta o modifica il filtro per il canale specificato.");
 		command.setAction(this::setChannelFilter);
@@ -43,11 +46,13 @@ public class ChannelFilterListener extends BotListener
 		this.addBotCommand(command);
 		
 		//Command for creating a game.
-		command = new BotCommand("remove", "Rimuove il filtro per il canale specificato");
+		command = new BotCommand("remove", "Rimuove il filtro per il canale specificato.");
 		command.setAction(this::removeChannelFilter);
 		command.getSubcommand()
 				.addOption(OptionType.CHANNEL, "channel", "Canale da cui rimuovere il filtro.", true);
 		this.addBotCommand(command);
+		
+		
 	}
 	
 	@Override
