@@ -91,7 +91,7 @@ public class ChannelFilterListener extends BotListener
 		}
 		
 		//Check if the message contains URLs.
-		String linkRegex = "https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)";
+		String linkRegex = "https?://(www\\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)";
 		Pattern p = Pattern.compile(linkRegex);
 		Matcher m = p.matcher(message.getContentDisplay());
 		boolean hasLinks = m.find();
