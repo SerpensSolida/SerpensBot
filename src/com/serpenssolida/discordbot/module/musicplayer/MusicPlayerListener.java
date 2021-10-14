@@ -328,7 +328,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 	{
 		GuildAudioController audioController = this.getGuildAudioController(guild.getId());
 		
-		if (audioController.getScheduler().isEmpty())
+		if (audioController == null || audioController.getScheduler().isEmpty())
 			this.closeConnection(guild);
 	}
 	
