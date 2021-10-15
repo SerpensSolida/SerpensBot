@@ -50,7 +50,7 @@ public class TrackLoadResultHandler implements AudioLoadResultHandler
 		//Create message.
 		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Music player", this.event.getUser())
 				.setThumbnail("https://img.youtube.com/vi/" + playlist.getSelectedTrack().getIdentifier() + "/hqdefault.jpg")
-				.setDescription("Playlist aggiunta alla coda: **" + playlist.getName() + "**.\n")
+				.setDescription("Playlist aggiunta alla coda: *" + playlist.getName() + "*.\n")
 				.appendDescription("\n**Lista tracce**:");
 		
 		StringBuilder numberField = new StringBuilder();
@@ -64,7 +64,7 @@ public class TrackLoadResultHandler implements AudioLoadResultHandler
 			if (titleField.length() < 900 && numberField.length() < 900)
 			{
 				numberField.append((i + 1) + ".\n");
-				titleField.append("**" + title + "**\n");
+				titleField.append("*" + title + "*\n");
 			}
 			else
 			{
@@ -74,8 +74,8 @@ public class TrackLoadResultHandler implements AudioLoadResultHandler
 			i++;
 		}
 		
-		embedBuilder.addField("", numberField.toString(), true);
-		embedBuilder.addField("", titleField.toString(), true);
+		embedBuilder.addField("N.", numberField.toString(), true);
+		embedBuilder.addField("Titolo", titleField.toString(), true);
 		
 		this.event.reply(new MessageBuilder().setEmbeds(embedBuilder.build()).build()).setEphemeral(false).queue();
 		

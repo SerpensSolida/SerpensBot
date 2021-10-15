@@ -15,6 +15,7 @@ import com.serpenssolida.discordbot.module.BotListener;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
@@ -264,11 +265,35 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		}
 		
 		//Check if the channel the user left is the one the bot is playing tracks.
-		if (!event.getChannelLeft().equals(audioController.getVoiceChannel()))
+		if (!event.getChannelLeft().equals(audioController.getVoiceChannel()) || !event.getChannelJoined().equals(audioController.getVoiceChannel()))
 			return;
 		
 		//Remove the user votes and update the track status message.
 		audioController.removeVote(event.getMember().getUser());
+		MessageBuilder messageBuilder = new MessageBuilder(audioController.getStatusMessage());
+		MusicPlayerListener.generateControlButtons(audioController, messageBuilder);
+		audioController.getStatusMessage().editMessage(messageBuilder.build()).queue();
+	}
+	
+	@Override
+	public void onGuildVoiceJoin(@NotNull GuildVoiceJoinEvent event)
+	{
+		//Check if the user that joined the channel is the bot.
+		if (SerpensBot.getApi().getSelfUser().equals(event.getMember().getUser()))
+			return;
+		
+		//Get audio controller.
+		GuildAudioController audioController = this.getGuildAudioController(event.getGuild().getId());
+		
+		//Check if the bot is playing tracks.
+		if (audioController == null)
+			return;
+		
+		//Check if the channel the user joined is the one the bot is playing tracks.
+		if (!event.getChannelJoined().equals(audioController.getVoiceChannel()))
+			return;
+		
+		//Update the track status message.
 		MessageBuilder messageBuilder = new MessageBuilder(audioController.getStatusMessage());
 		MusicPlayerListener.generateControlButtons(audioController, messageBuilder);
 		audioController.getStatusMessage().editMessage(messageBuilder.build()).queue();
@@ -400,8 +425,18 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		voiceChannelMembers.remove(SerpensBot.getApi().getSelfUser());
 		int count = voiceChannelMembers.size(); //Number of user that joined the voice channel minus bot.
 		
-		Button skipButton = Button.primary("skip", "Skip (" + audioController.getSkipVotes().getVoteCount() + "/" + count + ")");
-		Button stopButton = Button.danger("stop", "Stop (" + audioController.getStopVotes().getVoteCount() + "/" + count + ")");
+		String skipLabel = "Skip (" + audioController.getSkipVotes().getVoteCount() + "/" + (count / 2) + ")";
+		String stopLabel = "Stop (" + audioController.getStopVotes().getVoteCount() + "/" + (count / 2) + ")";
+		
+		//Don't show votes is there is only one user in voice channel.
+		if (count <= 1)
+		{
+			skipLabel = "Skip";
+			stopLabel = "Stop";
+		}
+		
+		Button skipButton = Button.primary("skip", skipLabel);
+		Button stopButton = Button.danger("stop", stopLabel);
 		Button showQueue = Button.secondary("show-queue", "Show queue");
 		messageBuilder.setActionRows(ActionRow.of(skipButton, stopButton, showQueue));
 	}
@@ -496,29 +531,33 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 			
 			ArrayList<AudioTrack> tracks = audioController.getScheduler().getTrackQueue();
 			
-			StringBuilder numberField = new StringBuilder();
-			StringBuilder titleField = new StringBuilder();
-			
-			//Add list of track to the embed.
-			int i = 0;
-			for (AudioTrack track : tracks)
+			if (!tracks.isEmpty())
 			{
-				String title = track.getInfo().title;
-				if (titleField.length() < 900 && numberField.length() < 900)
+				StringBuilder numberField = new StringBuilder();
+				StringBuilder titleField = new StringBuilder();
+				
+				//Add list of track to the embed.
+				int i = 0;
+				for (AudioTrack track : tracks)
 				{
-					numberField.append((i + 1) + ".\n");
-					titleField.append("**" + title + "**\n");
+					String title = track.getInfo().title;
+					if (titleField.length() < 900 && numberField.length() < 900)
+					{
+						numberField.append((i + 1) + ".\n");
+						titleField.append("*" + title + "*\n");
+					}
+					else
+					{
+						titleField.append("...altre " + (tracks.size() - i) + " tracce.");
+						break;
+					}
+					i++;
 				}
-				else
-				{
-					titleField.append("...altre " + (tracks.size() - i) + " tracce.");
-					break;
-				}
-				i++;
+				
+				embedBuilder.appendDescription("\n\n**Prossime tracce**:");
+				embedBuilder.addField("N.", numberField.toString(), true);
+				embedBuilder.addField("Titolo", titleField.toString(), true);
 			}
-			
-			embedBuilder.addField("", numberField.toString(), true);
-			embedBuilder.addField("", titleField.toString(), true);
 			
 			MessageBuilder messageBuilder = new MessageBuilder();
 			messageBuilder.setEmbeds(embedBuilder.build());
