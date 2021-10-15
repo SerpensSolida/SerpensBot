@@ -21,7 +21,7 @@ public class TrackLoadResultHandler implements AudioLoadResultHandler
 	private final SlashCommandEvent event;
 	private final TrackEventHandler listener;
 	
-	public TrackLoadResultHandler(GuildAudioController audioController, SlashCommandEvent event, MusicPlayerListener listener)
+	public TrackLoadResultHandler(GuildAudioController audioController, SlashCommandEvent event, TrackEventHandler listener)
 	{
 		this.audioController = audioController;
 		this.event = event;

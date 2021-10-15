@@ -16,15 +16,16 @@ public class TrackScheduler extends AudioEventAdapter
 	private final AudioPlayer player;
 	private final BlockingQueue<AudioTrack> queue;
 	private final Guild guild;
-	private final MusicPlayerListener listener;
+	private final TrackEventHandler listener;
 	
 	/**
 	 * @param player
-	 * 		The audio player this scheduler uses
+	 * 		The audio player this scheduler uses.
 	 * @param guild
+	 * 		The guild the track scheduler will be linked to.
 	 * @param listener
 	 */
-	public TrackScheduler(AudioPlayer player, Guild guild, MusicPlayerListener listener)
+	public TrackScheduler(AudioPlayer player, Guild guild, TrackEventHandler listener)
 	{
 		this.player = player;
 		this.guild = guild;
