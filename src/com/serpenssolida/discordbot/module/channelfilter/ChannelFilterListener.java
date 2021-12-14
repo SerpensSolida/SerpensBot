@@ -112,7 +112,6 @@ public class ChannelFilterListener extends BotListener
 			Message errorMessage = MessageUtils.buildErrorMessage("Messaggio non permesso", author, "I messaggi inviati nel canale *#" + channel.getName() + "* di **" + guild.getName() + "** devono contenere " + filterText);
 			PrivateChannel privateChannel = author.openPrivateChannel().complete();
 			privateChannel.sendMessage(errorMessage).queue();
-			privateChannel.close().queue();
 		}
 	}
 	

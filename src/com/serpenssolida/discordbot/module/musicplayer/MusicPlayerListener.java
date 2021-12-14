@@ -94,7 +94,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		}
 		
 		//Get user voice channel.
-		VoiceChannel voiceChannel = authorVoiceState.getChannel();
+		AudioChannel voiceChannel = authorVoiceState.getChannel();
 		
 		//Get guild audio controller.
 		GuildAudioController audioController = this.getGuildAudioController(guild.getId());
@@ -144,7 +144,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		}
 		
 		//Get user voice channel.
-		VoiceChannel voiceChannel = authorVoiceState.getChannel();
+		AudioChannel voiceChannel = authorVoiceState.getChannel();
 		
 		//Get guild audio controller.
 		GuildAudioController audioController = this.getGuildAudioController(guild.getId());
@@ -187,12 +187,10 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		
 		//Check if the user state is valid.
 		if (authorVoiceState == null)
-		{
 			return;
-		}
 		
 		//Get user voice channel.
-		VoiceChannel voiceChannel = authorVoiceState.getChannel();
+		AudioChannel voiceChannel = authorVoiceState.getChannel();
 		
 		//Get guild audio controller.
 		GuildAudioController audioController = this.getGuildAudioController(guild.getId());
@@ -420,7 +418,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 	private static void generateControlButtons(GuildAudioController audioController, MessageBuilder messageBuilder)
 	{
 		//Get voice channel users.
-		VoiceChannel voiceChannel = audioController.getVoiceChannel();
+		AudioChannel voiceChannel = audioController.getVoiceChannel();
 		HashSet<User> voiceChannelMembers = voiceChannel.getMembers().stream().map(Member::getUser).collect(Collectors.toCollection(HashSet::new));
 		
 		//Get users count.
@@ -452,7 +450,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 			event.deferEdit().queue();
 			
 			GuildAudioController audioController = this.getGuildAudioController(guild1.getId());
-			VoiceChannel voiceChannel = audioController.getVoiceChannel();
+			AudioChannel voiceChannel = audioController.getVoiceChannel();
 			
 			//Check if the user is in the correct voice channel.
 			if (!voiceChannel.getMembers().contains(event.getMember()))
@@ -488,7 +486,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 			event.deferEdit().queue();
 			
 			GuildAudioController audioController = this.getGuildAudioController(guild1.getId());
-			VoiceChannel voiceChannel = audioController.getVoiceChannel();
+			AudioChannel voiceChannel = audioController.getVoiceChannel();
 			
 			//Check if the user is in the correct voice channel.
 			if (!voiceChannel.getMembers().contains(event.getMember()))
@@ -602,7 +600,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 			return null;
 		}
 		
-		if (!authorVoiceState.inVoiceChannel())
+		if (!authorVoiceState.inAudioChannel())
 		{
 			Message message = MessageUtils.buildErrorMessage("Music Player", author, "Devi essere in un canale vocale per usare questo comando.");
 			event.reply(message).setEphemeral(true).queue();

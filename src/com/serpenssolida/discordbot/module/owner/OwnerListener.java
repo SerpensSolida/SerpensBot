@@ -6,7 +6,7 @@ import com.serpenssolida.discordbot.module.BotListener;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
 //import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
@@ -24,9 +24,13 @@ public class OwnerListener extends BotListener
 	}
 	
 	@Override
-	public void onPrivateMessageReceived(@NotNull PrivateMessageReceivedEvent event)
+	public void onMessageReceived(@NotNull MessageReceivedEvent event)
 	{
-		PrivateChannel channel = event.getChannel();
+		//Accept private message only.
+		if (event.isFromGuild())
+			return;
+		
+		PrivateChannel channel = event.getPrivateChannel();
 		User user = event.getAuthor();
 		String message = event.getMessage().getContentDisplay();
 		

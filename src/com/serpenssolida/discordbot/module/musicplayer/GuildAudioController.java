@@ -1,23 +1,20 @@
 package com.serpenssolida.discordbot.module.musicplayer;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.entities.*;
 
 public class GuildAudioController
 {
 	private final AudioPlayer player;
 	private final TrackScheduler scheduler;
-	private final VoiceChannel voiceChannel;
+	private final AudioChannel voiceChannel;
 	private final MessageChannel messageChannel;
 	
 	private Message statusMessage;
 	private final MusicVote skipVotes = new MusicVote();
 	private final MusicVote stopVotes = new MusicVote();
 	
-	public GuildAudioController(AudioPlayer player, TrackScheduler scheduler, VoiceChannel voiceChannel, MessageChannel messageChannel)
+	public GuildAudioController(AudioPlayer player, TrackScheduler scheduler, AudioChannel voiceChannel, MessageChannel messageChannel)
 	{
 		this.player = player;
 		this.scheduler = scheduler;
@@ -37,7 +34,7 @@ public class GuildAudioController
 		return this.scheduler;
 	}
 	
-	public VoiceChannel getVoiceChannel()
+	public AudioChannel getVoiceChannel()
 	{
 		return this.voiceChannel;
 	}
