@@ -24,6 +24,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.managers.AudioManager;
+import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -265,7 +267,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		}
 		
 		//Check if the channel the user left is the one the bot is playing tracks.
-		if (!event.getChannelLeft().equals(audioController.getVoiceChannel()) || !event.getChannelJoined().equals(audioController.getVoiceChannel()))
+		if (!event.getChannelLeft().equals(audioController.getVoiceChannel()) && !event.getChannelJoined().equals(audioController.getVoiceChannel()))
 			return;
 		
 		//Remove the user votes and update the track status message.
@@ -425,8 +427,8 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		voiceChannelMembers.remove(SerpensBot.getApi().getSelfUser());
 		int count = voiceChannelMembers.size(); //Number of user that joined the voice channel minus bot.
 		
-		String skipLabel = "Skip (" + audioController.getSkipVotes().getVoteCount() + "/" + (count / 2) + ")";
-		String stopLabel = "Stop (" + audioController.getStopVotes().getVoteCount() + "/" + (count / 2) + ")";
+		String skipLabel = "Skip (" + audioController.getSkipVotes().getVoteCount() + "/" + (count / 2 + 1) + ")";
+		String stopLabel = "Stop (" + audioController.getStopVotes().getVoteCount() + "/" + (count / 2 + 1) + ")";
 		
 		//Don't show votes is there is only one user in voice channel.
 		if (count <= 1)
@@ -529,35 +531,11 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 					.setThumbnail("https://img.youtube.com/vi/" + playingTrack.getIdentifier() + "/hqdefault.jpg")
 					.setDescription("Now playing:\n**" + playingTrack.getInfo().title + "**");
 			
+			//Generate playlist text.
 			ArrayList<AudioTrack> tracks = audioController.getScheduler().getTrackQueue();
-			
-			if (!tracks.isEmpty())
-			{
-				StringBuilder numberField = new StringBuilder();
-				StringBuilder titleField = new StringBuilder();
-				
-				//Add list of track to the embed.
-				int i = 0;
-				for (AudioTrack track : tracks)
-				{
-					String title = track.getInfo().title;
-					if (titleField.length() < 900 && numberField.length() < 900)
-					{
-						numberField.append((i + 1) + ".\n");
-						titleField.append("*" + title + "*\n");
-					}
-					else
-					{
-						titleField.append("...altre " + (tracks.size() - i) + " tracce.");
-						break;
-					}
-					i++;
-				}
-				
-				embedBuilder.appendDescription("\n\n**Prossime tracce**:");
-				embedBuilder.addField("N.", numberField.toString(), true);
-				embedBuilder.addField("Titolo", titleField.toString(), true);
-			}
+			ImmutablePair<String, String> fields = MusicPlayerListener.generateEmbedPlaylistFields(tracks);
+			embedBuilder.addField("N.", fields.getRight(), true);
+			embedBuilder.addField("Titolo", fields.getLeft(), true);
 			
 			MessageBuilder messageBuilder = new MessageBuilder();
 			messageBuilder.setEmbeds(embedBuilder.build());
@@ -569,6 +547,37 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		interactionGroup.addButtonCallback("show-queue", showQueueButtonAction);
 		
 		this.addInteractionGroup(guild.getId(), message.getId(), interactionGroup);
+	}
+	
+	protected static ImmutablePair<String, String> generateEmbedPlaylistFields(List<AudioTrack> tracks)
+	{
+		//Create message.
+		StringBuilder numberField = new StringBuilder();
+		StringBuilder titleField = new StringBuilder();
+		
+		//Add list of track to the embed.
+		int i = 0;
+		for (AudioTrack track : tracks)
+		{
+			String title = track.getInfo().title;
+			
+			if (title.length() > 50)
+				title = title.substring(0, 50) + "...";
+			
+			if (titleField.length() < 900 && numberField.length() < 900)
+			{
+				numberField.append((i + 1) + ".\n");
+				titleField.append("*" + title + "*\n");
+			}
+			else
+			{
+				titleField.append("...altre " + (tracks.size() - i) + " tracce.");
+				break;
+			}
+			i++;
+		}
+		
+		return new ImmutablePair<>(titleField.toString(), numberField.toString());
 	}
 	
 	private static GuildVoiceState getUserVoiceState(SlashCommandEvent event)

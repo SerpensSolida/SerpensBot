@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,29 +54,10 @@ public class TrackLoadResultHandler implements AudioLoadResultHandler
 				.setDescription("Playlist aggiunta alla coda: *" + playlist.getName() + "*.\n")
 				.appendDescription("\n**Lista tracce**:");
 		
-		StringBuilder numberField = new StringBuilder();
-		StringBuilder titleField = new StringBuilder();
-		
-		//Add list of track to the embed.
-		int i = 0;
-		for (AudioTrack track : tracks)
-		{
-			String title = track.getInfo().title;
-			if (titleField.length() < 900 && numberField.length() < 900)
-			{
-				numberField.append((i + 1) + ".\n");
-				titleField.append("*" + title + "*\n");
-			}
-			else
-			{
-				titleField.append("...altre " + (tracks.size() - i) + " tracce.");
-				break;
-			}
-			i++;
-		}
-		
-		embedBuilder.addField("N.", numberField.toString(), true);
-		embedBuilder.addField("Titolo", titleField.toString(), true);
+		//Generate playlist text.
+		ImmutablePair<String, String> fields = MusicPlayerListener.generateEmbedPlaylistFields(tracks);
+		embedBuilder.addField("N.", fields.getRight(), true);
+		embedBuilder.addField("Titolo", fields.getLeft(), true);
 		
 		this.event.reply(new MessageBuilder().setEmbeds(embedBuilder.build()).build()).setEphemeral(false).queue();
 		
