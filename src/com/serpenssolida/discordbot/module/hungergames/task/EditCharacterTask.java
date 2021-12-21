@@ -2,9 +2,9 @@ package com.serpenssolida.discordbot.module.hungergames.task;
 
 import com.serpenssolida.discordbot.MessageUtils;
 import com.serpenssolida.discordbot.interaction.InteractionCallback;
-import com.serpenssolida.discordbot.module.Task;
 import com.serpenssolida.discordbot.module.hungergames.Character;
 import com.serpenssolida.discordbot.module.hungergames.HungerGamesController;
+import com.serpenssolida.discordbot.module.hungergames.Task;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;

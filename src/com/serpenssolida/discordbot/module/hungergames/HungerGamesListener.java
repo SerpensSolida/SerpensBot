@@ -3,6 +3,9 @@ package com.serpenssolida.discordbot.module.hungergames;
 import com.serpenssolida.discordbot.MessageUtils;
 import com.serpenssolida.discordbot.SerpensBot;
 import com.serpenssolida.discordbot.command.BotCommand;
+import com.serpenssolida.discordbot.interaction.InteractionCallback;
+import com.serpenssolida.discordbot.interaction.InteractionGroup;
+import com.serpenssolida.discordbot.interaction.WrongInteractionEventException;
 import com.serpenssolida.discordbot.module.BotListener;
 import com.serpenssolida.discordbot.module.hungergames.task.CreateCharacterTask;
 import com.serpenssolida.discordbot.module.hungergames.task.EditCharacterTask;
@@ -12,16 +15,28 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.GenericComponentInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class HungerGamesListener extends BotListener
 {
+	private final HashMap<String, HashMap<User, Task>> tasks = new HashMap<>(); //List of task currently running.
+	
+	private static final Logger logger = LoggerFactory.getLogger(HungerGamesListener.class);
+	
 	public HungerGamesListener()
 	{
 		super("hg");
@@ -79,6 +94,119 @@ public class HungerGamesListener extends BotListener
 		command = new BotCommand("stop", "Interrompe l'esecuzione degli HungerGames.");
 		command.setAction(this::stopHungerGames);
 		this.addBotCommand(command);
+	}
+	
+	@Override
+	public void onMessageReceived(@NotNull MessageReceivedEvent event)
+	{
+		//Don't accept messages from private channels.
+		if (!event.isFromGuild())
+			return;
+		
+		Guild guild = event.getGuild();
+		User author = event.getAuthor(); //Author of the message.
+		MessageChannel channel = event.getChannel(); //Channel where the message was sent.
+		
+		//Get the task the author is currently running.
+		Task task = this.getTask(guild.getId(), author);
+		
+		//If the author of the message is the bot ignore the message.
+		if (SerpensBot.getApi().getSelfUser().getId().equals(author.getId()))
+			return;
+		
+		//Ignore the message if no task is found.
+		if (task == null || !task.getChannel().equals(channel))
+			return;
+		
+		//Pass the event to the task.
+		task.consumeMessage(event.getMessage());
+		
+		//Remove the task if it finished.
+		if (!task.isRunning())
+			this.removeTask(guild.getId(), task);
+	}
+	
+	@Override
+	public void onGenericComponentInteractionCreate(@NotNull GenericComponentInteractionCreateEvent event)
+	{
+		super.onGenericComponentInteractionCreate(event);
+		
+		String componendId = event.getComponentId();
+		User author = event.getUser(); //The user that added the reaction.
+		Guild guild = event.getGuild(); //The user that added the reaction.
+		
+		//If this event is not from a guild ignore it.
+		if (guild == null)
+			return;
+		
+		//Ignore bot reaction.
+		if (SerpensBot.getApi().getSelfUser().getId().equals(author.getId()))
+			return;
+		
+		//Get the interacction that the user can interact with.
+		InteractionGroup interactionGroup;
+		
+		//Task can have buttons too.
+		Task task = this.getTask(guild.getId(), author);
+		
+		if (task != null)
+		{
+			interactionGroup = task.getInteractionGroup();
+			InteractionCallback interactionCallback = interactionGroup.getComponentCallback(componendId);
+			
+			//Check if a callback was found.
+			if (interactionCallback == null)
+			{
+				logger.warn(SerpensBot.getMessage("Nessuna callback per l'inetrazione \"{}\" nella task.", componendId));
+				return;
+			}
+			
+			try
+			{
+				//Do button action.
+				boolean deleteMessage = interactionCallback.doAction(event);
+				
+				//Delete message that has the clicked button if it should be deleted.
+				if (deleteMessage)
+				{
+					event.getHook().deleteOriginal().queue();
+				}
+				
+				//Remove the task if it finished.
+				if (!task.isRunning())
+				{
+					this.removeTask(guild.getId(), task);
+				}
+			}
+			catch (WrongInteractionEventException e)
+			{
+				//Abort task.
+				this.removeTask(guild.getId(), task);
+				
+				//Send error message.
+				String embedTitle = SerpensBot.getMessage("botlistener_button_action_error");
+				String embedDescription = SerpensBot.getMessage("botlistener_interaction_event_type_error", e.getInteractionId(), e.getExpected(), e.getFound());
+				Message message = MessageUtils.buildErrorMessage(embedTitle, event.getUser(), embedDescription);
+				event.reply(message).setEphemeral(true).queue();
+				
+				//Log the error.
+				logger.error(e.getLocalizedMessage(), e);
+			}
+			catch (PermissionException e)
+			{
+				//Abort task.
+				this.removeTask(guild.getId(), task);
+				
+				//Send error message.
+				String embedTitle = SerpensBot.getMessage("botlistener_button_action_error");
+				String embedDescription = SerpensBot.getMessage("botlistener_missing_permmision_error", e.getPermission());
+				Message message = MessageUtils.buildErrorMessage(embedTitle, event.getUser(), embedDescription);
+				event.reply(message).setEphemeral(true).queue();
+				
+				//Log the error.
+				logger.error(e.getLocalizedMessage(), e);
+			}
+		}
 	}
 	
 	private static void startHungerGames(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
@@ -326,5 +454,88 @@ public class HungerGamesListener extends BotListener
 		//Send message info.
 		Message message = MessageUtils.buildSimpleMessage("Hunger Games", author, "Gli HungerGames sono stati fermati da " + author.getName() + ".");
 		event.reply(message).setEphemeral(false).queue();
+	}
+	
+	public Task getTask(String guildID, User user)
+	{
+		this.tasks.putIfAbsent(guildID, new HashMap<>());
+		return this.tasks.get(guildID).get(user);
+	}
+	
+	/**
+	 * Start the given task in the given guild id.
+	 *
+	 * @param guildID
+	 * 		The guild id the task is currently active.
+	 * @param task
+	 * 		The task that will be started.
+	 * @param event
+	 *  	The event that started the task.
+	 */
+	protected void startTask(String guildID, Task task, GenericInteractionCreateEvent event)
+	{
+		this.addTask(guildID, task);
+		task.start(event);
+	}
+	
+	/**
+	 * Start the given task in the given guild id.
+	 *
+	 * @param guildID
+	 * 		The guild id the task is currently active.
+	 * @param task
+	 * 		The task that will be started.
+	 */
+	protected void startTask(String guildID, Task task)
+	{
+		this.addTask(guildID, task);
+		task.start();
+	}
+	
+	protected void addTask(String guildID, Task task)
+	{
+		if (task.isInterrupted())
+			return;
+		
+		User user = task.getUser();
+		Task currentUserTask = this.getTask(guildID, user);
+		
+		//Replace the current task (if there is one) with the new one.
+		if (currentUserTask != null)
+			this.removeTask(guildID, currentUserTask);
+		
+		//Create the guild map if absent.
+		this.tasks.putIfAbsent(guildID, new HashMap<>());
+		
+		this.tasks.get(guildID).put(user, task);
+	}
+
+	/**
+	 * Method for the "cancel" command of a module. Based on the event data it will cancel a task.
+	 */
+	private void cancelTask(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	{
+		Task task = this.getTask(guild.getId(), author);
+		
+		//Check if the user has a task active.
+		if (task == null)
+		{
+			Message message = MessageUtils.buildErrorMessage(SerpensBot.getMessage("botlistener_command_cancel_title"), event.getUser(), SerpensBot.getMessage("botlistener_command_cancel_no_task_error"));
+			event.reply(message).setEphemeral(true).queue();
+			return;
+		}
+		
+		//Remove the task
+		this.removeTask(guild.getId(), this.getTask(guild.getId(), author));
+		
+		Message message = MessageUtils.buildSimpleMessage(SerpensBot.getMessage("botlistener_command_cancel_title"), author, SerpensBot.getMessage("botlistener_command_cancel_info"));
+		event.reply(message).setEphemeral(false).queue();
+	}
+	
+	protected void removeTask(String guildID, Task task)
+	{
+		this.tasks.putIfAbsent(guildID, new HashMap<>());
+		
+		this.tasks.get(guildID).remove(task.getUser());
 	}
 }
