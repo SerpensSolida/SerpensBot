@@ -96,7 +96,7 @@ public class HungerGamesListener extends BotListener
 		this.addBotCommand(command);
 		
 		//Command for cancelling a task.
-		command = new BotCommand("cancel", SerpensBot.getMessage("Interrompe la task corrente."));
+		command = new BotCommand("cancel", "Interrompe la task corrente.");
 		command.setAction(this::cancelTask);
 		this.addBotCommand(command);
 	}
