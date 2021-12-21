@@ -20,7 +20,6 @@ public class OwnerListener extends BotListener
 		
 		//Module has no tasks and cannot get help.
 		this.getBotCommands().clear();
-		//this.getUnlistedBotCommands().clear();
 	}
 	
 	@Override
