@@ -8,7 +8,7 @@
 
     <groupId>com.serpensolida.discordbot</groupId>
     <artifactId>SerpensBot</artifactId>
-    <version>1.9.8</version>
+    <version>1.9.9</version>
 
     <build>
         <sourceDirectory>src</sourceDirectory>
@@ -59,7 +59,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
-
 
     <repositories>
         <repository>
