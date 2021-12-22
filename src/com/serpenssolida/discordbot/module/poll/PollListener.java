@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.Button;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -423,7 +424,7 @@ public class PollListener extends BotListener
 					//The user tried to switch the with the same vote.
 					if (!switched)
 					{
-						event.reply(MessageUtils.buildErrorMessage("Votazione sondaggio", author, "Hai già votato per l'opzione: *" + option.getId() + "*")).setEphemeral(true).queue();
+						event.reply(MessageUtils.buildErrorMessage("Votazione sondaggio", author, "Hai già votato per l'opzione: *" + option.getText() + "*")).setEphemeral(true).queue();
 						return InteractionCallback.LEAVE_MESSAGE;
 					}
 					
@@ -453,19 +454,24 @@ public class PollListener extends BotListener
 	private static MessageBuilder generatePollMessage(Poll poll, User author)
 	{
 		MessageBuilder messageBuilder = new MessageBuilder();
-		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed(poll.getQuestion(), author)
+		EmbedBuilder pollEmbedBuilder= MessageUtils.getDefaultEmbed(poll.getQuestion(), author)
 				.setDescription("*Sondaggio in corso...*")
 				.setFooter("Richiesto da " + author.getName() + " | ID: " + poll.getMessageId(), author.getAvatarUrl());
+		EmbedBuilder legendEmbedBuilder = new EmbedBuilder();
 		
 		if (poll.isFinished())
-			embedBuilder.setDescription(PollListener.getWinnerDescription(poll));
+			pollEmbedBuilder.setDescription(PollListener.getWinnerDescription(poll));
 		else
 			messageBuilder.setActionRows(PollListener.buildPollMessageButtons(poll)); //Add buttons.
 		
 		if (poll.getVotesCount() > 0)
-			embedBuilder.setImage("attachment://pie_chart.png");
-		
-		messageBuilder.setEmbeds(embedBuilder.build());
+		{
+			pollEmbedBuilder.setImage("attachment://pie_chart.png");
+			legendEmbedBuilder.setImage("attachment://chart_legend.png");
+			messageBuilder.setEmbeds(pollEmbedBuilder.build(), legendEmbedBuilder.build());
+		}
+		else
+			messageBuilder.setEmbeds(pollEmbedBuilder.build());
 		
 		return messageBuilder;
 	}
@@ -502,10 +508,16 @@ public class PollListener extends BotListener
 		//If there are votes in the poll we can generate an image.
 		if (poll.getVotesCount() > 0)
 		{
-			byte[] pollChart = PollDrawer.generatePieChart(poll);
+			ImmutablePair<byte[], byte[]> pieChartImages = PollDrawer.getPieChartImages(poll);
+			
+			byte[] pollChart = pieChartImages.getLeft();
+			byte[] pollLegend = pieChartImages.getRight();
 			
 			if (pollChart != null)
+			{
 				editMessage.addFile(pollChart, "pie_chart.png");
+				editMessage.addFile(pollLegend, "chart_legend.png");
+			}
 		}
 		
 		editMessage.queue();
