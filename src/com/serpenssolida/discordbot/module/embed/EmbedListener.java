@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -48,7 +48,7 @@ public class EmbedListener extends BotListener
 		this.addBotCommand(command);
 	}
 	
-	private void sendEmbed(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private void sendEmbed(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping titleArg = event.getOption("title");
 		OptionMapping descriptionArg = event.getOption("description");
@@ -141,7 +141,7 @@ public class EmbedListener extends BotListener
 		event.reply(messageBuilder.build()).queue();
 	}
 	
-	private void generateEmbed(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private void generateEmbed(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping titleArg = event.getOption("title");
 		OptionMapping messageIdArg = event.getOption("message-id");

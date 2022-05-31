@@ -8,7 +8,7 @@ import com.serpenssolida.discordbot.MessageUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,10 +19,10 @@ public class TrackLoadResultHandler implements AudioLoadResultHandler
 {
 	private static final Logger logger = LoggerFactory.getLogger(TrackLoadResultHandler.class);
 	private final GuildAudioController audioController;
-	private final SlashCommandEvent event;
+	private final SlashCommandInteractionEvent event;
 	private final TrackEventHandler listener;
 	
-	public TrackLoadResultHandler(GuildAudioController audioController, SlashCommandEvent event, TrackEventHandler listener)
+	public TrackLoadResultHandler(GuildAudioController audioController, SlashCommandInteractionEvent event, TrackEventHandler listener)
 	{
 		this.audioController = audioController;
 		this.event = event;

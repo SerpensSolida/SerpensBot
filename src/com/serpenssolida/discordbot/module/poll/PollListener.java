@@ -11,13 +11,13 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 
@@ -91,7 +91,7 @@ public class PollListener extends BotListener
 		this.addBotCommand(command);
 	}
 	
-	private void createNewPoll(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private void createNewPoll(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping questionArg = event.getOption("question");
 		OptionMapping durationArg = event.getOption("duration");
@@ -146,7 +146,7 @@ public class PollListener extends BotListener
 		timer.start();
 	}
 	
-	private void removeVote(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private void removeVote(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping pollIdArg = event.getOption("poll-id");
 		
@@ -181,7 +181,7 @@ public class PollListener extends BotListener
 		event.reply(message).setEphemeral(true).queue();
 	}
 	
-	private void editPollDescription(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private void editPollDescription(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping pollIdArg = event.getOption("poll-id");
 		OptionMapping descriptionArg = event.getOption("description");
@@ -222,7 +222,7 @@ public class PollListener extends BotListener
 		event.reply(message).setEphemeral(false).queue();
 	}
 	
-	private void addOption(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private void addOption(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping pollIdArg = event.getOption("poll-id");
 		OptionMapping descriptionArg = event.getOption("description");
@@ -273,7 +273,7 @@ public class PollListener extends BotListener
 		event.reply(message).setEphemeral(false).queue();
 	}
 	
-	private void removeOption(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private void removeOption(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping pollIdArg = event.getOption("poll-id");
 		OptionMapping indexArg = event.getOption("position");
@@ -329,7 +329,7 @@ public class PollListener extends BotListener
 		event.reply(messageInfo).setEphemeral(false).queue();
 	}
 	
-	private void removePoll(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private void removePoll(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping pollIdArg = event.getOption("poll-id");
 		

@@ -5,9 +5,9 @@ import com.serpenssolida.discordbot.interaction.InteractionCallback;
 import com.serpenssolida.discordbot.interaction.InteractionGroup;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 /**
  * A Task is a routine that gets input from non-command messages sent by a specific {@link User} to a specific {@link MessageChannel}.
@@ -46,7 +46,7 @@ public abstract class Task
 	 * @param event
 	 * 		The event that created this task.
 	 */
-	public void start(GenericInteractionCreateEvent event)
+	public void start(SlashCommandInteractionEvent event)
 	{
 		MessageBuilder messageBuilder = new MessageBuilder();
 		boolean ephemeral = this.startMessage(messageBuilder);

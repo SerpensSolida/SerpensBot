@@ -7,10 +7,10 @@ import com.serpenssolida.discordbot.SerpensBot;
 import com.serpenssolida.discordbot.command.BotCommand;
 import com.serpenssolida.discordbot.module.BotListener;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,7 +115,7 @@ public class ChannelFilterListener extends BotListener
 		}
 	}
 	
-	private void setChannelFilter(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private void setChannelFilter(SlashCommandInteraction event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping channelArg = event.getOption("channel");
 		OptionMapping requireImagesArg = event.getOption("requires_images");
@@ -157,7 +157,7 @@ public class ChannelFilterListener extends BotListener
 		event.reply(message).setEphemeral(false).queue();
 	}
 	
-	private void removeChannelFilter(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private void removeChannelFilter(SlashCommandInteraction event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping channelArg = event.getOption("channel");
 		

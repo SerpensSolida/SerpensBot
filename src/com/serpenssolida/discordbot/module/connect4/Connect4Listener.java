@@ -13,12 +13,12 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 
 import javax.swing.*;
@@ -58,7 +58,7 @@ public class Connect4Listener extends BotListener
 		this.addBotCommand(command);
 	}
 	
-	private void startGame(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private void startGame(SlashCommandInteraction event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping opponentArg = event.getOption("opponent");
 		
@@ -90,7 +90,7 @@ public class Connect4Listener extends BotListener
 		timer.start();
 	}
 	
-	private void removeGame(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private void removeGame(SlashCommandInteraction event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping gameIdArg = event.getOption("game-id");
 		
@@ -137,7 +137,7 @@ public class Connect4Listener extends BotListener
 		this.removeInteractionGroup(guild.getId(), game.getMessageId());
 	}
 	
-	private void sendLeaderboard(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private void sendLeaderboard(SlashCommandInteraction event, Guild guild, MessageChannel channel, User author)
 	{
 		//Get the leaderboard.
 		Connect4Leaderboard leaderboard = Connect4Controller.getLeaderboard(guild.getId());

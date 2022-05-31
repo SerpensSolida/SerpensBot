@@ -12,12 +12,12 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -50,7 +50,7 @@ public class TicTacToeListener extends BotListener
 		this.addBotCommand(command);
 	}
 	
-	private void startGame(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private void startGame(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping opponentArg = event.getOption("opponent");
 		
@@ -82,7 +82,7 @@ public class TicTacToeListener extends BotListener
 		timer.start();
 	}
 	
-	private void removeGame(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private void removeGame(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping gameIdArg = event.getOption("game-id");
 		

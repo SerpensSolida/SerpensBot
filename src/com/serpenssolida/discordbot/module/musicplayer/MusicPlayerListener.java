@@ -18,11 +18,11 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.Button;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.managers.AudioManager;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import org.jetbrains.annotations.NotNull;
@@ -72,7 +72,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		AudioSourceManagers.registerRemoteSources(MusicPlayerListener.playerManager);
 	}
 	
-	private void playTrack(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private void playTrack(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping songArg = event.getOption("song");
 		
@@ -132,7 +132,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		MusicPlayerListener.playerManager.loadItem(song, new TrackLoadResultHandler(audioController, event, this));
 	}
 	
-	private void skipTrack(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private void skipTrack(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		//Get voice state of the user
 		GuildVoiceState authorVoiceState = MusicPlayerListener.getUserVoiceState(event);
@@ -180,7 +180,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		}
 	}
 	
-	private void stopPlayback(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private void stopPlayback(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		//Get voice state of the user
 		GuildVoiceState authorVoiceState = MusicPlayerListener.getUserVoiceState(event);
@@ -578,7 +578,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		return new ImmutablePair<>(titleField.toString(), numberField.toString());
 	}
 	
-	private static GuildVoiceState getUserVoiceState(SlashCommandEvent event)
+	private static GuildVoiceState getUserVoiceState(SlashCommandInteractionEvent event)
 	{
 		Member authorMember = event.getMember();
 		User author = event.getUser();

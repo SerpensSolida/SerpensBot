@@ -15,9 +15,8 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.GenericComponentInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.PermissionException;
 import net.dv8tion.jda.api.interactions.commands.Command;
@@ -214,7 +213,7 @@ public class HungerGamesListener extends BotListener
 		}
 	}
 	
-	private static void startHungerGames(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private static void startHungerGames(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		//Check if no Hunger Games is running.
 		if (HungerGamesController.isHungerGamesRunning(guild.getId()))
@@ -231,7 +230,7 @@ public class HungerGamesListener extends BotListener
 		event.reply(MessageUtils.buildSimpleMessage("Hunger Games", author, "Gli Hunger Games stanno per iniziare!")).queue();
 	}
 	
-	private void sendCharacterCard(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private void sendCharacterCard(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		Character character;
 		OptionMapping tagArg = event.getOption("tag");
@@ -310,7 +309,7 @@ public class HungerGamesListener extends BotListener
 		event.reply(messageBuilder.build()).setEphemeral(false).queue();
 	}
 	
-	private void setCharacterEnabled(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private void setCharacterEnabled(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		Character character = HungerGamesController.getCharacter(guild.getId(), author.getId());
 		OptionMapping valueArg = event.getOption("value");
@@ -350,7 +349,7 @@ public class HungerGamesListener extends BotListener
 		event.reply(message).setEphemeral(false).queue();
 	}
 	
-	private void setPlaybackSpeed(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private void setPlaybackSpeed(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping secondsArg = event.getOption("seconds");
 		
@@ -372,7 +371,7 @@ public class HungerGamesListener extends BotListener
 		event.reply(message).setEphemeral(false).queue();
 	}
 	
-	private void sendLeaderboard(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private void sendLeaderboard(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping typeArg = event.getOption("type");
 		String fieldName;
@@ -441,7 +440,7 @@ public class HungerGamesListener extends BotListener
 		event.reply(messageBuilder.build()).setEphemeral(false).queue();
 	}
 	
-	private void stopHungerGames(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private void stopHungerGames(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		boolean isRunning = HungerGamesController.isHungerGamesRunning(guild.getId());
 		
@@ -477,7 +476,7 @@ public class HungerGamesListener extends BotListener
 	 * @param event
 	 *  	The event that started the task.
 	 */
-	protected void startTask(String guildID, Task task, GenericInteractionCreateEvent event)
+	protected void startTask(String guildID, Task task, SlashCommandInteractionEvent event)
 	{
 		this.addTask(guildID, task);
 		task.start(event);
@@ -518,7 +517,7 @@ public class HungerGamesListener extends BotListener
 	/**
 	 * Method for the "cancel" command of a module. Based on the event data it will cancel a task.
 	 */
-	private void cancelTask(SlashCommandEvent event, Guild guild, MessageChannel channel, User author)
+	private void cancelTask(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		Task task = this.getTask(guild.getId(), author);
 		
