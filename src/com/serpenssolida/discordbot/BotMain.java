@@ -3,6 +3,7 @@ package com.serpenssolida.discordbot;
 import com.serpenssolida.discordbot.module.channelfilter.ChannelFilterListener;
 import com.serpenssolida.discordbot.module.connect4.Connect4Listener;
 import com.serpenssolida.discordbot.module.embed.EmbedListener;
+import com.serpenssolida.discordbot.module.forum.ForumChannelListener;
 import com.serpenssolida.discordbot.module.hungergames.HungerGamesListener;
 import com.serpenssolida.discordbot.module.musicplayer.MusicPlayerListener;
 import com.serpenssolida.discordbot.module.owner.OwnerListener;
@@ -23,5 +24,6 @@ public class BotMain
 		SerpensBot.addModule(new Connect4Listener());
 		SerpensBot.addModule(new ChannelFilterListener());
 		SerpensBot.addModule(new MusicPlayerListener());
+		SerpensBot.addModule(new ForumChannelListener());
 	}
 }
