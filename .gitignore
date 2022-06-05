@@ -34,4 +34,5 @@ hs_err_pid*
 /settings.json
 /bot.json
 /server_data/
+/global_data/
 /deploy.bat
