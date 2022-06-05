@@ -128,6 +128,14 @@ public class ForumChannelListener extends BotListener
 	{
 		OptionMapping channelNameArg = event.getOption("channel_name");
 		
+		//Check if user is an admin.
+		if (!SerpensBot.isAdmin(event.getMember()))
+		{
+			Message message = MessageUtils.buildErrorMessage("Forum channel", author, "Devi essere un admin per creare un forum.");
+			event.reply(message).setEphemeral(true).queue();
+			return;
+		}
+		
 		if (channelNameArg == null)
 		{
 			Message message = MessageUtils.buildErrorMessage("Forum channel", author, "Devi inserire il parametro channel_name.");
@@ -153,6 +161,14 @@ public class ForumChannelListener extends BotListener
 	private void convertChannelToForum(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping channelArg = event.getOption("channel");
+		
+		//Check if user is an admin.
+		if (!SerpensBot.isAdmin(event.getMember()))
+		{
+			Message message = MessageUtils.buildErrorMessage("Forum channel", author, "Devi essere un admin per convertire un canale in un forum.");
+			event.reply(message).setEphemeral(true).queue();
+			return;
+		}
 		
 		if (channelArg == null)
 		{
