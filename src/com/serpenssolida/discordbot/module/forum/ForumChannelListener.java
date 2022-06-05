@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,10 +45,17 @@ public class ForumChannelListener extends BotListener
 		this.removeBotCommand("cancel");
 		
 		//Command for creating an embed.
-		BotCommand command = new BotCommand("init", "Crea un canale da usare come forum.");
+		BotCommand command = new BotCommand("create", "Crea un canale da usare come forum.");
 		command.setAction(this::initForum);
 		command.getSubcommand()
 				.addOption(OptionType.STRING, "channel_name", "Il nome del canale da creare.", true);
+		this.addBotCommand(command);
+		
+		//Command for creating an embed.
+		command = new BotCommand("init", "Converte un canale in un forum.");
+		command.setAction(this::convertChannelToForum);
+		command.getSubcommand()
+				.addOption(OptionType.CHANNEL, "channel", "Il canale da convertire", true);
 		this.addBotCommand(command);
 		
 		//Load saved forums.
@@ -118,8 +126,6 @@ public class ForumChannelListener extends BotListener
 	
 	private void initForum(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
-		OptionMapping channelArg = event.getOption("channel_name");
-		//MessageChannel targetChannel = channelArg == null ? channel : channelArg.getAsMessageChannel();
 		OptionMapping channelNameArg = event.getOption("channel_name");
 		
 		if (channelNameArg == null)
@@ -138,25 +144,51 @@ public class ForumChannelListener extends BotListener
 			return;
 		}
 		
+		Modal modal = this.getForumDataModal();
+		event.replyModal(modal).queue();
+		
+		this.addModalCallback(guild.getId(), author.getId(), this.generateCreateForumCallback(channelName));
+	}
+	
+	private void convertChannelToForum(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
+	{
+		OptionMapping channelArg = event.getOption("channel");
+		
+		if (channelArg == null)
+		{
+			Message message = MessageUtils.buildErrorMessage("Forum channel", author, "Devi inserire il parametro channel.");
+			event.reply(message).setEphemeral(true).queue();
+			return;
+		}
+		
+		TextChannel targetChannel = channelArg.getAsTextChannel();
+		
+		Modal modal = this.getForumDataModal();
+		event.replyModal(modal).queue();
+		
+		this.addModalCallback(guild.getId(), author.getId(), this.generateConvertChannelCallback(targetChannel));
+	}
+	
+	@NotNull
+	private Modal getForumDataModal()
+	{
+		//Fields.
 		TextInput forumTitle = TextInput.create("title", "Titolo del messaggio", TextInputStyle.SHORT)
 				.build();
-		
 		TextInput forumDescription = TextInput.create("description", "Descrizione del messaggio", TextInputStyle.PARAGRAPH)
 				.build();
-		
 		TextInput buttonLabel = TextInput.create("button_label", "Testo del bottone", TextInputStyle.SHORT)
 				.build();
 		
+		//Create modal.
 		Modal modal = Modal.create("forum", "Forum Channel")
 				.addActionRows(ActionRow.of(forumTitle), ActionRow.of(forumDescription), ActionRow.of(buttonLabel))
 				.build();
 		
-		event.replyModal(modal).queue();
-		
-		this.addModalCallback(guild.getId(), author.getId(), this.generateCreateForumModalCallback(channelName));
+		return modal;
 	}
 	
-	private ModalCallback generateCreateForumModalCallback(String channelName)
+	private ModalCallback generateCreateForumCallback(String channelName)
 	{
 		ModalCallback callback = (event, guild, channel, author) ->
 		{
@@ -197,6 +229,56 @@ public class ForumChannelListener extends BotListener
 		return callback;
 	}
 	
+	private ModalCallback generateConvertChannelCallback(TextChannel targetChannel)
+	{
+		ModalCallback callback = (event, guild, channel, author) ->
+		{
+			ModalMapping titleArg = event.getValue("title");
+			ModalMapping descriptionArg = event.getValue("description");
+			ModalMapping buttonLabelArg = event.getValue("button_label");
+			
+			//Check modal input.
+			if (titleArg == null || descriptionArg == null || buttonLabelArg == null)
+			{
+				Message message = MessageUtils.buildErrorMessage("Forum channel", author, "Devi inserire tutti i parametri.");
+				event.reply(message).setEphemeral(true).queue();
+				return;
+			}
+			
+			//Get modal input.
+			String title = titleArg.getAsString();
+			String description = descriptionArg.getAsString();
+			String buttonLabel = buttonLabelArg.getAsString();
+			
+			//Set permission of the target channel
+			targetChannel.upsertPermissionOverride(guild.getPublicRole())
+					.setAllowed(EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND_IN_THREADS))
+					.setDenied(EnumSet.of(Permission.MESSAGE_SEND, Permission.CREATE_PRIVATE_THREADS, Permission.CREATE_PUBLIC_THREADS))
+					.complete();
+			
+			targetChannel.upsertPermissionOverride(guild.getBotRole())
+					.setAllowed(EnumSet.of(Permission.MESSAGE_SEND, Permission.CREATE_PUBLIC_THREADS))
+					.complete();
+			
+			/*TextChannel textChannel = guild.createTextChannel(channelName)
+					.addPermissionOverride(guild.getPublicRole(), EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_SEND_IN_THREADS), EnumSet.of(Permission.MESSAGE_SEND, Permission.CREATE_PRIVATE_THREADS, Permission.CREATE_PUBLIC_THREADS))
+					.addPermissionOverride(guild.getBotRole(), EnumSet.of(Permission.MESSAGE_SEND, Permission.CREATE_PUBLIC_THREADS), null)
+					.complete();*/
+			
+			Forum forum = new Forum(title, description, buttonLabel, guild.getId(), targetChannel.getId());
+			Message forumMessage = this.createStartMessage(guild, targetChannel, forum);
+			forum.setMessageID(forumMessage.getId());
+			
+			this.forums.put(targetChannel.getId(), forum);
+			this.saveForums();
+			
+			Message message = MessageUtils.buildSimpleMessage("Forum channel", author, "Canale inizializzato correttamente.");
+			event.reply(message).queue();
+		};
+		
+		return callback;
+	}
+	
 	private ModalCallback generateCreateThreadModalCallback()
 	{
 		ModalCallback callback = (event, guild, channel, author) ->
@@ -215,7 +297,8 @@ public class ForumChannelListener extends BotListener
 			String title = titleArg.getAsString();
 			
 			//Create thread.
-			event.getTextChannel().createThreadChannel(title).complete();
+			ThreadChannel threadChannel = event.getTextChannel().createThreadChannel(title).complete();
+			threadChannel.addThreadMember(author).queue();
 			
 			//Recreate the starting message.
 			Forum forum = this.forums.get(event.getTextChannel().getId());
