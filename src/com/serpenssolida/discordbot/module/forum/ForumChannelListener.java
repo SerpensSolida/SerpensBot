@@ -48,7 +48,7 @@ public class ForumChannelListener extends BotListener
 		BotCommand command = new BotCommand("create", "Crea un canale da usare come forum.");
 		command.setAction(this::initForum);
 		command.getSubcommand()
-				.addOption(OptionType.STRING, "channel_name", "Il nome del canale da creare.", true);
+				.addOption(OptionType.STRING, "channel-name", "Il nome del canale da creare.", true);
 		this.addBotCommand(command);
 		
 		//Command for creating an embed.
@@ -128,7 +128,7 @@ public class ForumChannelListener extends BotListener
 	
 	private void initForum(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
-		OptionMapping channelNameArg = event.getOption("channel_name");
+		OptionMapping channelNameArg = event.getOption("channel-name");
 		
 		//Check if user is an admin.
 		if (!SerpensBot.isAdmin(event.getMember()))
