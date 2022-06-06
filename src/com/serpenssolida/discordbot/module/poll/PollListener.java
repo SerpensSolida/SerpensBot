@@ -1,6 +1,7 @@
 package com.serpenssolida.discordbot.module.poll;
 
 import com.serpenssolida.discordbot.MessageUtils;
+import com.serpenssolida.discordbot.SerpensBot;
 import com.serpenssolida.discordbot.command.BotCommand;
 import com.serpenssolida.discordbot.interaction.InteractionCallback;
 import com.serpenssolida.discordbot.interaction.InteractionGroup;
@@ -12,6 +13,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -20,10 +22,12 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.MessageAction;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class PollListener extends BotListener
 {
@@ -45,11 +49,12 @@ public class PollListener extends BotListener
 				.addOption(OptionType.STRING, "question", "La domanda del sondaggio", true)
 				.addOption(OptionType.STRING, "option1", "Opzione del sondaggio", true)
 				.addOption(OptionType.STRING, "option2", "Opzione del sondaggio", true);
+		
 		for (int i = 3; i <= 9; i++)
-		{
 			subCommand.addOption(OptionType.STRING, "option" + i, "Opzione del sondaggio", false);
-		}
+		
 		subCommand.addOption(OptionType.INTEGER, "duration", "Durata in minuti del sondaggio. (default: 60 minuti)", false);
+		subCommand.addOption(OptionType.BOOLEAN, "keep-down", "Se tenere il sondaggio in fondo alla chat oppure no. (default: true)", false);
 		this.addBotCommand(command);
 		
 		//Command for deleting a poll.
@@ -91,22 +96,71 @@ public class PollListener extends BotListener
 		this.addBotCommand(command);
 	}
 	
+	@Override
+	public void onMessageReceived(@NotNull MessageReceivedEvent event)
+	{
+		//Don't accept messages from private channels.
+		if (!event.isFromGuild())
+			return;
+		
+		Guild guild = event.getGuild();
+		MessageChannel channel = event.getChannel(); //Channel where the message was sent.
+		User author = event.getAuthor();
+		
+		//If the author of the message is the bot, ignore the message.
+		if (SerpensBot.getApi().getSelfUser().getId().equals(author.getId()))
+			return;
+		
+		for (Map.Entry<String, Poll> pollEntry : this.polls.entrySet())
+		{
+			Poll poll = pollEntry.getValue();
+			
+			if (!poll.getChannel().equals(channel))
+				continue;
+			
+			if (!poll.isKeepDown())
+				break;
+			
+			//Get previous poll message.
+			Message previousPollMessage = channel.retrieveMessageById(poll.getMessageID()).complete();
+			previousPollMessage.delete().queue();
+			
+			//Resend message.
+			Message pollMessage = channel.sendMessage(PollListener.generatePollMessage(poll, author).build()).complete();
+			
+			//Set the correct message id for poll, map, and interaction group.
+			this.switchInteractionGroupMessage(guild.getId(), poll.getMessageID(), pollMessage.getId());
+			poll.setMessageID(pollMessage.getId());
+			this.polls.remove(previousPollMessage.getId());
+			this.polls.put(poll.getMessageID(), poll);
+			
+			//Refresh message after sending it.
+			PollListener.refreshPollMessage(poll, pollMessage);
+			
+			break;
+		}
+	}
+	
 	private void createNewPoll(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping questionArg = event.getOption("question");
 		OptionMapping durationArg = event.getOption("duration");
+		OptionMapping keepDownArg = event.getOption("keep-down");
 		
 		//Null check for arguments.
 		if (questionArg == null)
 			return;
 		
-		//Get duration of the poll
+		//Get duration of the poll.
 		int duration = 60;
 		if (durationArg != null)
 			duration = (int) durationArg.getAsLong();
 		
+		//Get the keep down flag.
+		boolean keepDown = keepDownArg == null || keepDownArg.getAsBoolean();
+		System.out.println("DO I NEED TO KEEP DOWN:" + keepDown);
 		//Create the poll.
-		Poll poll = new Poll(questionArg.getAsString(), author);
+		Poll poll = new Poll(questionArg.getAsString(), author, channel, keepDown);
 		
 		//Generate poll options.
 		int k = 1;
@@ -133,7 +187,7 @@ public class PollListener extends BotListener
 		Message message = hook.retrieveOriginal().complete();
 		String messageId = message.getId();
 		
-		poll.setMessageId(messageId); //Set poll message.
+		poll.setMessageID(messageId); //Set poll message.
 		this.addInteractionGroup(guild.getId(), messageId, interactionGroup); //Register button group.
 		this.polls.put(messageId, poll); //Add poll to the list.
 		
@@ -174,7 +228,7 @@ public class PollListener extends BotListener
 		}
 		
 		//Refresh the message.
-		Message message = channel.retrieveMessageById(poll.getMessageId()).complete();
+		Message message = channel.retrieveMessageById(poll.getMessageID()).complete();
 		PollListener.refreshPollMessage(poll, message);
 		
 		message = MessageUtils.buildSimpleMessage("Rimozione voto", author, "Voto rimosso con successo.");
@@ -212,11 +266,11 @@ public class PollListener extends BotListener
 		poll.setQuestion(descriptionArg.getAsString());
 		
 		//Refresh poll message.
-		Message pollMessage = channel.retrieveMessageById(poll.getMessageId()).complete();
+		Message pollMessage = channel.retrieveMessageById(poll.getMessageID()).complete();
 		PollListener.refreshPollMessage(poll, pollMessage);
 		
 		InteractionGroup interactionGroup = PollListener.generateButtonCallback(poll);
-		this.addInteractionGroup(guild.getId(), poll.getMessageId(), interactionGroup);
+		this.addInteractionGroup(guild.getId(), poll.getMessageID(), interactionGroup);
 		
 		Message message = MessageUtils.buildSimpleMessage("Modifica descrizione del sondaggio", author, "Descrizione cambiata con successo.");
 		event.reply(message).setEphemeral(false).queue();
@@ -263,11 +317,11 @@ public class PollListener extends BotListener
 		poll.addOption(option);
 		
 		//Refresh poll message.
-		Message pollMessage = channel.retrieveMessageById(poll.getMessageId()).complete();
+		Message pollMessage = channel.retrieveMessageById(poll.getMessageID()).complete();
 		PollListener.refreshPollMessage(poll, pollMessage);
 		
 		InteractionGroup interactionGroup = PollListener.generateButtonCallback(poll);
-		this.addInteractionGroup(guild.getId(), poll.getMessageId(), interactionGroup);
+		this.addInteractionGroup(guild.getId(), poll.getMessageID(), interactionGroup);
 		
 		Message message = MessageUtils.buildSimpleMessage("Aggiunta opzione al sondaggio", author, "Aggiunta l'opzione \"" + option.getText() + "\" al sondaggio.");
 		event.reply(message).setEphemeral(false).queue();
@@ -321,7 +375,7 @@ public class PollListener extends BotListener
 		}
 		
 		//Refresh the poll message.
-		Message message = channel.retrieveMessageById(poll.getMessageId()).complete();
+		Message message = channel.retrieveMessageById(poll.getMessageID()).complete();
 		PollListener.refreshPollMessage(poll, message);
 		
 		//Send message info.
@@ -371,16 +425,16 @@ public class PollListener extends BotListener
 	private void stopPoll(Poll poll, Guild guild, MessageChannel channel)
 	{
 		//Get the poll by id.
-		Poll removedPoll = this.polls.remove(poll.getMessageId());
+		Poll removedPoll = this.polls.remove(poll.getMessageID());
 		
 		if (removedPoll == null)
 			return;
 		
 		//Stop the poll, refresh its message and remove buttons callback.
 		removedPoll.setFinished(true);
-		Message message = channel.retrieveMessageById(poll.getMessageId()).complete();
+		Message message = channel.retrieveMessageById(poll.getMessageID()).complete();
 		PollListener.refreshPollMessage(poll, message);
-		this.removeInteractionGroup(guild.getId(), poll.getMessageId());
+		this.removeInteractionGroup(guild.getId(), poll.getMessageID());
 	}
 	
 	private static ArrayList<ActionRow> buildPollMessageButtons(Poll poll)
@@ -456,7 +510,7 @@ public class PollListener extends BotListener
 		MessageBuilder messageBuilder = new MessageBuilder();
 		EmbedBuilder pollEmbedBuilder= MessageUtils.getDefaultEmbed(poll.getQuestion(), author)
 				.setDescription("*Sondaggio in corso...*")
-				.setFooter("Richiesto da " + author.getName() + " | ID: " + poll.getMessageId(), author.getAvatarUrl());
+				.setFooter("Richiesto da " + author.getName() + " | ID: " + poll.getMessageID(), author.getAvatarUrl());
 		EmbedBuilder legendEmbedBuilder = new EmbedBuilder();
 		
 		if (poll.isFinished())

@@ -1,5 +1,6 @@
 package com.serpenssolida.discordbot.module.poll;
 
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 
 import java.util.*;
@@ -10,15 +11,19 @@ public class Poll
 {
 	private final User author; //The author of the poll.
 	private final HashSet<User> users = new HashSet<>(); //Users that added a vote in the poll.
-	private String messageId; //ID of the message the poll is in.
+	private final MessageChannel channel;
+	private String messageID; //ID of the message the poll is in.
 	private String question; //Question of the poll.
 	private LinkedHashMap<String, PollOption> options = new LinkedHashMap<>(); //Options of the poll.
+	private boolean keepDown;
 	private boolean finished; //If the poll is finished.
 
-	public Poll(String question, User author)
+	public Poll(String question, User author, MessageChannel channel, boolean keepDown)
 	{
 		this.question = question;
 		this.author = author;
+		this.channel = channel;
+		this.keepDown = keepDown;
 	}
 	
 	/**
@@ -205,14 +210,19 @@ public class Poll
 		return this.users.contains(author);
 	}
 	
-	public String getMessageId()
+	public String getMessageID()
 	{
-		return this.messageId;
+		return this.messageID;
 	}
 	
-	public void setMessageId(String messageId)
+	public void setMessageID(String messageID)
 	{
-		this.messageId = messageId;
+		this.messageID = messageID;
+	}
+	
+	public MessageChannel getChannel()
+	{
+		return this.channel;
 	}
 	
 	public String getQuestion()
@@ -238,6 +248,16 @@ public class Poll
 	public User getAuthor()
 	{
 		return this.author;
+	}
+	
+	public boolean isKeepDown()
+	{
+		return keepDown;
+	}
+	
+	public void setKeepDown(boolean keepDown)
+	{
+		this.keepDown = keepDown;
 	}
 	
 	public static class PollOption
