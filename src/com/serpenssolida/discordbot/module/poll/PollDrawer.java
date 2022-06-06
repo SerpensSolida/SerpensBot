@@ -23,7 +23,7 @@ public class PollDrawer
 	 * Generate a pie chart picture displaying options and their votes.
 	 * @return The picture generated as {@link ByteArrayOutputStream}.
 	 */
-	public static byte[] generatePieChart(PieChart chart) //TODO: find a better one.
+	public static byte[] generatePieChart(PieChart chart)
 	{
 		PieStyler styler = chart.getStyler();
 		
@@ -51,7 +51,7 @@ public class PollDrawer
 	 * Generate a pie chart legend displaying options and their votes.
 	 * @return The picture generated as {@link ByteArrayOutputStream}.
 	 */
-	public static byte[] generatePieChartLegend(Poll poll, PieChart chart) //TODO: find a better one.
+	public static byte[] generatePieChartLegend(Poll poll, PieChart chart)
 	{
 		Font legendFont = chart.getStyler().getLegendFont().deriveFont(Font.PLAIN, 18);
 		
