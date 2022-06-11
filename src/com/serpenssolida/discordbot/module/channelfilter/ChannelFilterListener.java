@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.serpenssolida.discordbot.MessageUtils;
 import com.serpenssolida.discordbot.SerpensBot;
+import com.serpenssolida.discordbot.UserUtils;
 import com.serpenssolida.discordbot.command.BotCommand;
 import com.serpenssolida.discordbot.module.BotListener;
 import net.dv8tion.jda.api.entities.*;
@@ -122,7 +123,7 @@ public class ChannelFilterListener extends BotListener
 		OptionMapping requireLinksArg = event.getOption("requires_links");
 		
 		//Check if user is an admin.
-		if (!SerpensBot.isAdmin(event.getMember()))
+		if (!UserUtils.hasMemberAdminPermissions(event.getMember()))
 		{
 			Message message = MessageUtils.buildErrorMessage("Channel Filter", author, "Devi essere un admin per impostare un filtro.");
 			event.reply(message).setEphemeral(true).queue();
@@ -162,7 +163,7 @@ public class ChannelFilterListener extends BotListener
 		OptionMapping channelArg = event.getOption("channel");
 		
 		//Check if user is an admin.
-		if (!SerpensBot.isAdmin(event.getMember()) && !event.getMember().isOwner())
+		if (!UserUtils.hasMemberAdminPermissions(event.getMember()))
 		{
 			Message message = MessageUtils.buildErrorMessage("Channel Filter", author, "Devi essere un admin per rimuovere un filtro.");
 			event.reply(message).setEphemeral(true).queue();

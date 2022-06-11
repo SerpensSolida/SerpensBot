@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.serpenssolida.discordbot.MessageUtils;
 import com.serpenssolida.discordbot.SerpensBot;
+import com.serpenssolida.discordbot.UserUtils;
 import com.serpenssolida.discordbot.command.BotCommand;
 import com.serpenssolida.discordbot.interaction.ButtonAction;
 import com.serpenssolida.discordbot.interaction.InteractionGroup;
@@ -233,7 +234,7 @@ public class ForumChannelListener extends BotListener
 		OptionMapping channelNameArg = event.getOption("channel-name");
 		
 		//Check if user is an admin.
-		if (!SerpensBot.isAdmin(event.getMember()) && !event.getMember().isOwner())
+		if (!UserUtils.hasMemberAdminPermissions(event.getMember()))
 		{
 			Message message = MessageUtils.buildErrorMessage("Forum channel", author, "Devi essere un admin per creare un forum.");
 			event.reply(message).setEphemeral(true).queue();
@@ -270,7 +271,7 @@ public class ForumChannelListener extends BotListener
 		OptionMapping channelArg = event.getOption("channel");
 		
 		//Check if user is an admin.
-		if (!SerpensBot.isAdmin(event.getMember()))
+		if (!UserUtils.hasMemberAdminPermissions(event.getMember()))
 		{
 			Message message = MessageUtils.buildErrorMessage("Forum channel", author, "Devi essere un admin per convertire un canale in un forum.");
 			event.reply(message).setEphemeral(true).queue();
