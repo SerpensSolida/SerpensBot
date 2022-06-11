@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -124,6 +125,36 @@ public class ForumChannelListener extends BotListener
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	@Override
+	public void onMessageDelete(@NotNull MessageDeleteEvent event)
+	{
+		String deletedMessageID = event.getMessageId();
+		MessageChannel channel = event.getChannel();
+		Guild guild = event.getGuild();
+		
+		//Get the forum data.
+		Forum forum = this.forums.get(channel.getId());
+		
+		if (forum == null)
+			return;
+		
+		//Check if the deleted message is the forum message.
+		if (!deletedMessageID.equals(forum.getMessageID()))
+			return;
+		
+		//Remove the unlinked interactiong group.
+		this.removeInteractionGroup(guild.getId(), deletedMessageID);
+		
+		//Recreate the forum message.
+		Message forumMessage = this.createStartMessage(guild, event.getTextChannel(), forum);
+		
+		//Update forum data.
+		forum.setMessageID(forumMessage.getId());
+		this.saveForums();
+		
+		logger.info("Messaggio del forum nel canale #{} ripristinato correttamente", channel.getName());
 	}
 	
 	private void initForum(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
@@ -328,7 +359,7 @@ public class ForumChannelListener extends BotListener
 			previousForumMessage.delete().complete();
 			this.removeInteractionGroup(guild.getId(), previousForumMessage.getId());
 			
-			//Recreate the starting message.
+			//Recreate the forum message.
 			Message forumMessage = this.createStartMessage(guild, event.getTextChannel(), forum);
 			
 			//Update forum data.
