@@ -465,7 +465,7 @@ public class ForumChannelListener extends BotListener
 	private Message createStartMessage(Guild guild, TextChannel channel, Forum forum)
 	{
 		//Build forum message.
-		MessageBuilder initMessageBuilder = new MessageBuilder(MessageUtils.buildSimpleMessage(forum.getTitle(), SerpensBot.getApi().getSelfUser(), forum.getDescription()));
+		MessageBuilder initMessageBuilder = new MessageBuilder(MessageUtils.buildSimpleMessage(forum.getTitle(), forum.getDescription()));
 		initMessageBuilder.setActionRows(ActionRow.of(Button.primary("create_thread", forum.getButtonLabel())));
 		Message forumMessage = channel.sendMessage(initMessageBuilder.build()).complete();
 		
