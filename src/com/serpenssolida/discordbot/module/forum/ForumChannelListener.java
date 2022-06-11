@@ -12,8 +12,10 @@ import com.serpenssolida.discordbot.module.BotListener;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -30,6 +32,8 @@ import java.io.*;
 import java.nio.file.Paths;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 public class ForumChannelListener extends BotListener
 {
@@ -76,13 +80,60 @@ public class ForumChannelListener extends BotListener
 			ForumData forumData = gson.fromJson(reader, ForumData.class);
 			this.forums.putAll(forumData.getForums());
 			
-			for (Forum forum : this.forums.values())
+			HashSet<String> orphanForums = new HashSet<>();
+			
+			for (Map.Entry<String, Forum> forumEntry : this.forums.entrySet())
 			{
+				String channelID = forumEntry.getKey();
+				Forum forum = forumEntry.getValue();
+				
+				Guild guild = SerpensBot.getApi().getGuildById(forum.getGuildID());
+				TextChannel channel = SerpensBot.getApi().getChannelById(TextChannel.class, channelID);
+				
+				if (guild == null || channel == null)
+				{
+					logger.info("Il forum nel canale con id {} del server con id {} è diventato orfano. Cancellazione forum.", channelID, forum.getGuildID());
+					orphanForums.add(channelID);
+					continue;
+				}
+				
+				try
+				{
+					channel.retrieveMessageById(forum.getMessageID()).complete();
+				}
+				catch (ErrorResponseException e)
+				{
+					switch (e.getErrorResponse())
+					{
+						case UNKNOWN_MESSAGE: //Message was deleted.
+							//Recreate the forum message.
+							Message forumMessage = this.createStartMessage(guild, channel, forum);
+							
+							//Update forum data.
+							forum.setMessageID(forumMessage.getId());
+							logger.info("Messaggio del forum nel canale #{} del server \"{}\" è stato cancellato, ripristinato correttamente", channel.getName(), guild.getName());
+							
+							//Save data.
+							this.saveForums();
+							break;
+							
+						case MISSING_PERMISSIONS: //Missing permissions.
+						case MISSING_ACCESS: //Kicked from the guild.
+							logger.info("Il forum nel canale #{} del server \"#{}\" è diventato orfano. Cancellazione forum.", channel.getName(), guild.getName());
+							orphanForums.add(channelID);
+							continue;
+					}
+				}
+				
 				//Add button callback.
 				InteractionGroup startThreadButtonGroup = new InteractionGroup();
 				startThreadButtonGroup.addButtonCallback("create_thread", this.getCreateThreadButtonCallback());
 				this.addInteractionGroup(forum.getGuildID(), forum.getMessageID(), startThreadButtonGroup);
 			}
+			
+			//Remove all orfan forums and save the changes.
+			if (this.forums.keySet().removeAll(orphanForums))
+				this.saveForums();
 		}
 		catch (FileNotFoundException e)
 		{
@@ -152,9 +203,29 @@ public class ForumChannelListener extends BotListener
 		
 		//Update forum data.
 		forum.setMessageID(forumMessage.getId());
-		this.saveForums();
-		
 		logger.info("Messaggio del forum nel canale #{} ripristinato correttamente", channel.getName());
+		
+		//Save data.
+		this.saveForums();
+	}
+	
+	@Override
+	public void onChannelDelete(@NotNull ChannelDeleteEvent event)
+	{
+		Channel channel = event.getChannel();
+		
+		//Remove the forum that is inside the channel.
+		Forum removedForum = this.forums.remove(channel.getId());
+		
+		//Check if the forum was removed.
+		if (removedForum == null)
+			return;
+		
+		logger.info("Il canale #{} nel server \"{}\" è stato rimosso. Rimozione forum associato al canale.", event.getGuild().getName(), channel.getName());
+		
+		//Remove interaction group and save the forum data.
+		this.removeInteractionGroup(event.getGuild().getId(), removedForum.getMessageID());
+		this.saveForums();
 	}
 	
 	private void initForum(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
@@ -162,7 +233,7 @@ public class ForumChannelListener extends BotListener
 		OptionMapping channelNameArg = event.getOption("channel-name");
 		
 		//Check if user is an admin.
-		if (!SerpensBot.isAdmin(event.getMember()))
+		if (!SerpensBot.isAdmin(event.getMember()) && !event.getMember().isOwner())
 		{
 			Message message = MessageUtils.buildErrorMessage("Forum channel", author, "Devi essere un admin per creare un forum.");
 			event.reply(message).setEphemeral(true).queue();
