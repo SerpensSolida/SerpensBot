@@ -17,6 +17,7 @@ public class Poll
 	private LinkedHashMap<String, PollOption> options = new LinkedHashMap<>(); //Options of the poll.
 	private boolean keepDown;
 	private boolean finished; //If the poll is finished.
+	private int messageCount = 0; //Number of message that are below the poll.
 
 	public Poll(String question, User author, MessageChannel channel, boolean keepDown)
 	{
@@ -252,12 +253,22 @@ public class Poll
 	
 	public boolean isKeepDown()
 	{
-		return keepDown;
+		return this.keepDown;
 	}
 	
 	public void setKeepDown(boolean keepDown)
 	{
 		this.keepDown = keepDown;
+	}
+	
+	public int getMessageCount()
+	{
+		return this.messageCount;
+	}
+	
+	public void setMessageCount(int messageCount)
+	{
+		this.messageCount = messageCount;
 	}
 	
 	public static class PollOption

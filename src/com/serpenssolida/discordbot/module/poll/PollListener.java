@@ -121,6 +121,15 @@ public class PollListener extends BotListener
 			if (!poll.isKeepDown())
 				break;
 			
+			if (poll.getMessageCount() < 10)
+			{
+				poll.setMessageCount(poll.getMessageCount() + 1);
+				break;
+			}
+			
+			//Reset message count.
+			poll.setMessageCount(0);
+			
 			//Get previous poll message.
 			Message previousPollMessage = channel.retrieveMessageById(poll.getMessageID()).complete();
 			previousPollMessage.delete().queue();
