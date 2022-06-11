@@ -69,9 +69,13 @@ public class ChannelFilterListener extends BotListener
 		User author = event.getAuthor();
 		
 		//TODO: add support for threads when they are supported.
-		
+
 		//If the author of the message is the bot, ignore the message.
 		if (SerpensBot.getApi().getSelfUser().getId().equals(author.getId()))
+			return;
+		
+		//Check if this message is of type THREAD_CREATED.
+		if (message.getType() == MessageType.THREAD_CREATED)
 			return;
 		
 		FilterData filter = this.getFilter(guild.getId(), channel.getId());
