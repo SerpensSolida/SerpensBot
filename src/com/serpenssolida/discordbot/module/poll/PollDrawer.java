@@ -15,7 +15,31 @@ import java.util.Comparator;
 
 public class PollDrawer
 {
-	private static final Color[] colors = {new Color(0x957d95), new Color(0x904c77), new Color(0xe49ab0), new Color(0xB5BA72), new Color(0xf0f2a6), new Color(0x8cd867), new Color(0x2fbf71), new Color(0x729EA1), new Color(0x84dccf)};
+	private static final Color[] colors =
+			{
+					new Color(0x957d95),
+					new Color(0x904c77),
+					new Color(0xe49ab0),
+					new Color(0xB5BA72),
+					new Color(0xf0f2a6),
+					new Color(0x8cd867),
+					new Color(0x2fbf71),
+					new Color(0x729EA1),
+					new Color(0x84dccf),
+					new Color(0x288AFF),
+					new Color(0x132FB2),
+					new Color(0x6D30E7),
+					new Color(0xEE42C6),
+					new Color(0xFF3F3F),
+					new Color(0xEA8842),
+					new Color(0xFFEC19),
+					new Color(0x71E70F),
+					new Color(0x294820),
+					new Color(0x127528),
+					new Color(0x0D7269),
+					new Color(0x223552),
+					new Color(0x3E124F),
+			};
 	
 	private PollDrawer() {}
 	

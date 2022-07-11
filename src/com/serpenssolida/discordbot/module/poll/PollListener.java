@@ -32,6 +32,7 @@ import java.util.Map;
 public class PollListener extends BotListener
 {
 	private final HashMap<String, Poll> polls = new HashMap<>();
+	private static final int MAX_OPTIONS = 22;
 	
 	public PollListener()
 	{
@@ -50,7 +51,7 @@ public class PollListener extends BotListener
 				.addOption(OptionType.STRING, "option1", "Opzione del sondaggio", true)
 				.addOption(OptionType.STRING, "option2", "Opzione del sondaggio", true);
 		
-		for (int i = 3; i <= 9; i++)
+		for (int i = 3; i <= MAX_OPTIONS; i++)
 			subCommand.addOption(OptionType.STRING, "option" + i, "Opzione del sondaggio", false);
 		
 		subCommand.addOption(OptionType.INTEGER, "duration", "Durata in minuti del sondaggio. (default: 60 minuti)", false);
@@ -173,7 +174,7 @@ public class PollListener extends BotListener
 		
 		//Generate poll options.
 		int k = 1;
-		for (int i = 1; i <= 9; i++)
+		for (int i = 1; i <= MAX_OPTIONS; i++)
 		{
 			OptionMapping optionArg = event.getOption("option" + i);
 			
@@ -312,11 +313,11 @@ public class PollListener extends BotListener
 			return;
 		}
 		
-		//Check if poll are less than 9.
+		//Check if poll are less than MAX_OPTIONS.
 		int pollSize = poll.getOptions().size();
-		if (pollSize >= 9)
+		if (pollSize >= MAX_OPTIONS)
 		{
-			Message message = MessageUtils.buildErrorMessage("Aggiunta opzione al sondaggio", author, "Non è possibile aggiungere più di 9 opzioni ad un sondaggio.");
+			Message message = MessageUtils.buildErrorMessage("Aggiunta opzione al sondaggio", author, "Non è possibile aggiungere più di " + MAX_OPTIONS + " opzioni ad un sondaggio.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -457,7 +458,7 @@ public class PollListener extends BotListener
 			Button button = Button.primary(pollOption.getId(), pollOption.getText());
 			buttons.add(button);
 			
-			if (buttons.size() == 3)
+			if (buttons.size() == 5)
 			{
 				rows.add(ActionRow.of(buttons));
 				buttons.clear();
