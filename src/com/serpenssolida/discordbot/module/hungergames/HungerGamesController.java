@@ -33,14 +33,13 @@ public class HungerGamesController
 	private static HungerGamesController getInstance(String guildID)
 	{
 		HungerGamesController controller = instance.get(guildID);
+		HungerGamesController.loadFont();
 		
 		if (controller == null)
 		{
 			controller = new HungerGamesController();
-			HungerGamesController.instance.put(guildID, controller);
-			HungerGamesController.loadFont();
-			
 			HungerGamesController.load(guildID);
+			HungerGamesController.instance.put(guildID, controller);
 		}
 		
 		return controller;
@@ -193,7 +192,7 @@ public class HungerGamesController
 						.deriveFont(12f);
 			}
 		}
-		catch (FontFormatException | IOException e)
+		catch (FontFormatException | IOException | RuntimeException e)
 		{
 			e.printStackTrace();
 		}
