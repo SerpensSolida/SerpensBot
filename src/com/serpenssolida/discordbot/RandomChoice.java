@@ -25,11 +25,11 @@ public class RandomChoice
 	 * Get a random object from the give array, the object is chosen randomly based on the give probability.
 	 *
 	 * @param data
-	 * 		Array of object the method will chose from.
+	 * 		Array of object the method will choose from.
 	 * @param probabilities
 	 * 		Array of weights that will determine the weight of the object inside the array.
 	 *
-	 * @return An random object from the array.
+	 * @return A random object from the array.
 	 */
 	public static Object getRandomWithProbability(Object[] data, float[] probabilities)
 	{
@@ -67,6 +67,6 @@ public class RandomChoice
 	
 	public static boolean randomChance(float probability)
 	{
-		return random.nextFloat() * 100 < probability;
+		return random.nextFloat() * 100 <= probability;
 	}
 }

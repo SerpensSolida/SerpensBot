@@ -38,9 +38,9 @@ import java.util.Map;
 
 public class ForumChannelListener extends BotListener
 {
-	private final HashMap<String, Forum> forums = new HashMap<>();
+	private static final Logger logger = LoggerFactory.getLogger(ForumChannelListener.class);
 	
-	private static final Logger logger = LoggerFactory.getLogger(Forum.class);
+	private final HashMap<String, Forum> forums = new HashMap<>();
 	
 	public ForumChannelListener()
 	{
@@ -50,14 +50,14 @@ public class ForumChannelListener extends BotListener
 		//This module has no task.
 		this.removeBotCommand("cancel");
 		
-		//Command for creating an embed.
+		//Command for creating a forum channel.
 		BotCommand command = new BotCommand("create", "Crea un canale da usare come forum.");
 		command.setAction(this::initForum);
 		command.getSubcommand()
 				.addOption(OptionType.STRING, "channel-name", "Il nome del canale da creare.", true);
 		this.addBotCommand(command);
 		
-		//Command for creating an embed.
+		//Command for converting a channel into a forum channel.
 		command = new BotCommand("init", "Converte un canale in un forum.");
 		command.setAction(this::convertChannelToForum);
 		command.getSubcommand()
@@ -68,6 +68,9 @@ public class ForumChannelListener extends BotListener
 		this.loadForums();
 	}
 	
+	/**
+	 * Loads forum data.
+	 */
 	private void loadForums()
 	{
 		File fileCharacters = new File(Paths.get("global_data", "forum",  "forums.json").toString());
@@ -83,6 +86,7 @@ public class ForumChannelListener extends BotListener
 			
 			HashSet<String> orphanForums = new HashSet<>();
 			
+			//Foreach forum create the callback.
 			for (Map.Entry<String, Forum> forumEntry : this.forums.entrySet())
 			{
 				String channelID = forumEntry.getKey();
@@ -98,32 +102,10 @@ public class ForumChannelListener extends BotListener
 					continue;
 				}
 				
-				try
+				if (this.checkForumMessageState(forum, guild, channel))
 				{
-					channel.retrieveMessageById(forum.getMessageID()).complete();
-				}
-				catch (ErrorResponseException e)
-				{
-					switch (e.getErrorResponse())
-					{
-						case UNKNOWN_MESSAGE: //Message was deleted.
-							//Recreate the forum message.
-							Message forumMessage = this.createStartMessage(guild, channel, forum);
-							
-							//Update forum data.
-							forum.setMessageID(forumMessage.getId());
-							logger.info("Messaggio del forum nel canale #{} del server \"{}\" è stato cancellato, ripristinato correttamente", channel.getName(), guild.getName());
-							
-							//Save data.
-							this.saveForums();
-							break;
-							
-						case MISSING_PERMISSIONS: //Missing permissions.
-						case MISSING_ACCESS: //Kicked from the guild.
-							logger.info("Il forum nel canale #{} del server \"#{}\" è diventato orfano. Cancellazione forum.", channel.getName(), guild.getName());
-							orphanForums.add(channelID);
-							continue;
-					}
+					orphanForums.add(channelID);
+					continue;
 				}
 				
 				//Add button callback.
@@ -146,15 +128,49 @@ public class ForumChannelListener extends BotListener
 		}
 	}
 	
+	private boolean checkForumMessageState(Forum forum, Guild guild, TextChannel channel)
+	{
+		try
+		{
+			channel.retrieveMessageById(forum.getMessageID()).complete();
+		}
+		catch (ErrorResponseException e)
+		{
+			switch (e.getErrorResponse())
+			{
+				case UNKNOWN_MESSAGE: //Message was deleted.
+					//Recreate the forum message.
+					Message forumMessage = this.createStartMessage(guild, channel, forum);
+					
+					//Update forum data.
+					forum.setMessageID(forumMessage.getId());
+					logger.info("Messaggio del forum nel canale #{} del server \"{}\" è stato cancellato, ripristinato correttamente", channel.getName(), guild.getName());
+					
+					//Save data.
+					this.saveForums();
+					break;
+					
+				case MISSING_PERMISSIONS, MISSING_ACCESS: //Kicked from the guild or missing permissions..
+					logger.info("Il forum nel canale #{} del server \"#{}\" è diventato orfano. Cancellazione forum.", channel.getName(), guild.getName());
+					return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Save forum data.
+	 */
 	private void saveForums()
 	{
-		File fileCharacters = new File(Paths.get("global_data", "forum",  "forums.json").toString());
+		File forumFile = new File(Paths.get("global_data", "forum",  "forums.json").toString());
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		
 		logger.info("Salvataggio/aggiornamento dei forum aperti.");
 		
 		//Save data to file.
-		try (PrintWriter writer = new PrintWriter(new FileWriter(fileCharacters)))
+		try (PrintWriter writer = new PrintWriter(new FileWriter(forumFile)))
 		{
 			ForumData forumData = new ForumData(this.forums);
 			writer.println(gson.toJson(forumData));
@@ -163,9 +179,9 @@ public class ForumChannelListener extends BotListener
 		{
 			try
 			{
-				fileCharacters.getParentFile().mkdirs();
+				forumFile.getParentFile().mkdirs();
 				
-				if (fileCharacters.createNewFile())
+				if (forumFile.createNewFile())
 					this.saveForums();
 			}
 			catch (IOException ex)
@@ -229,6 +245,9 @@ public class ForumChannelListener extends BotListener
 		this.saveForums();
 	}
 	
+	/**
+	 * Callback for "create" command.
+	 */
 	private void initForum(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping channelNameArg = event.getOption("channel-name");
@@ -252,6 +271,14 @@ public class ForumChannelListener extends BotListener
 		//Get parameters.
 		String channelName = channelNameArg.getAsString();
 		
+		//Check name format.
+		if (channelName.length() < 1 || channelName.length() > 100)
+		{
+			Message message = MessageUtils.buildErrorMessage("Forum channel", author, "Il nome del canale deve essere lungo da 1 a 100 caratteri.");
+			event.reply(message).setEphemeral(true).queue();
+			return;
+		}
+		
 		//Check if a channel with the given name already exists.
 		if (!guild.getTextChannelsByName(channelName, true).isEmpty())
 		{
@@ -266,6 +293,9 @@ public class ForumChannelListener extends BotListener
 		this.addModalCallback(guild.getId(), author.getId(), this.generateCreateForumCallback(channelName));
 	}
 	
+	/**
+	 * Callback for "convert" command.
+	 */
 	private void convertChannelToForum(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping channelArg = event.getOption("channel");
@@ -295,15 +325,24 @@ public class ForumChannelListener extends BotListener
 		this.addModalCallback(guild.getId(), author.getId(), this.generateConvertChannelCallback(targetChannel));
 	}
 	
+	/**
+	 * Generate a Modal form that prompts the user to input data for the forum message.
+	 *
+	 * @return
+	 * 		The Modal containing inputs for the requested data.
+	 */
 	@NotNull
 	private Modal getForumDataModal()
 	{
 		//Create the fields.
 		TextInput forumTitle = TextInput.create("title", "Titolo del messaggio", TextInputStyle.SHORT)
+				.setMaxLength(100)
 				.build();
 		TextInput forumDescription = TextInput.create("description", "Descrizione del messaggio", TextInputStyle.PARAGRAPH)
+				.setMaxLength(4000)
 				.build();
 		TextInput buttonLabel = TextInput.create("button_label", "Testo del bottone", TextInputStyle.SHORT)
+				.setMaxLength(Button.LABEL_MAX_LENGTH)
 				.build();
 		
 		//Create modal.
@@ -312,6 +351,15 @@ public class ForumChannelListener extends BotListener
 				.build();
 	}
 	
+	/**
+	 * Generate the callback for the "create forum" Modal.
+	 *
+	 * @param channelName
+	 * 		The name of the channel that will be created.
+	 *
+	 * @return
+	 * 		The modal callback for the "create forum" Modal.
+	 */
 	private ModalCallback generateCreateForumCallback(String channelName)
 	{
 		return (event, guild, channel, author) ->
@@ -355,6 +403,15 @@ public class ForumChannelListener extends BotListener
 		};
 	}
 	
+	/**
+	 * Generate the callback for the "convert channel" Modal.
+	 *
+	 * @param targetChannel
+	 * 		The target channel to convert to a forum channel.
+	 *
+	 * @return
+	 * 		The callback for the "convert channel" Modal.
+	 */
 	private ModalCallback generateConvertChannelCallback(TextChannel targetChannel)
 	{
 		return (event, guild, channel, author) ->
@@ -402,6 +459,12 @@ public class ForumChannelListener extends BotListener
 		};
 	}
 	
+	/**
+	 * Generate the callback for the "create thread" Modal.
+	 *
+	 * @return
+	 * 		The callback for the "create thread" Modal.
+	 */
 	private ModalCallback generateCreateThreadModalCallback()
 	{
 		return (event, guild, channel, author) ->
@@ -443,12 +506,19 @@ public class ForumChannelListener extends BotListener
 		};
 	}
 	
+	/**
+	 * Generate the callback for the button that send the "create thread" Modal.
+	 *
+	 * @return
+	 * 		The callback for the button that send the "create thread" Modal.
+	 */
 	private ButtonAction getCreateThreadButtonCallback()
 	{
 		return (event, guild, channel, message, author) ->
 		{
 			//Create modal fields.
 			TextInput forumTitle = TextInput.create("title", "Titolo del thread", TextInputStyle.SHORT)
+					.setMaxLength(100)
 					.build();
 			
 			//Create and send the modal.
@@ -462,6 +532,19 @@ public class ForumChannelListener extends BotListener
 		};
 	}
 	
+	/**
+	 * Generate the forum message of a forum channel.
+	 *
+	 * @param guild
+	 * 		The guild the forum is in.
+	 * @param channel
+	 * 		The channel the forum is in.
+	 * @param forum
+	 * 		The forum data for creating the message.
+	 *
+	 * @return
+	 * 		The forum message for the given forum.
+	 */
 	private Message createStartMessage(Guild guild, TextChannel channel, Forum forum)
 	{
 		//Build forum message.

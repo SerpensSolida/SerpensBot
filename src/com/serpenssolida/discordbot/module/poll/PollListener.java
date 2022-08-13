@@ -168,7 +168,7 @@ public class PollListener extends BotListener
 		
 		//Get the keep down flag.
 		boolean keepDown = keepDownArg == null || keepDownArg.getAsBoolean();
-		System.out.println("DO I NEED TO KEEP DOWN:" + keepDown);
+
 		//Create the poll.
 		Poll poll = new Poll(questionArg.getAsString(), author, channel, keepDown);
 		
@@ -428,6 +428,7 @@ public class PollListener extends BotListener
 	
 	/**
 	 * Stop the given poll and refresh its message.
+	 *
 	 * @param poll The poll to stop.
 	 * @param guild The guild the poll is in.
 	 * @param channel The channel the poll was sent in.

@@ -32,6 +32,19 @@ public class Connect4Game
 		}
 	}
 	
+	/**
+	 * Checks if the move in the given position is a winning move.
+	 *
+	 * @param turn
+	 * 		The turn the game is at.
+	 * @param x
+	 * 		The x position of the move.
+	 * @param y
+	 * 		The y position of the move.
+	 *
+	 * @return
+	 * 		True if the move is a winning move, false otherwise.
+	 */
 	public boolean checkMove(int turn, int x, int y)
 	{
 		//Direction for the check.
@@ -72,7 +85,7 @@ public class Connect4Game
 						break;
 				}
 				
-				//Check if there was 4 in a row.
+				//Check if there is 4 in a row.
 				if (count == 4)
 					return true;
 			}
@@ -81,6 +94,16 @@ public class Connect4Game
 		return false;
 	}
 	
+	/**
+	 * Places the given player pawn in the given cell.
+	 *
+	 * @param playerIndex
+	 * 		The index of the player that made the move.
+	 * @param x
+	 * 		The x position of the cell.
+	 * @param y
+	 * 		The y position of the cell.
+	 */
 	public void setCell(int playerIndex, int x, int y)
 	{
 		if (!this.isCellEmpty(x, y))
@@ -89,6 +112,15 @@ public class Connect4Game
 		this.field[x][y] = playerIndex;
 	}
 	
+	/**
+	 * Gets the height of the last empty space in the column.
+	 *
+	 * @param x
+	 * 		The x position of the column.
+	 *
+	 * @return
+	 * 		The height of the last empty space in the column.
+	 */
 	public int getHeight(int x)
 	{
 		int height = -1;
@@ -104,14 +136,34 @@ public class Connect4Game
 		return FIELD_HEIGHT;
 	}
 	
+	/**
+	 * Gets the value inside the given cell.
+	 *
+	 * @param x
+	 * 		The x position of the cell.
+	 * @param y
+	 * 		The y position of the cell.
+	 *
+	 * @return
+	 * 		The value inside the given cell.
+	 */
 	public int getCell(int x, int y)
 	{
-		if (x < 0 && x >= Connect4Game.FIELD_WIDTH && y < 0 && y >= Connect4Game.FIELD_HEIGHT)
+		if (x < 0 || x >= Connect4Game.FIELD_WIDTH || y < 0 || y >= Connect4Game.FIELD_HEIGHT)
 			return -1;
 		
 		return this.field[x][y];
 	}
 	
+	/**
+	 * Gets the User with the given index in the game.
+	 *
+	 * @param playerIndex
+	 *		The index of the user.
+	 *
+	 * @return
+	 * 		The Discord User with the given index in the game.
+	 */
 	public User getPlayer(int playerIndex)
 	{
 		if (playerIndex > this.players.length || playerIndex < 0)
@@ -120,21 +172,50 @@ public class Connect4Game
 		return this.players[playerIndex];
 	}
 	
+	/**
+	 * Gets the Users that are playing the game.
+	 *
+	 * @return
+	 * 		An HashSet of User containing the users that are playing the game.
+	 */
 	public HashSet<User> getPlayers()
 	{
 		return new HashSet<>(Arrays.asList(this.players));
 	}
 	
+	/**
+	 * Checks if the given cell is empty.
+	 *
+	 * @param x
+	 * 		The x position of the cell.
+	 * @param y
+	 * 		The y position of the cell.
+	 *
+	 * @return
+	 * 		True if the cell is empty, false otherwise.
+	 */
 	public boolean isCellEmpty(int x, int y)
 	{
 		return this.field[x][y] == -1;
 	}
 	
+	/**
+	 * Gets the user that is currently playing.
+	 *
+	 * @return
+	 * 		The Discord User that is currently playing.
+	 */
 	public User getCurrentUser()
 	{
 		return this.players[this.currentTurn];
 	}
 	
+	/**
+	 * Checks if the field is completely full.
+	 *
+	 * @return
+	 * 		True if the field is full, false otherwise.
+	 */
 	public boolean isFieldFull()
 	{
 		for (int[] row : this.field)
@@ -149,6 +230,9 @@ public class Connect4Game
 		return true;
 	}
 	
+	/**
+	 * Increment the game turn counter.
+	 */
 	public void incrementTurn()
 	{
 		if (this.currentTurn == 0)
@@ -157,17 +241,12 @@ public class Connect4Game
 			this.currentTurn = 0;
 	}
 	
-	public int[][] getField()
-	{
-		return this.field;
-	}
-	
 	public String getMessageId()
 	{
 		return this.messageId;
 	}
 	
-	public void setMessageId(String messageId)
+	void setMessageId(String messageId)
 	{
 		this.messageId = messageId;
 	}
@@ -175,11 +254,6 @@ public class Connect4Game
 	public int getCurrentTurn()
 	{
 		return this.currentTurn;
-	}
-	
-	public void setCurrentTurn(int currentTurn)
-	{
-		this.currentTurn = currentTurn;
 	}
 	
 	public boolean isInterrupted()

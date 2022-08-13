@@ -7,7 +7,8 @@ public class EventResult
 	
 	public enum State
 	{
-		SUCCESSFUL, FAILED
+		SUCCESSFUL,
+		FAILED
 	}
 	
 	public EventResult(String eventMessage, State state)
@@ -35,7 +36,6 @@ public class EventResult
 	{
 		this.state = state;
 	}
-	
 	
 	public String toString()
 	{

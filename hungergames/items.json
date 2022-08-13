@@ -3,7 +3,7 @@
     {
       "hpRestored": 20.0,
       "name": "pane",
-      "useMessage": "user azzanna la sua fetta di food e quadagna amountHP.",
+      "useMessage": "user azzanna la sua fetta di food e guadagna amountHP.",
       "consumable": true
     },
     {
@@ -68,7 +68,7 @@
     },
     {
       "hpRestored": 20.0,
-      "name": "patitne",
+      "name": "patatine",
       "useMessage": "user prende una patatina... e la mangia. user recupera amountHP.",
       "consumable": true
     },

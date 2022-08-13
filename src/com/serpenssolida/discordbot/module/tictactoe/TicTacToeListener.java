@@ -50,6 +50,9 @@ public class TicTacToeListener extends BotListener
 		this.addBotCommand(command);
 	}
 	
+	/**
+	 * Callback for "start" command.
+	 */
 	private void startGame(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping opponentArg = event.getOption("opponent");
@@ -82,6 +85,9 @@ public class TicTacToeListener extends BotListener
 		timer.start();
 	}
 	
+	/**
+	 * Callback for "stop" command.
+	 */
 	private void removeGame(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping gameIdArg = event.getOption("game-id");
@@ -112,6 +118,16 @@ public class TicTacToeListener extends BotListener
 		event.reply(MessageUtils.buildSimpleMessage("TicTacToe", author, "La partita è stata interrotta con successo.")).setEphemeral(false).queue();
 	}
 	
+	/**
+	 * Stop the given game.
+	 *
+	 * @param game
+	 * 		The game to stop.
+	 * @param guild
+	 *		The guild the game is in.
+	 * @param channel
+	 * 		The channel the game is in.
+	 */
 	private void stopGame(TicTacToeGame game, Guild guild, MessageChannel channel)
 	{
 		if (game == null)

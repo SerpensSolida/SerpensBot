@@ -17,7 +17,7 @@ public class RandomEvent implements HungerGamesEvent
 					"user ha brama di sangue.",
 					"user si sdraia in un prato.",
 					"user si mette a danzare da solo.",
-					"user sta piangedo."
+					"user sta piangendo."
 			};
 	
 	public EventResult doEvent(HungerGames hg)

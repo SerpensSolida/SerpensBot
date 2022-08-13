@@ -42,7 +42,7 @@ public class Connect4GameDrawer
 		
 		return ImageUtils.toByteArray(fieldImage);
 	}
-	
+
 	private static void drawNumberGuide(Graphics2D g, int fieldHeight, int cellWidth, int cellHeight)
 	{
 		for (int i = 0; i < FIELD_WIDTH; i++)
@@ -90,6 +90,7 @@ public class Connect4GameDrawer
 		g.fillRect(0, 0, fieldWidth, fieldHeight);
 		g.setColor(new Color(0, 0, 0, 0));
 		g.setComposite(AlphaComposite.Clear);
+		
 		for (int i = 0; i < FIELD_WIDTH; i++)
 		{
 			for (int j = 0; j < FIELD_HEIGHT; j++)
@@ -99,6 +100,7 @@ public class Connect4GameDrawer
 				g.fillOval( x + 2,   y + 2, cellWidth - 4, cellHeight - 4);
 			}
 		}
+		
 		g.setComposite(AlphaComposite.SrcOver);
 	}
 	

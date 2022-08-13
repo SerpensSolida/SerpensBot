@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Poll
@@ -46,8 +45,8 @@ public class Poll
 		winners.add(top);
 		
 		//Recreate the stream and find other option that may have the same vote as the top option.
-		sorted = this.getOptions().parallelStream().sorted((o1, o2) -> o2.getVotesCount() - o1.getVotesCount());
-		for (PollOption pollOption : sorted.collect(Collectors.toList()))
+		sorted = this.getOptions().stream().sorted((o1, o2) -> o2.getVotesCount() - o1.getVotesCount());
+		for (PollOption pollOption : sorted.toList())
 		{
 			if (top == pollOption)
 				continue;

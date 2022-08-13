@@ -72,6 +72,9 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		AudioSourceManagers.registerRemoteSources(MusicPlayerListener.playerManager);
 	}
 	
+	/**
+	 * Callback for "play" command.
+	 */
 	private void playTrack(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping songArg = event.getOption("song");
@@ -132,6 +135,9 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		MusicPlayerListener.playerManager.loadItem(song, new TrackLoadResultHandler(audioController, event, this));
 	}
 	
+	/**
+	 * Callback for "skip" command.
+	 */
 	private void skipTrack(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		//Get voice state of the user
@@ -180,6 +186,9 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		}
 	}
 	
+	/**
+	 * Callback for "stop" command.
+	 */
 	private void stopPlayback(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		//Get voice state of the user
@@ -371,6 +380,15 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		this.closeConnection(guild);
 	}
 	
+	/**
+	 * Generate the status message of the music player.
+	 *
+	 * @param audioController
+	 * 		The {@link GuildAudioController} containing the status to be reppresented inside the message.
+	 *
+	 * @return
+	 * 		The message containing the status of the given {@link GuildAudioController}.
+	 */
 	public static Message generateTrackStatusMessage(GuildAudioController audioController)
 	{
 		//Get track that is currently playing.
@@ -390,6 +408,14 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		return messageBuilder.build();
 	}
 	
+	/**
+	 * Delete the old status message and create a new status message.
+	 *
+	 * @param guild
+	 * 		{@link Guild} the status message is in.
+	 * @param audioController
+	 * 		The {@link GuildAudioController} containing the status of the music player.
+	 */
 	public void createNewTrackStatusMessage(Guild guild, GuildAudioController audioController)
 	{
 		//Delete old track status message.
@@ -402,6 +428,14 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		audioController.setStatusMessage(statusMessage);
 	}
 	
+	/**
+	 * Delete the current track status message of the given {@link GuildAudioController} and remove its interaction group.
+	 *
+	 * @param guild
+	 * 		The {@link Guild} the message is in.
+	 * @param audioController
+	 * 		The {@link GuildAudioController} that owns the status message.
+	 */
 	public void deleteTrackStatusMessage(Guild guild, GuildAudioController audioController)
 	{
 		Message statusMessage = audioController.getStatusMessage();
@@ -415,6 +449,14 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		this.removeInteractionGroup(guild.getId(), audioController.getMessageChannel().getId());
 	}
 	
+	/**
+	 * Adds the control buttons (play, skip, stop) to the given {@link MessageBuilder}.
+	 *
+	 * @param audioController
+	 * 		The {@link GuildAudioController} containing the status of the player.
+	 * @param messageBuilder
+	 * 		The {@link MessageBuilder} to add control buttons to.
+	 */
 	private static void generateControlButtons(GuildAudioController audioController, MessageBuilder messageBuilder)
 	{
 		//Get voice channel users.
@@ -441,6 +483,14 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		messageBuilder.setActionRows(ActionRow.of(skipButton, stopButton, showQueue));
 	}
 	
+	/**
+	 * Register the control button callbacks.
+	 *
+	 * @param guild
+	 * 		The {@link Guild} that the message is in.
+	 * @param message
+	 * 		The {@link Message} that owns the buttons.
+	 */
 	private void registerControlButtonsCallback(Guild guild, Message message)
 	{
 		InteractionGroup interactionGroup = new InteractionGroup();
@@ -547,6 +597,15 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		this.addInteractionGroup(guild.getId(), message.getId(), interactionGroup);
 	}
 	
+	/**
+	 * Generate the fields for the playlist embed.
+	 *
+	 * @param tracks
+	 * 		The list of tracks in the playlist.
+	 *
+	 * @return
+	 * 		An {@link ImmutablePair} containing the fields of the playlist.
+	 */
 	protected static ImmutablePair<String, String> generateEmbedPlaylistFields(List<AudioTrack> tracks)
 	{
 		//Create message.
@@ -578,6 +637,15 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		return new ImmutablePair<>(titleField.toString(), numberField.toString());
 	}
 	
+	/**
+	 * Get the state of the user.
+	 *
+	 * @param event
+	 * 		The {@link SlashCommandInteractionEvent} containing the author of the event.
+	 *
+	 * @return
+	 * 		The {@link GuildVoiceState} of the user.
+	 */
 	private static GuildVoiceState getUserVoiceState(SlashCommandInteractionEvent event)
 	{
 		Member authorMember = event.getMember();
@@ -610,16 +678,39 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		return authorVoiceState;
 	}
 	
+	/**
+	 * Returns {@link GuildAudioController} of the given guild.
+	 *
+	 * @param guildID
+	 * 		The id of the guild that owns the controller.
+	 *
+	 * @return
+	 * 		The {@link GuildAudioController} of the guild.
+	 */
 	private GuildAudioController getGuildAudioController(String guildID)
 	{
 		return this.activeAudioController.get(guildID);
 	}
 	
+	/**
+	 * Set the {@link GuildAudioController} of the given guild.
+	 *
+	 * @param guildID
+	 * 		The id of the {@link Guild} that the {@link GuildAudioController} will be assigned to.
+	 * @param guildAudioController
+	 * 		The {@link GuildAudioController} that will be assigned to the given guild.
+	 */
 	private void setGuildAudioController(String guildID, GuildAudioController guildAudioController)
 	{
 		this.activeAudioController.put(guildID, guildAudioController);
 	}
 	
+	/**
+	 * Remove the {@link GuildAudioController} from the given guild.
+	 *
+	 * @param guildID
+	 * 		The id of the {@link Guild}.
+	 */
 	private void removeGuildAudioController(String guildID)
 	{
 		this.activeAudioController.remove(guildID);

@@ -45,9 +45,7 @@ public class TrackScheduler extends AudioEventAdapter
 		//something is playing, it returns false and does nothing. In that case the player was already playing so this
 		//track goes to the queue instead.
 		if (!this.player.startTrack(track, true))
-		{
 			this.queue.offer(track);
-		}
 		else
 			this.listener.onNewTrack(this.guild);
 	}
@@ -77,9 +75,7 @@ public class TrackScheduler extends AudioEventAdapter
 	{
 		//Only start the next track if the end reason is suitable for it (FINISHED or LOAD_FAILED)
 		if (endReason.mayStartNext)
-		{
 			this.nextTrack();
-		}
 	}
 	
 	@Override

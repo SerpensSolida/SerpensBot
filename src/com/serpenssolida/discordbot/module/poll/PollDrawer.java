@@ -45,7 +45,9 @@ public class PollDrawer
 	
 	/**
 	 * Generate a pie chart picture displaying options and their votes.
-	 * @return The picture generated as {@link ByteArrayOutputStream}.
+	 *
+	 * @return
+	 * 		The picture generated as {@link ByteArrayOutputStream}.
 	 */
 	public static byte[] generatePieChart(PieChart chart)
 	{
@@ -73,7 +75,9 @@ public class PollDrawer
 	
 	/**
 	 * Generate a pie chart legend displaying options and their votes.
-	 * @return The picture generated as {@link ByteArrayOutputStream}.
+	 *
+	 * @return
+	 * 		The picture generated as {@link ByteArrayOutputStream}.
 	 */
 	public static byte[] generatePieChartLegend(Poll poll, PieChart chart)
 	{
@@ -89,7 +93,7 @@ public class PollDrawer
 			pollOptionChartEntry.add(new PollOptionChartEntry(option, seriesColors[i]));
 			i++;
 		}
-		pollOptionChartEntry.sort(Comparator.comparingInt(entry -> -entry.getOption().getVotesCount()));
+		pollOptionChartEntry.sort(Comparator.comparingInt(entry -> -entry.option().getVotesCount()));
 		
 		//Create image.
 		BufferedImage pieChartImage = new BufferedImage(300, 40 + (pollOptionChartEntry.size() - 1) * 35, BufferedImage.TYPE_4BYTE_ABGR);
@@ -101,11 +105,11 @@ public class PollDrawer
 		for (PollOptionChartEntry option : pollOptionChartEntry)
 		{
 			//Truncate option text.
-			String optionText = PollDrawer.truncateString(legendFont, option.getOption().getText(), g, 200);
-			int votes = option.getOption().getVotesCount();
+			String optionText = PollDrawer.truncateString(legendFont, option.option().getText(), g, 200);
+			int votes = option.option().getVotesCount();
 			
 			//Draw color.
-			g.setColor(option.getColor());
+			g.setColor(option.color());
 			g.fillRect(0, i * 35, 30, 30);
 			
 			//Draw option text.
@@ -161,25 +165,5 @@ public class PollDrawer
 		return truncatedText;
 	}
 	
-	private static final class PollOptionChartEntry
-	{
-		private final Poll.PollOption option;
-		private final Color color;
-		
-		private PollOptionChartEntry(Poll.PollOption option, Color color)
-		{
-			this.option = option;
-			this.color = color;
-		}
-		
-		public Poll.PollOption getOption()
-		{
-			return this.option;
-		}
-		
-		public Color getColor()
-		{
-			return this.color;
-		}
-	}
+	private record PollOptionChartEntry(Poll.PollOption option, Color color) {}
 }

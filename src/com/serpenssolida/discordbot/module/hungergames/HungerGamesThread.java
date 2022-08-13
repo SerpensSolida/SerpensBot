@@ -26,8 +26,9 @@ public class HungerGamesThread extends Thread
 	
 	private static final Logger logger = LoggerFactory.getLogger(HungerGamesThread.class);
 	
-	private static final HungerGamesEvent[] events = {
-			new BattleEvent(),
+	private static final HungerGamesEvent[] events =
+	{
+			new DuelEvent(),
 			new EatFoodEvent(),
 			new FoundItemEvent(),
 			new SurpriseAttackEvent(),

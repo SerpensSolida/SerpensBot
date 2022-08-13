@@ -1,5 +1,7 @@
 package com.serpenssolida.discordbot.module.hungergames.inventory;
 
+import com.serpenssolida.discordbot.RandomChoice;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,9 +13,8 @@ public class Inventory
 	
 	public void removeItem(Item item)
 	{
-		if (item instanceof Weapon)
+		if (item instanceof Weapon weapon)
 		{
-			Weapon weapon = (Weapon) item;
 			ItemStack<Weapon> itemStack = this.weapons.get(weapon);
 			if (itemStack != null)
 			{
@@ -22,9 +23,8 @@ public class Inventory
 					this.weapons.remove(weapon);
 			}
 		}
-		else if (item instanceof Food)
+		else if (item instanceof Food food)
 		{
-			Food food = (Food) item;
 			ItemStack<Food> itemStack = this.foods.get(food);
 			if (itemStack != null)
 			{
@@ -37,9 +37,8 @@ public class Inventory
 	
 	public void addItem(Item item, int num)
 	{
-		if (item instanceof Weapon)
+		if (item instanceof Weapon weapon)
 		{
-			Weapon weapon = (Weapon) item;
 			if (this.weapons.containsKey(weapon))
 			{
 				ItemStack<Weapon> itemStack = this.weapons.get(item);
@@ -50,9 +49,8 @@ public class Inventory
 				this.weapons.put(weapon, new ItemStack<>(weapon, num));
 			}
 		}
-		else if (item instanceof Food)
+		else if (item instanceof Food food)
 		{
-			Food food = (Food) item;
 			if (this.foods.containsKey(food))
 			{
 				ItemStack<Food> itemStack = this.foods.get(item);
@@ -106,5 +104,18 @@ public class Inventory
 		}
 		stringBuilder.replace(stringBuilder.length() - 2, stringBuilder.length() - 1, "");
 		return stringBuilder.toString();
+	}
+	
+	/**
+	 * Returns a random item from the inventory.
+	 *
+	 * @return
+	 * 		A random item inside the inventory.
+	 */
+	public Item getRandomItemFromInventory()
+	{
+		ArrayList<Item> items = this.getItems();
+		
+		return !items.isEmpty() ? (Item) RandomChoice.getRandom(items.toArray()) : null;
 	}
 }

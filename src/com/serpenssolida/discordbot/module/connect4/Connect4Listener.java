@@ -52,16 +52,20 @@ public class Connect4Listener extends BotListener
 				.addOption(OptionType.STRING, "game-id", "Id della partita", true);
 		this.addBotCommand(command);
 		
-		//Command for displaying the leader board.
+		//Command for displaying the leaderboard.
 		command = new BotCommand("leaderboard", "Mostra la classifica di Connect4.");
 		command.setAction(this::sendLeaderboard);
 		this.addBotCommand(command);
 	}
 	
+	/**
+	 * Callback for "start" command.
+	 */
 	private void startGame(SlashCommandInteraction event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping opponentArg = event.getOption("opponent");
 		
+		//Check arguments.
 		if (opponentArg == null)
 			return;
 		
@@ -85,11 +89,14 @@ public class Connect4Listener extends BotListener
 		Connect4Listener.refreshGameMessage(game, message, author);
 		
 		//Set a timer of 5 minutes to stop the game.
-		Timer timer = new Timer(30 * 60 * 1000, e -> this.stopGame(game, guild, channel)); //TODO: Make it configurable.
+		Timer timer = new Timer(30 * 60 * 1000, e -> this.stopGame(game, guild, channel));
 		timer.setRepeats(false);
 		timer.start();
 	}
 	
+	/**
+	 * Callback for "stop" command.
+	 */
 	private void removeGame(SlashCommandInteraction event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping gameIdArg = event.getOption("game-id");
@@ -123,20 +130,9 @@ public class Connect4Listener extends BotListener
 		event.reply(message).setEphemeral(false).queue();
 	}
 	
-	private void stopGame(Connect4Game game, Guild guild, MessageChannel channel)
-	{
-		if (game == null)
-			return;
-		
-		game.setInterrupted(true);
-		
-		Message gameMessage = channel.retrieveMessageById(game.getMessageId()).complete();
-		Connect4Listener.refreshGameMessage(game, gameMessage, game.getPlayer(0));
-		
-		this.games.remove(game.getMessageId());
-		this.removeInteractionGroup(guild.getId(), game.getMessageId());
-	}
-	
+	/**
+	 * Callback for the leaderboard command.
+	 */
 	private void sendLeaderboard(SlashCommandInteraction event, Guild guild, MessageChannel channel, User author)
 	{
 		//Get the leaderboard.
@@ -177,6 +173,38 @@ public class Connect4Listener extends BotListener
 		event.reply(messageBuilder.build()).queue();
 	}
 	
+	/**
+	 * Stops the given game.
+	 *
+	 * @param game
+	 * 		The game to stop.
+	 * @param guild
+	 * 		The guild the game is in.
+	 * @param channel
+	 * 		The channel the game is in.
+	 */
+	private void stopGame(Connect4Game game, Guild guild, MessageChannel channel)
+	{
+		if (game == null)
+			return;
+		
+		game.setInterrupted(true);
+		
+		Message gameMessage = channel.retrieveMessageById(game.getMessageId()).complete();
+		Connect4Listener.refreshGameMessage(game, gameMessage, game.getPlayer(0));
+		
+		this.games.remove(game.getMessageId());
+		this.removeInteractionGroup(guild.getId(), game.getMessageId());
+	}
+	
+	/**
+	 * Adds the game button components to the given message.
+	 *
+ 	 * @param messageBuilder
+	 * 		The MessageBuilder that will have the buttons added to it.
+	 * @param game
+	 * 		The state of the game that is currently being played.
+	 */
 	private static void addConnect4Buttons(MessageBuilder messageBuilder, Connect4Game game)
 	{
 		ArrayList<Button> buttons = new ArrayList<>();
@@ -206,6 +234,12 @@ public class Connect4Listener extends BotListener
 		messageBuilder.setActionRows(actionRows);
 	}
 	
+	/**
+	 * Generate the callback for the game button components.
+	 *
+	 * @return
+	 * 	The callback used by the button components of the game.
+	 */
 	private InteractionGroup generateGameCallback()
 	{
 		InteractionGroup interactionGroup = new InteractionGroup();
@@ -299,6 +333,16 @@ public class Connect4Listener extends BotListener
 		return interactionGroup;
 	}
 	
+	/**
+	 * Refresh the given message containing the game with the current status of the game.
+	 *
+	 * @param game
+	 * 		The game that is currently playing on the given message
+	 * @param message
+	 * 		The message containing the game.
+	 * @param author
+	 * 		The User that started the game.
+	 */
 	private static void refreshGameMessage(Connect4Game game, Message message, User author)
 	{
 		MessageAction editMessage = message.editMessage(Connect4Listener.generateGameMessage(game, author).build());
@@ -318,6 +362,17 @@ public class Connect4Listener extends BotListener
 		editMessage.queue();
 	}
 	
+	/**
+	 * Generate a message containing the game.
+	 *
+	 * @param game
+	 * 		The game to be shown in the message.
+	 * @param author
+	 * 		The User that started the game.
+	 *
+	 * @return
+	 * 		The message of the game.
+	 */
 	private static MessageBuilder generateGameMessage(Connect4Game game, User author)
 	{
 		MessageBuilder messageBuilder = new MessageBuilder();
@@ -348,6 +403,7 @@ public class Connect4Listener extends BotListener
 		//Add game immage.
 		embedBuilder.setImage("attachment://field.png");
 		
+		//Add the embeds.
 		messageBuilder.setEmbeds(embedBuilder.build());
 		
 		return messageBuilder;

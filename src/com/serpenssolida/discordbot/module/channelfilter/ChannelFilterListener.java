@@ -32,12 +32,12 @@ public class ChannelFilterListener extends BotListener
 	public ChannelFilterListener()
 	{
 		super("channelfilter");
-		this.setModuleName("Channel filter");
+		this.setModuleName("ChannelFilter");
 		
 		//This module has no task.
 		this.removeBotCommand("cancel");
 		
-		//Command for creating a game.
+		//Command for creating a filter.
 		BotCommand command = new BotCommand("set", "Setta o modifica il filtro per il canale specificato.");
 		command.setAction(this::setChannelFilter);
 		command.getSubcommand()
@@ -46,14 +46,12 @@ public class ChannelFilterListener extends BotListener
 				.addOption(OptionType.BOOLEAN, "requires_links", "Se settato a true i messaggi dovranno contenere un link per essere accettati.", false);
 		this.addBotCommand(command);
 		
-		//Command for creating a game.
+		//Command for removing a filter.
 		command = new BotCommand("remove", "Rimuove il filtro per il canale specificato.");
 		command.setAction(this::removeChannelFilter);
 		command.getSubcommand()
 				.addOption(OptionType.CHANNEL, "channel", "Canale da cui rimuovere il filtro.", true);
 		this.addBotCommand(command);
-		
-		
 	}
 	
 	@Override
@@ -118,6 +116,88 @@ public class ChannelFilterListener extends BotListener
 		}
 	}
 	
+	/**
+	 * Loads the given guild filters.
+	 *
+	 * @param guildID
+	 * 		The id of the guild.
+	 */
+	private void loadFilters(String guildID)
+	{
+		File fitersFile = new File(Paths.get("server_data", guildID, ChannelFilterListener.FOLDER,  "filters.json").toString());
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		Guild guild = SerpensBot.getApi().getGuildById(guildID);
+		
+		if (guild == null)
+			return;
+		
+		logger.info("Cariamento filtri per il server `{}`.", guild.getName());
+		
+		//Load filter data.
+		try (BufferedReader reader = new BufferedReader(new FileReader(fitersFile)))
+		{
+			GuildFilterData guildFilterData = gson.fromJson(reader, GuildFilterData.class);
+			this.channelFilters.put(guildID, guildFilterData);
+		}
+		catch (FileNotFoundException e)
+		{
+			logger.info("Nessun file da caricare.");
+			this.channelFilters.put(guildID, new GuildFilterData());
+			this.saveFilters(guildID);
+		}
+		catch (IOException e)
+		{
+			logger.error("", e);
+			this.channelFilters.put(guildID, new GuildFilterData());
+			this.saveFilters(guildID);
+		}
+	}
+	
+	/**
+	 * Saves the given guild filters.
+	 *
+	 * @param guildID
+	 * 		The id of the guild.
+	 */
+	public void saveFilters(String guildID)
+	{
+		File fitersFile = new File(Paths.get("server_data", guildID, ChannelFilterListener.FOLDER,  "filters.json").toString());
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		Guild guild = SerpensBot.getApi().getGuildById(guildID);
+		
+		if (guild == null)
+			return;
+		
+		logger.info("Salvataggio filtri per il server \"{}\".", guild.getName());
+		
+		try (PrintWriter writer = new PrintWriter(new FileWriter(fitersFile)))
+		{
+			GuildFilterData filters = this.channelFilters.get(guildID);
+			writer.println(gson.toJson(filters));
+		}
+		catch (FileNotFoundException e)
+		{
+			try
+			{
+				fitersFile.getParentFile().mkdirs();
+				
+				if (fitersFile.createNewFile())
+					this.saveFilters(guildID);
+			}
+			catch (IOException ex)
+			{
+				ex.printStackTrace();
+			}
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Callback for the "set" command.
+ 	 */
 	private void setChannelFilter(SlashCommandInteraction event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping channelArg = event.getOption("channel");
@@ -160,6 +240,9 @@ public class ChannelFilterListener extends BotListener
 		event.reply(message).setEphemeral(false).queue();
 	}
 	
+	/**
+	 * Callback for the "remove" command.
+	 */
 	private void removeChannelFilter(SlashCommandInteraction event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping channelArg = event.getOption("channel");
@@ -180,7 +263,7 @@ public class ChannelFilterListener extends BotListener
 			return;
 		}
 		
-		//Check if teh channel has a filter.
+		//Check if the channel has a filter.
 		if (this.getFilter(guild.getId(), channelArg.getAsGuildChannel().getId()) == null)
 		{
 			Message message = MessageUtils.buildErrorMessage("Channel Filter", author, "Il canale non ha nessun filtro assegnato.");
@@ -197,96 +280,65 @@ public class ChannelFilterListener extends BotListener
 		event.reply(message).setEphemeral(false).queue();
 	}
 	
+	/**
+	 * Gets the filter for the given channel in the given guild.
+	 *
+	 * @param guildID
+	 * 		The id of the guild the channel is in.
+	 * @param channelID
+	 * 		The id of the channel the filter is set to.
+	 *
+	 * @return
+	 * 		The filter of the given channel.
+	 */
 	private FilterData getFilter(String guildID, String channelID)
 	{
+		//Load the filters if the filters haven't already been loaded.
 		if (!this.channelFilters.containsKey(guildID))
 			this.loadFilters(guildID);
 		
+		//Get the filter for the given channel.
 		GuildFilterData filters = this.channelFilters.get(guildID);
 		return filters.getFilter(channelID);
 	}
 	
+	/**
+	 * Sets the filter for the given channel in the given guild.
+	 *
+	 * @param guildID
+	 * 		The id of the guild the channel is in.
+	 * @param channelID
+	 * 		The id of channel that the filter will be assigned to.
+	 * @param filter
+	 * 		The filter to assign to the channel.
+	 */
 	private void setFilter(String guildID, String channelID, FilterData filter)
 	{
+		//Load the filters if the filters haven't already been loaded.
 		if (!this.channelFilters.containsKey(guildID))
 			this.loadFilters(guildID);
 		
+		//Set the filter for the given channel.
 		GuildFilterData filters = this.channelFilters.get(guildID);
 		filters.setFilter(channelID, filter);
 	}
 	
+	/**
+	 * Removes the filter from the given channel in the given guild.
+	 *
+	 * @param guildID
+	 *		The id of the guild id the channel is from.
+	 * @param channelID
+	 * 		The id of the channel the filter to be removed is in.
+	 */
 	private void removeFilter(String guildID, String channelID)
 	{
+		//Load the filters if the filters haven't already been loaded.
 		if (!this.channelFilters.containsKey(guildID))
 			this.loadFilters(guildID);
 		
+		//Remove the filter from the give channel.
 		GuildFilterData filters = this.channelFilters.get(guildID);
 		filters.removeFilter(channelID);
-	}
-	
-	private void loadFilters(String guildID)
-	{
-		File fitersFile = new File(Paths.get("server_data", guildID, ChannelFilterListener.FOLDER,  "filters.json").toString());
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		Guild guild = SerpensBot.getApi().getGuildById(guildID);
-		
-		if (guild == null)
-			return;
-		
-		logger.info("Cariamento filtri per il server `{}`.", guild.getName());
-		
-		try (BufferedReader reader = new BufferedReader(new FileReader(fitersFile)))
-		{
-			GuildFilterData guildFilterData = gson.fromJson(reader, GuildFilterData.class);
-			this.channelFilters.put(guildID, guildFilterData);
-		}
-		catch (FileNotFoundException e)
-		{
-			logger.info("Nessun file da caricare.");
-			this.channelFilters.put(guildID, new GuildFilterData());
-			this.saveFilters(guildID);
-		}
-		catch (IOException e)
-		{
-			logger.error("", e);
-			this.channelFilters.put(guildID, new GuildFilterData());
-			this.saveFilters(guildID);
-		}
-	}
-	
-	public void saveFilters(String guildID)
-	{
-		File fitersFile = new File(Paths.get("server_data", guildID, ChannelFilterListener.FOLDER,  "filters.json").toString());
-		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		Guild guild = SerpensBot.getApi().getGuildById(guildID);
-		
-		if (guild == null)
-			return;
-		
-		logger.info("Salvataggio filtri per il server \"{}\".", guild.getName());
-		
-		try (PrintWriter writer = new PrintWriter(new FileWriter(fitersFile)))
-		{
-			GuildFilterData filters = this.channelFilters.get(guildID);
-			writer.println(gson.toJson(filters));
-		}
-		catch (FileNotFoundException e)
-		{
-			try
-			{
-				fitersFile.getParentFile().mkdirs();
-				
-				if (fitersFile.createNewFile())
-					this.saveFilters(guildID);
-			}
-			catch (IOException ex)
-			{
-				ex.printStackTrace();
-			}
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
 	}
 }

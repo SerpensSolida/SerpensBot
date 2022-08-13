@@ -143,6 +143,7 @@ public class Player
 			enemy.getEnemies().remove(this);
 			enemy.getFriends().remove(this);
 		}
+		
 		for (Player friend : this.getFriends())
 		{
 			friend.getEnemies().remove(this);

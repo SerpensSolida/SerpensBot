@@ -48,6 +48,9 @@ public class EmbedListener extends BotListener
 		this.addBotCommand(command);
 	}
 	
+	/**
+	 * Callback for the "send" command.
+	 */
 	private void sendEmbed(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping titleArg = event.getOption("title");
@@ -141,6 +144,9 @@ public class EmbedListener extends BotListener
 		event.reply(messageBuilder.build()).queue();
 	}
 	
+	/**
+	 * Callback for the "generate" command.
+	 */
 	private void generateEmbed(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping titleArg = event.getOption("title");

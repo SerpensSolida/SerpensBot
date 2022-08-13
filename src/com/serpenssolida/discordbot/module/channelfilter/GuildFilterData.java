@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class GuildFilterData
 {
-	private HashMap<String, FilterData> filters = new HashMap<>();
+	private final HashMap<String, FilterData> filters = new HashMap<>();
 	
 	public void setFilter(String channelID, FilterData filter)
 	{

@@ -9,8 +9,6 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
-//import net.dv8tion.jda.api.events.message.priv.PrivateMessageReceivedEvent;
-
 public class OwnerListener extends BotListener
 {
 	public OwnerListener()
