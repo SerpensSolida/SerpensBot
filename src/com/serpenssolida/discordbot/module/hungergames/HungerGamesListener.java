@@ -33,8 +33,6 @@ import java.util.List;
 
 public class HungerGamesListener extends BotListener
 {
-	//private final HashMap<String, HashMap<User, Task>> tasks = new HashMap<>(); //List of task currently running.
-	
 	private static final Logger logger = LoggerFactory.getLogger(HungerGamesListener.class);
 	
 	public HungerGamesListener()
@@ -89,6 +87,9 @@ public class HungerGamesListener extends BotListener
 		this.addBotCommand(command);
 	}
 	
+	/**
+	 * Callback for "character" command.
+	 */
 	private void createCharacter(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		if (HungerGamesController.isHungerGamesRunning(guild.getId()))
@@ -111,7 +112,7 @@ public class HungerGamesListener extends BotListener
 				.setEmbeds(embedBuilder.build())
 				.setActionRows(ActionRow.of(Button.primary("continue", "Continua"), Button.danger("abort", "Annulla")));
 		
-		InteractionGroup interactionGroup = this.getTaskInteractionGroup();
+		InteractionGroup interactionGroup = this.generateCharacterTaskInteractionGroup();
 		
 		InteractionHook hook = event.reply(messageBuilder.build()).setEphemeral(true).complete();
 		Message message = hook.retrieveOriginal().complete();
@@ -119,32 +120,9 @@ public class HungerGamesListener extends BotListener
 		this.addInteractionGroup(guild.getId(), message.getId(), interactionGroup);
 	}
 	
-	private static int[] checkStats(String stats) throws StatsExceedMaximunException, StatOutOfRangeException, WrongNumberOfStatsException
-	{
-		String[] abilitiesList = stats.strip().replaceAll(" +", " ").split(" ");
-		int[] abilities = new int[abilitiesList.length];
-		int sum = 0;
-		
-		//Check number of ability sent with the message.
-		if (abilities.length != 7)
-			throw new WrongNumberOfStatsException("Le caratteristiche devono essere 7.");
-		
-		//Check abilities format.
-		for (int i = 0; i < abilitiesList.length; i++)
-		{
-			abilities[i] = Integer.parseInt(abilitiesList[i]);
-			sum += abilities[i];
-			
-			if (abilities[i] < 0 || abilities[i] > 10)
-				throw new StatOutOfRangeException("le caratteristiche devono essere tra 0 e 10.");
-		}
-		
-		if (sum != HungerGamesController.SUM_STATS)
-			throw new StatsExceedMaximunException("La somma delle statistiche non può superare: " + HungerGamesController.SUM_STATS, sum);
-		
-		return abilities;
-	}
-	
+	/**
+	 * Callback for "start" command.
+	 */
 	private static void startHungerGames(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		//Check if no Hunger Games is running.
@@ -162,6 +140,9 @@ public class HungerGamesListener extends BotListener
 		event.reply(MessageUtils.buildSimpleMessage("Hunger Games", author, "Gli Hunger Games stanno per iniziare!")).queue();
 	}
 	
+	/**
+	 * Callback for "card" command.
+	 */
 	private void sendCharacterCard(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		Character character;
@@ -239,6 +220,9 @@ public class HungerGamesListener extends BotListener
 		event.reply(messageBuilder.build()).setEphemeral(false).queue();
 	}
 	
+	/**
+	 * Callback for "enable" command.
+	 */
 	private void setCharacterEnabled(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		Character character = HungerGamesController.getCharacter(guild.getId(), author.getId());
@@ -279,6 +263,9 @@ public class HungerGamesListener extends BotListener
 		event.reply(message).setEphemeral(false).queue();
 	}
 	
+	/**
+	 * Callback for "speed" command.
+	 */
 	private void setPlaybackSpeed(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping secondsArg = event.getOption("seconds");
@@ -301,6 +288,9 @@ public class HungerGamesListener extends BotListener
 		event.reply(message).setEphemeral(false).queue();
 	}
 	
+	/**
+	 * Callback for "leaderboard" command.
+	 */
 	private void sendLeaderboard(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		OptionMapping typeArg = event.getOption("type");
@@ -370,6 +360,9 @@ public class HungerGamesListener extends BotListener
 		event.reply(messageBuilder.build()).setEphemeral(false).queue();
 	}
 	
+	/**
+	 * Callback for "stop" command.
+	 */
 	private void stopHungerGames(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
 		boolean isRunning = HungerGamesController.isHungerGamesRunning(guild.getId());
@@ -390,7 +383,52 @@ public class HungerGamesListener extends BotListener
 		event.reply(message).setEphemeral(false).queue();
 	}
 	
-	private InteractionGroup getTaskInteractionGroup()
+	/**
+	 * Parses stats and check their format.
+	 * @param stats
+	 * 		{@link String} containing the stats to be parsed and checked.
+	 *
+	 * @return
+	 * 		An array containing the stats.
+	 *
+	 * @throws StatsExceedMaximunException
+	 * 		When the sum of stats is greater that the maximum allowed.
+	 * @throws StatOutOfRangeException
+	 * 		When a single stats is out of range.
+	 * @throws WrongNumberOfStatsException
+	 * 		When there was an error while parsing a stat.
+	 */
+	private static int[] checkStats(String stats) throws StatsExceedMaximunException, StatOutOfRangeException, WrongNumberOfStatsException
+	{
+		String[] abilitiesList = stats.strip().replaceAll(" +", " ").split(" ");
+		int[] abilities = new int[abilitiesList.length];
+		int sum = 0;
+		
+		//Check number of ability sent with the message.
+		if (abilities.length != 7)
+			throw new WrongNumberOfStatsException("Le caratteristiche devono essere 7.");
+		
+		//Check abilities format.
+		for (int i = 0; i < abilitiesList.length; i++)
+		{
+			abilities[i] = Integer.parseInt(abilitiesList[i]);
+			sum += abilities[i];
+			
+			if (abilities[i] < 0 || abilities[i] > 10)
+				throw new StatOutOfRangeException("le caratteristiche devono essere tra 0 e 10.");
+		}
+		
+		if (sum != HungerGamesController.SUM_STATS)
+			throw new StatsExceedMaximunException("La somma delle statistiche non può superare: " + HungerGamesController.SUM_STATS, sum);
+		
+		return abilities;
+	}
+	
+	/**
+	 * Generate the {@link InteractionGroup} for the create/edit task.
+	 * @return
+	 */
+	private InteractionGroup generateCharacterTaskInteractionGroup()
 	{
 		InteractionGroup interactionGroup = new InteractionGroup();
 		interactionGroup.addButtonCallback("continue", (buttonInteractionEvent, guild, messageChannel, message, author) ->
@@ -398,9 +436,9 @@ public class HungerGamesListener extends BotListener
 			Character character = HungerGamesController.getCharacter(guild.getId(), author.getId());
 			
 			//Create and send the modal.
-			Modal modal = this.getCharacteModal(character);
+			Modal modal = this.generateCharacterTaskModal(character);
 			buttonInteractionEvent.replyModal(modal).queue();
-			this.addModalCallback(guild.getId(), author.getId(), this.getCreateCharacterModalCallback(message));
+			this.addModalCallback(guild.getId(), author.getId(), this.generateCharacterTaskModalCallback(message));
 			return InteractionCallback.LEAVE_MESSAGE;
 		});
 		interactionGroup.addButtonCallback("abort", (buttonInteractionEvent, guild1, messageChannel, message, user) ->
@@ -412,7 +450,16 @@ public class HungerGamesListener extends BotListener
 		return interactionGroup;
 	}
 	
-	private Modal getCharacteModal(Character character)
+	/**
+	 * Generate the modal for the create/edit character task.
+	 *
+	 * @param character
+	 * 		The {@link Character} of the user.
+	 *
+	 * @return
+	 * 		The {@link Modal} generated.
+	 */
+	private Modal generateCharacterTaskModal(Character character)
 	{
 		String characterName = character != null ? character.getName() : null;
 		String characterStats = character != null ? String.join(" ", "" + character.getVitality(), "" + character.getStrength(), "" + character.getAbility(), "" + character.getSpecial(), "" + character.getSpeed(), "" + character.getEndurance(), "" + character.getTaste()) : null;
@@ -434,7 +481,16 @@ public class HungerGamesListener extends BotListener
 				.build();
 	}
 	
-	private ModalCallback getCreateCharacterModalCallback(Message message)
+	/**
+	 * Generate the {@link ModalCallback} for the create/edit task.
+	 *
+	 * @param message
+	 * 		The message of the task.
+	 *
+	 * @return
+	 * 		The {@link ModalCallback} of the create/edit task.
+	 */
+	private ModalCallback generateCharacterTaskModalCallback(Message message)
 	{
 		return (event, guild, channel, author) ->
 		{
