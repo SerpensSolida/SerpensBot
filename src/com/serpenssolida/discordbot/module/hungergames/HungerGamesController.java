@@ -38,7 +38,7 @@ public class HungerGamesController
 		if (controller == null)
 		{
 			controller = new HungerGamesController();
-			HungerGamesController.load(guildID);
+			HungerGamesController.load(controller, guildID);
 			HungerGamesController.instance.put(guildID, controller);
 		}
 		
@@ -67,7 +67,7 @@ public class HungerGamesController
 		HungerGamesController.getInstance(guildID).gameThread = t;
 	}
 	
-	public static void load(String guildID)
+	public static void load(HungerGamesController controller, String guildID)
 	{
 		File fileCharacters = new File(Paths.get("server_data", guildID, HungerGamesController.FOLDER,  "characters.json").toString());
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -76,7 +76,7 @@ public class HungerGamesController
 		try (BufferedReader reader = new BufferedReader(new FileReader(fileCharacters)))
 		{
 			CharacterData characterData = gson.fromJson(reader, CharacterData.class);
-			HungerGamesController.getInstance(guildID).characters = characterData.getCharacters();
+			controller.characters = characterData.getCharacters();
 		}
 		catch (FileNotFoundException e)
 		{
@@ -87,7 +87,7 @@ public class HungerGamesController
 			e.printStackTrace();
 		}
 		
-		HungerGamesController.loadSettings(guildID);
+		HungerGamesController.loadSettings(controller, guildID);
 	}
 	
 	public static void save(String guildID)
@@ -125,7 +125,7 @@ public class HungerGamesController
 		HungerGamesController.saveSettings(guildID);
 	}
 	
-	public static void loadSettings(String guildID)
+	public static void loadSettings(HungerGamesController controller, String guildID)
 	{
 		File fileData = new File(Paths.get("server_data", guildID, HungerGamesController.FOLDER,  "hg_data.json").toString());
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -133,9 +133,9 @@ public class HungerGamesController
 		try (BufferedReader reader = new BufferedReader(new FileReader(fileData)))
 		{
 			HungerGamesData hgData = gson.fromJson(reader, HungerGamesData.class);
-			HungerGamesController.setCount(guildID, hgData.getHgCount());
-			HungerGamesController.setMessageSpeed(guildID, hgData.getMessageSpeed());
-			HungerGamesController.getInstance(guildID).winners = hgData.getWinners();
+			controller.count = hgData.getHgCount();
+			controller.messageSpeed = hgData.getMessageSpeed();
+			controller.winners = hgData.getWinners();
 		}
 		catch (FileNotFoundException e)
 		{

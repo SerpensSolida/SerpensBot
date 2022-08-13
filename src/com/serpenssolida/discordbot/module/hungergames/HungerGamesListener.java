@@ -5,10 +5,8 @@ import com.serpenssolida.discordbot.SerpensBot;
 import com.serpenssolida.discordbot.command.BotCommand;
 import com.serpenssolida.discordbot.interaction.InteractionCallback;
 import com.serpenssolida.discordbot.interaction.InteractionGroup;
-import com.serpenssolida.discordbot.interaction.WrongInteractionEventException;
+import com.serpenssolida.discordbot.modal.ModalCallback;
 import com.serpenssolida.discordbot.module.BotListener;
-import com.serpenssolida.discordbot.module.hungergames.task.CreateCharacterTask;
-import com.serpenssolida.discordbot.module.hungergames.task.EditCharacterTask;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -16,23 +14,26 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.exceptions.PermissionException;
+import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import org.jetbrains.annotations.NotNull;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.Modal;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.text.TextInput;
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.interactions.modals.ModalMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 
 public class HungerGamesListener extends BotListener
 {
-	private final HashMap<String, HashMap<User, Task>> tasks = new HashMap<>(); //List of task currently running.
+	//private final HashMap<String, HashMap<User, Task>> tasks = new HashMap<>(); //List of task currently running.
 	
 	private static final Logger logger = LoggerFactory.getLogger(HungerGamesListener.class);
 	
@@ -42,22 +43,15 @@ public class HungerGamesListener extends BotListener
 		this.setModuleName("HungerGames");
 		
 		//Command for creating a character.
-		BotCommand command = new BotCommand("create", "Fa partire la procedura per la creazione di un personaggio.");
-		command.setAction((event, guild, channel, author) ->
-				this.startTask(guild.getId(), new CreateCharacterTask(guild, author, channel), event));
+		BotCommand command = new BotCommand("character", "Fa partire la procedura per la creazione/modifica del personaggio.");
+		command.setAction(this::createCharacter);
 		this.addBotCommand(command);
 		
 		//Command for displaying character info.
-		command = new BotCommand("character", "Invia alla chat la card delle statistiche del personaggio.");
+		command = new BotCommand("card", "Invia alla chat la card delle statistiche del personaggio.");
 		command.setAction(this::sendCharacterCard);
 		command.getSubcommand()
 				.addOption(OptionType.USER, "tag", "L'utente di cui visualizzare le statistiche.", false);
-		this.addBotCommand(command);
-		
-		//Command for editing a character.
-		command = new BotCommand("edit", "Fa partire la procedura di modifica del personaggio.");
-		command.setAction((event, guild, channel, author) ->
-				this.startTask(guild.getId(), new EditCharacterTask(guild, author, channel), event));
 		this.addBotCommand(command);
 		
 		//Command for enabling or disabling a character.
@@ -93,124 +87,62 @@ public class HungerGamesListener extends BotListener
 		command = new BotCommand("stop", "Interrompe l'esecuzione degli HungerGames.");
 		command.setAction(this::stopHungerGames);
 		this.addBotCommand(command);
-		
-		//Command for cancelling a task.
-		command = new BotCommand("cancel", "Interrompe la task corrente.");
-		command.setAction(this::cancelTask);
-		this.addBotCommand(command);
 	}
 	
-	@Override
-	public void onMessageReceived(@NotNull MessageReceivedEvent event)
+	private void createCharacter(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
 	{
-		//Don't accept messages from private channels.
-		if (!event.isFromGuild())
-			return;
-		
-		Guild guild = event.getGuild();
-		User author = event.getAuthor(); //Author of the message.
-		MessageChannel channel = event.getChannel(); //Channel where the message was sent.
-		
-		//Get the task the author is currently running.
-		Task task = this.getTask(guild.getId(), author);
-		
-		//If the author of the message is the bot ignore the message.
-		if (SerpensBot.getApi().getSelfUser().getId().equals(author.getId()))
-			return;
-		
-		//Ignore the message if no task is found.
-		if (task == null || !task.getChannel().equals(channel))
-			return;
-		
-		//Pass the event to the task.
-		task.consumeMessage(event.getMessage());
-		
-		//Remove the task if it finished.
-		if (!task.isRunning())
-			this.removeTask(guild.getId(), task);
-	}
-	
-	@Override
-	public void onGenericComponentInteractionCreate(@NotNull GenericComponentInteractionCreateEvent event)
-	{
-		super.onGenericComponentInteractionCreate(event);
-		
-		String componendId = event.getComponentId();
-		User author = event.getUser(); //The user that added the reaction.
-		Guild guild = event.getGuild(); //The user that added the reaction.
-		
-		//If this event is not from a guild ignore it.
-		if (guild == null)
-			return;
-		
-		//Ignore bot reaction.
-		if (SerpensBot.getApi().getSelfUser().getId().equals(author.getId()))
-			return;
-		
-		//Get the interacction that the user can interact with.
-		InteractionGroup interactionGroup;
-		
-		//Task can have buttons too.
-		Task task = this.getTask(guild.getId(), author);
-		
-		if (task != null)
+		if (HungerGamesController.isHungerGamesRunning(guild.getId()))
 		{
-			interactionGroup = task.getInteractionGroup();
-			InteractionCallback interactionCallback = interactionGroup.getComponentCallback(componendId);
-			
-			//Check if a callback was found.
-			if (interactionCallback == null)
-			{
-				logger.warn(SerpensBot.getMessage("Nessuna callback per l'inetrazione \"{}\" nella task.", componendId));
-				return;
-			}
-			
-			try
-			{
-				//Do button action.
-				boolean deleteMessage = interactionCallback.doAction(event);
-				
-				//Delete message that has the clicked button if it should be deleted.
-				if (deleteMessage)
-				{
-					event.getHook().deleteOriginal().queue();
-				}
-				
-				//Remove the task if it finished.
-				if (!task.isRunning())
-				{
-					this.removeTask(guild.getId(), task);
-				}
-			}
-			catch (WrongInteractionEventException e)
-			{
-				//Abort task.
-				this.removeTask(guild.getId(), task);
-				
-				//Send error message.
-				String embedTitle = SerpensBot.getMessage("botlistener_button_action_error");
-				String embedDescription = SerpensBot.getMessage("botlistener_interaction_event_type_error", e.getInteractionId(), e.getExpected(), e.getFound());
-				Message message = MessageUtils.buildErrorMessage(embedTitle, event.getUser(), embedDescription);
-				event.reply(message).setEphemeral(true).queue();
-				
-				//Log the error.
-				logger.error(e.getLocalizedMessage(), e);
-			}
-			catch (PermissionException e)
-			{
-				//Abort task.
-				this.removeTask(guild.getId(), task);
-				
-				//Send error message.
-				String embedTitle = SerpensBot.getMessage("botlistener_button_action_error");
-				String embedDescription = SerpensBot.getMessage("botlistener_missing_permmision_error", e.getPermission());
-				Message message = MessageUtils.buildErrorMessage(embedTitle, event.getUser(), embedDescription);
-				event.reply(message).setEphemeral(true).queue();
-				
-				//Log the error.
-				logger.error(e.getLocalizedMessage(), e);
-			}
+			Message message = MessageUtils.buildErrorMessage("Forum channel", author, "Non puoi usare questo comando perchè è in corso un HungerGames.");
+			event.reply(message).setEphemeral(true).queue();
+			return;
 		}
+		
+		Character character = HungerGamesController.getCharacter(guild.getId(), author.getId());
+		
+		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed(character == null ? "Creazione del personaggio" : "Modifica del personaggio", author)
+				.appendDescription("Stai " + (character == null ? "creando" : "modificando") +" il tuo personaggio. Ti verrà inviato un modulo da compilare con il nome e le caratteristiche del personnaggio")
+				.appendDescription("\nLe caratteristiche sono: ")
+				.appendDescription("**V**italità, **F**orza, **A**bilità, **S**pecial, **Ve**locità, **R**esistenza e **G**usto. ")
+				.appendDescription("Per impostare correttamente le caratteristiche devi inserire 7 numeri separati da uno spazio, in questo modo: **V F A S Ve R G** (Es: 10 5 5 10 4 1 5)")
+				.appendDescription("\nLa somma dei valori delle caratteristiche deve essere " + HungerGamesController.SUM_STATS + " punti e ogni caratteristica deve essere compresa tra 0 e 10!");
+		
+		MessageBuilder messageBuilder = new MessageBuilder()
+				.setEmbeds(embedBuilder.build())
+				.setActionRows(ActionRow.of(Button.primary("continue", "Continua"), Button.danger("abort", "Annulla")));
+		
+		InteractionGroup interactionGroup = this.getTaskInteractionGroup();
+		
+		InteractionHook hook = event.reply(messageBuilder.build()).setEphemeral(true).complete();
+		Message message = hook.retrieveOriginal().complete();
+		
+		this.addInteractionGroup(guild.getId(), message.getId(), interactionGroup);
+	}
+	
+	private static int[] checkStats(String stats) throws StatsExceedMaximunException, StatOutOfRangeException, WrongNumberOfStatsException
+	{
+		String[] abilitiesList = stats.strip().replaceAll(" +", " ").split(" ");
+		int[] abilities = new int[abilitiesList.length];
+		int sum = 0;
+		
+		//Check number of ability sent with the message.
+		if (abilities.length != 7)
+			throw new WrongNumberOfStatsException("Le caratteristiche devono essere 7.");
+		
+		//Check abilities format.
+		for (int i = 0; i < abilitiesList.length; i++)
+		{
+			abilities[i] = Integer.parseInt(abilitiesList[i]);
+			sum += abilities[i];
+			
+			if (abilities[i] < 0 || abilities[i] > 10)
+				throw new StatOutOfRangeException("le caratteristiche devono essere tra 0 e 10.");
+		}
+		
+		if (sum != HungerGamesController.SUM_STATS)
+			throw new StatsExceedMaximunException("La somma delle statistiche non può superare: " + HungerGamesController.SUM_STATS, sum);
+		
+		return abilities;
 	}
 	
 	private static void startHungerGames(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
@@ -248,7 +180,7 @@ public class HungerGamesListener extends BotListener
 		//Check if a character was found.
 		if (character == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Creazione personaggio", author, "L'utente non ha creato nessun personaggio.");
+			Message message = MessageUtils.buildErrorMessage("Card personaggio", author, "L'utente non ha creato nessun personaggio.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -271,9 +203,7 @@ public class HungerGamesListener extends BotListener
 		StringBuilder nameColumn = new StringBuilder();
 		
 		for (String s : statsName)
-		{
 			nameColumn.append(s + "\n");
-		}
 		
 		//Values of the characteristics of the player.
 		StringBuilder valueColumn = new StringBuilder();
@@ -460,86 +390,169 @@ public class HungerGamesListener extends BotListener
 		event.reply(message).setEphemeral(false).queue();
 	}
 	
-	public Task getTask(String guildID, User user)
+	private InteractionGroup getTaskInteractionGroup()
 	{
-		this.tasks.putIfAbsent(guildID, new HashMap<>());
-		return this.tasks.get(guildID).get(user);
-	}
-	
-	/**
-	 * Start the given task in the given guild id.
-	 *
-	 * @param guildID
-	 * 		The guild id the task is currently active.
-	 * @param task
-	 * 		The task that will be started.
-	 * @param event
-	 *  	The event that started the task.
-	 */
-	protected void startTask(String guildID, Task task, SlashCommandInteractionEvent event)
-	{
-		this.addTask(guildID, task);
-		task.start(event);
-	}
-	
-	/**
-	 * Start the given task in the given guild id.
-	 *
-	 * @param guildID
-	 * 		The guild id the task is currently active.
-	 * @param task
-	 * 		The task that will be started.
-	 */
-	protected void startTask(String guildID, Task task)
-	{
-		this.addTask(guildID, task);
-		task.start();
-	}
-	
-	protected void addTask(String guildID, Task task)
-	{
-		if (task.isInterrupted())
-			return;
-		
-		User user = task.getUser();
-		Task currentUserTask = this.getTask(guildID, user);
-		
-		//Replace the current task (if there is one) with the new one.
-		if (currentUserTask != null)
-			this.removeTask(guildID, currentUserTask);
-		
-		//Create the guild map if absent.
-		this.tasks.putIfAbsent(guildID, new HashMap<>());
-		
-		this.tasks.get(guildID).put(user, task);
-	}
-
-	/**
-	 * Method for the "cancel" command of a module. Based on the event data it will cancel a task.
-	 */
-	private void cancelTask(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
-	{
-		Task task = this.getTask(guild.getId(), author);
-		
-		//Check if the user has a task active.
-		if (task == null)
+		InteractionGroup interactionGroup = new InteractionGroup();
+		interactionGroup.addButtonCallback("continue", (buttonInteractionEvent, guild, messageChannel, message, author) ->
 		{
-			Message message = MessageUtils.buildErrorMessage(SerpensBot.getMessage("botlistener_command_cancel_title"), event.getUser(), SerpensBot.getMessage("botlistener_command_cancel_no_task_error"));
-			event.reply(message).setEphemeral(true).queue();
-			return;
+			Character character = HungerGamesController.getCharacter(guild.getId(), author.getId());
+			
+			//Create and send the modal.
+			Modal modal = this.getCharacteModal(character);
+			buttonInteractionEvent.replyModal(modal).queue();
+			this.addModalCallback(guild.getId(), author.getId(), this.getCreateCharacterModalCallback(message));
+			return InteractionCallback.LEAVE_MESSAGE;
+		});
+		interactionGroup.addButtonCallback("abort", (buttonInteractionEvent, guild1, messageChannel, message, user) ->
+		{
+			buttonInteractionEvent.editComponents(List.of()).queue();
+			return InteractionCallback.LEAVE_MESSAGE;
+		});
+		
+		return interactionGroup;
+	}
+	
+	private Modal getCharacteModal(Character character)
+	{
+		String characterName = character != null ? character.getName() : null;
+		String characterStats = character != null ? String.join(" ", "" + character.getVitality(), "" + character.getStrength(), "" + character.getAbility(), "" + character.getSpecial(), "" + character.getSpeed(), "" + character.getEndurance(), "" + character.getTaste()) : null;
+		
+		//Create the fields.
+		TextInput name = TextInput.create("character_name", "Nome del personaggio.", TextInputStyle.SHORT)
+				.setMaxLength(16)
+				.setValue(characterName)
+				.build();
+		TextInput stats = TextInput.create("stats", "Statistiche, V F A S Ve R G", TextInputStyle.SHORT)
+				.setMaxLength(100)
+				.setValue(characterStats)
+				.setPlaceholder("Vitalità Forza Abilità Special Velocità Resistenza Gusto")
+				.build();
+		
+		//Create modal.
+		return Modal.create("create_character", "Creazione pesonaggio")
+				.addActionRows(ActionRow.of(name), ActionRow.of(stats))
+				.build();
+	}
+	
+	private ModalCallback getCreateCharacterModalCallback(Message message)
+	{
+		return (event, guild, channel, author) ->
+		{
+			ModalMapping nameArg = event.getValue("character_name");
+			ModalMapping statsArg = event.getValue("stats");
+			
+			String guildID = guild.getId();
+			String authorID = author.getId();
+			
+			if (nameArg == null || statsArg == null)
+				return;
+			
+			Character character = HungerGamesController.getCharacter(guildID, authorID);
+			
+			String name = nameArg.getAsString();
+			String strStats = statsArg.getAsString();
+			int[] abilities;
+			
+			EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed(character == null ? "Creazione del personaggio" : "Modifica del personaggio", author);
+			
+			try
+			{
+				abilities = HungerGamesListener.checkStats(strStats);
+			}
+			catch (StatsExceedMaximunException e)
+			{
+				embedBuilder.appendDescription("La somma dei valori delle caratteristiche deve essere " +  HungerGamesController.SUM_STATS + " punti! Somma dei valori inseriti: " + e.getSum());
+				
+				MessageBuilder messageBuilder = new MessageBuilder()
+						.setEmbeds(embedBuilder.build())
+						.setActionRows(ActionRow.of(Button.primary("continue", "Continua"), Button.danger("abort", "Annulla")));
+				
+				event.editMessage(messageBuilder.build()).queue();
+				return;
+			}
+			catch (StatOutOfRangeException | NumberFormatException e)
+			{
+				embedBuilder.appendDescription("Formato delle caratteristiche errato. Inserisci solo numeri tra 0 e 10!");
+				
+				MessageBuilder messageBuilder = new MessageBuilder()
+						.setEmbeds(embedBuilder.build())
+						.setActionRows(ActionRow.of(Button.primary("continue", "Continua"), Button.danger("abort", "Annulla")));
+				
+				event.editMessage(messageBuilder.build()).queue();
+				return;
+			}
+			catch (WrongNumberOfStatsException e)
+			{
+				embedBuilder.appendDescription("Inserisci tutte le caratteristiche!")
+						.appendDescription("\nLe caratteristiche sono: ")
+						.appendDescription("Vitalità, Forza, Abilità, Special, Velocità, Resistenza e Gusto. ")
+						.appendDescription("\nLa somma dei valori delle caratteristiche deve essere " + HungerGamesController.SUM_STATS + " punti e ogni caratteristica deve essere compresa tra 0 e 10!");
+				
+				MessageBuilder messageBuilder = new MessageBuilder()
+						.setEmbeds(embedBuilder.build())
+						.setActionRows(ActionRow.of(Button.primary("continue", "Continua"), Button.danger("abort", "Annulla")));
+				
+				event.editMessage(messageBuilder.build()).queue();
+				return;
+			}
+			
+			if (character == null)
+			{
+				character = new Character(authorID);
+				character.setName(name);
+				character.setStats(abilities);
+				HungerGamesController.addCharacter(guildID, character);
+				
+				embedBuilder.appendDescription("Creazione personaggio completata!");
+			}
+			else
+			{
+				character.setName(name);
+				character.setStats(abilities);
+				HungerGamesController.save(guildID);
+				
+				embedBuilder.appendDescription("Modifica personaggio completata!");
+			}
+			
+			this.removeInteractionGroup(guild.getId(), message.getId());
+			
+			MessageBuilder messageBuilder = new MessageBuilder()
+					.setEmbeds(embedBuilder.build());
+			
+			event.editComponents(List.of()).queue();
+			channel.sendMessage(messageBuilder.build()).queue();
+		};
+	}
+	
+	private static class StatsExceedMaximunException extends Exception
+	{
+		private final int sum;
+		
+		public StatsExceedMaximunException(String message, int sum)
+		{
+			super(message);
+			this.sum = sum;
 		}
 		
-		//Remove the task
-		this.removeTask(guild.getId(), this.getTask(guild.getId(), author));
-		
-		Message message = MessageUtils.buildSimpleMessage(SerpensBot.getMessage("botlistener_command_cancel_title"), author, SerpensBot.getMessage("botlistener_command_cancel_info"));
-		event.reply(message).setEphemeral(false).queue();
+		private int getSum()
+		{
+			return this.sum;
+		}
 	}
 	
-	protected void removeTask(String guildID, Task task)
+	private static class StatOutOfRangeException extends Exception
 	{
-		this.tasks.putIfAbsent(guildID, new HashMap<>());
-		
-		this.tasks.get(guildID).remove(task.getUser());
+		public StatOutOfRangeException(String message)
+		{
+			super(message);
+		}
+	}
+	
+	private static class WrongNumberOfStatsException extends Exception
+	{
+		public WrongNumberOfStatsException(String message)
+		{
+			super(message);
+		}
 	}
 }
