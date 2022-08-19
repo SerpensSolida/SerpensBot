@@ -36,3 +36,5 @@ hs_err_pid*
 /server_data/
 /global_data/
 /deploy.bat
+/server/
+/logs/

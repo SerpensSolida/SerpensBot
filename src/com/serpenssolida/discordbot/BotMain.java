@@ -14,16 +14,19 @@ public class BotMain
 {
 	public static void main(String[] args)
 	{
-		SerpensBot.start();
+		SerpensBot.setOnInitCallback(() ->
+		{
+			SerpensBot.addModule(new HungerGamesListener());
+			SerpensBot.addModule(new PollListener());
+			SerpensBot.addModule(new TicTacToeListener());
+			SerpensBot.addModule(new OwnerListener());
+			SerpensBot.addModule(new EmbedListener());
+			SerpensBot.addModule(new Connect4Listener());
+			SerpensBot.addModule(new ChannelFilterListener());
+			SerpensBot.addModule(new MusicPlayerListener());
+			SerpensBot.addModule(new ForumChannelListener());
+		});
 		
-		SerpensBot.addModule(new HungerGamesListener());
-		SerpensBot.addModule(new PollListener());
-		SerpensBot.addModule(new TicTacToeListener());
-		SerpensBot.addModule(new OwnerListener());
-		SerpensBot.addModule(new EmbedListener());
-		SerpensBot.addModule(new Connect4Listener());
-		SerpensBot.addModule(new ChannelFilterListener());
-		SerpensBot.addModule(new MusicPlayerListener());
-		SerpensBot.addModule(new ForumChannelListener());
+		SerpensBot.start();
 	}
 }
