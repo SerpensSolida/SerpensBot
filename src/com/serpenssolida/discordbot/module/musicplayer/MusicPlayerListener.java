@@ -49,9 +49,6 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		super("musicplayer");
 		this.setModuleName("Music player");
 		
-		//This module has no task.
-		this.removeBotCommand("cancel");
-		
 		//Command for adding a song to the queue.
 		BotCommand command = new BotCommand("play", "Agginunge alla coda una traccia.");
 		command.getSubcommand()

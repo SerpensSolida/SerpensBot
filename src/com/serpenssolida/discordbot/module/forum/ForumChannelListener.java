@@ -47,9 +47,6 @@ public class ForumChannelListener extends BotListener
 		super("forum");
 		this.setModuleName("ForumChannel");
 		
-		//This module has no task.
-		this.removeBotCommand("cancel");
-		
 		//Command for creating a forum channel.
 		BotCommand command = new BotCommand("create", "Crea un canale da usare come forum.");
 		command.setAction(this::initForum);

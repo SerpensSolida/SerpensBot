@@ -23,9 +23,6 @@ public class EmbedListener extends BotListener
 		super("embed");
 		this.setModuleName("Embed");
 		
-		//This module has no task.
-		this.removeBotCommand("cancel");
-		
 		//Command for creating an embed.
 		BotCommand command = new BotCommand("send", "Invia un embed nel canale corrente.");
 		command.setAction(this::sendEmbed);

@@ -34,9 +34,6 @@ public class ChannelFilterListener extends BotListener
 		super("channelfilter");
 		this.setModuleName("ChannelFilter");
 		
-		//This module has no task.
-		this.removeBotCommand("cancel");
-		
 		//Command for creating a filter.
 		BotCommand command = new BotCommand("set", "Setta o modifica il filtro per il canale specificato.");
 		command.setAction(this::setChannelFilter);

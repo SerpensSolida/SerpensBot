@@ -16,7 +16,7 @@ public class OwnerListener extends BotListener
 		super("owner");
 		this.setModuleName("Owner");
 		
-		//Module has no tasks and cannot get help.
+		//Module has no commands and cannot get help.
 		this.getBotCommands().clear();
 	}
 	

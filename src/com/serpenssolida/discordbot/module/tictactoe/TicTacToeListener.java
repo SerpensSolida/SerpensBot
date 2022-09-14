@@ -32,9 +32,6 @@ public class TicTacToeListener extends BotListener
 		super("tictactoe");
 		this.setModuleName("TicTacToe");
 		
-		//This module has no task.
-		this.removeBotCommand("cancel");
-		
 		//Command for creating a game.
 		BotCommand command = new BotCommand("start", "Comincia una partita di tris.");
 		command.setAction(this::startGame);

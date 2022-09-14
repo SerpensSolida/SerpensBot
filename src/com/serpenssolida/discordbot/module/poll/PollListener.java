@@ -39,9 +39,6 @@ public class PollListener extends BotListener
 		super("poll");
 		this.setModuleName("Poll");
 		
-		//This module has no task.
-		this.removeBotCommand("cancel");
-		
 		//Command for creating a poll.
 		BotCommand command = new BotCommand("create", "Crea un nuovo sondaggio");
 		command.setAction(this::createNewPoll);

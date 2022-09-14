@@ -35,9 +35,6 @@ public class Connect4Listener extends BotListener
 		super("connect4");
 		this.setModuleName("Connect4");
 		
-		//This module has no task.
-		this.removeBotCommand("cancel");
-		
 		//Command for creating a game.
 		BotCommand command = new BotCommand("start", "Comincia una partita di forza 4.");
 		command.setAction(this::startGame);
