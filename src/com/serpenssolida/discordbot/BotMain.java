@@ -8,6 +8,7 @@ import com.serpenssolida.discordbot.module.hungergames.HungerGamesListener;
 import com.serpenssolida.discordbot.module.musicplayer.MusicPlayerListener;
 import com.serpenssolida.discordbot.module.owner.OwnerListener;
 import com.serpenssolida.discordbot.module.poll.PollListener;
+import com.serpenssolida.discordbot.module.thread.ThreadListener;
 import com.serpenssolida.discordbot.module.tictactoe.TicTacToeListener;
 
 public class BotMain
@@ -25,6 +26,7 @@ public class BotMain
 			SerpensBot.addModule(new ChannelFilterListener());
 			SerpensBot.addModule(new MusicPlayerListener());
 			SerpensBot.addModule(new ForumChannelListener());
+			SerpensBot.addModule(new ThreadListener());
 		});
 		
 		SerpensBot.start();
