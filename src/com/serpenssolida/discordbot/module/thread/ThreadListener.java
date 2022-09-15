@@ -17,12 +17,12 @@ public class ThreadListener extends BotListener
 		this.setModuleName("ThreadOwner");
 		
 		//Context menu "Pinna messaggio".
-		MessageContextMenuOption option = new MessageContextMenuOption("Pinna messaggio");
+		MessageContextMenuOption option = new MessageContextMenuOption("Attacca messaggio");
 		option.setAction(this::pinMessage);
 		this.addMessageContextMenuOption(option);
 		
 		//Context menu "Spinna messaggio".
-		option = new MessageContextMenuOption("Spinna messaggio");
+		option = new MessageContextMenuOption("Stacca messaggio");
 		option.setAction(this::unpinMessage);
 		this.addMessageContextMenuOption(option);
 	}
@@ -39,7 +39,7 @@ public class ThreadListener extends BotListener
 		//Check if the channel is null.
 		if (channel == null)
 		{
-			MessageCreateData message = MessageUtils.buildErrorMessage("Pinna messaggio", author, "Non è stato possibile trovare il canale specificato.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Attacca messaggio", author, "Non è stato possibile trovare il canale specificato.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -47,7 +47,7 @@ public class ThreadListener extends BotListener
 		//Check if the channel is a thread.
 		if (!channel.getType().isThread())
 		{
-			MessageCreateData message = MessageUtils.buildErrorMessage("Pinna messaggio", author, "Puoi usare questa opzione solo su un messaggio all'interno di un thread.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Attacca messaggio", author, "Puoi usare questa opzione solo su un messaggio all'interno di un thread.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -55,7 +55,7 @@ public class ThreadListener extends BotListener
 		//Check if the author of the event is the owner of the thread.
 		if (!author.getId().equals(channel.asThreadChannel().getOwnerId()))
 		{
-			MessageCreateData message = MessageUtils.buildErrorMessage("Pinna messaggio", author, "Puoi usare questa opzione solo se sei il creatore del thread.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Attacca messaggio", author, "Puoi usare questa opzione solo se sei il creatore del thread.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -63,7 +63,7 @@ public class ThreadListener extends BotListener
 		//Pin the message and send confirmation.
 		eventMessage.pin().complete();
 		
-		MessageCreateData message = MessageUtils.buildSimpleMessage("Pinna messaggio", author, "Messaggio pinnato correttamente.");
+		MessageCreateData message = MessageUtils.buildSimpleMessage("Attacca messaggio", author, "Messaggio pinnato correttamente.");
 		event.reply(message).setEphemeral(true).queue();
 	}
 	
@@ -80,7 +80,7 @@ public class ThreadListener extends BotListener
 		//Check if the channel is null.
 		if (channel == null)
 		{
-			MessageCreateData message = MessageUtils.buildErrorMessage("Spinna messaggio", author, "Non è stato possibile trovare il canale specificato.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Stacca messaggio", author, "Non è stato possibile trovare il canale specificato.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -88,7 +88,7 @@ public class ThreadListener extends BotListener
 		//Check if the channel is a thread.
 		if (!channel.getType().isThread())
 		{
-			MessageCreateData message = MessageUtils.buildErrorMessage("Spinna messaggio", author, "Puoi usare questa opzione solo su un messaggio all'interno di un thread.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Stacca messaggio", author, "Puoi usare questa opzione solo su un messaggio all'interno di un thread.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -96,7 +96,7 @@ public class ThreadListener extends BotListener
 		//Check if the author of the event is the owner of the thread.
 		if (!author.getId().equals(channel.asThreadChannel().getOwnerId()))
 		{
-			MessageCreateData message = MessageUtils.buildErrorMessage("Spinna messaggio", author, "Puoi usare questa opzione solo se sei il creatore del thread.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Stacca messaggio", author, "Puoi usare questa opzione solo se sei il creatore del thread.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -104,7 +104,7 @@ public class ThreadListener extends BotListener
 		//Pin the message and send confirmation.
 		eventMessage.unpin().complete();
 		
-		MessageCreateData message = MessageUtils.buildSimpleMessage("Spinna messaggio", author, "Messaggio spinnato correttamente.");
+		MessageCreateData message = MessageUtils.buildSimpleMessage("Stacca messaggio", author, "Messaggio spinnato correttamente.");
 		event.reply(message).setEphemeral(true).queue();
 	}
 }
