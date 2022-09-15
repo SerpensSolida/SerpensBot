@@ -7,10 +7,11 @@ import com.serpenssolida.discordbot.RandomChoice;
 import com.serpenssolida.discordbot.module.hungergames.event.*;
 import com.serpenssolida.discordbot.module.hungergames.io.ItemData;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.utils.FileUpload;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,14 +64,14 @@ public class HungerGamesThread extends Thread
 	
 	private void runHungerGames() throws InterruptedException
 	{
-		MessageBuilder messageBuilder = new MessageBuilder();
+		MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
 		EmbedBuilder embedBuilder = new EmbedBuilder();
 		HashSet<Player> alivePlayers = this.hg.getAlivePlayers();
 		
 		//Check if there are enough player to play the game.
 		if (alivePlayers.size() < 2)
 		{
-			Message message = MessageUtils.buildErrorMessage("Connect4", this.author, "Numero giocatori insufficenti. Chiedi a qualcuno di creare o abilitare il suo personaggio.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Connect4", this.author, "Numero giocatori insufficenti. Chiedi a qualcuno di creare o abilitare il suo personaggio.");
 			this.channel.sendMessage(message).queue();
 			HungerGamesController.setRunning(this.guildID,false);
 			return;
@@ -134,7 +135,7 @@ public class HungerGamesThread extends Thread
 			{
 				Player winner = (Player) alivePlayers.toArray()[0]; //This player is the winner.
 				
-				messageBuilder = new MessageBuilder();
+				messageBuilder = new MessageCreateBuilder();
 				embedBuilder = (new EmbedBuilder()).setTitle("Il vincitore è **" + winner + "**!").setThumbnail(winner.getOwner().getAvatarUrl());
 				messageBuilder.setEmbeds(embedBuilder.build());
 				
@@ -145,7 +146,7 @@ public class HungerGamesThread extends Thread
 			else
 			{
 				//All player died, no winner.
-				messageBuilder = new MessageBuilder();
+				messageBuilder = new MessageCreateBuilder();
 				embedBuilder = new EmbedBuilder();
 				
 				embedBuilder.setTitle("Nessun vincitore!");
@@ -166,7 +167,7 @@ public class HungerGamesThread extends Thread
 	
 	private void doTurnCycle()
 	{
-		MessageBuilder messageBuilder = new MessageBuilder();
+		MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
 		StringBuilder stringBuilder = new StringBuilder();
 		EmbedBuilder embedBuilder = new EmbedBuilder();
 		
@@ -215,7 +216,7 @@ public class HungerGamesThread extends Thread
 		//Check if the image was generated correctly.
 		if (statusImage != null)
 			this.channel.sendMessage(messageBuilder.build())
-					.addFile(statusImage, "status.png")
+					.setFiles(FileUpload.fromData(statusImage, "status.png"))
 					.queue();
 		
 		//Clear all lists used by events.

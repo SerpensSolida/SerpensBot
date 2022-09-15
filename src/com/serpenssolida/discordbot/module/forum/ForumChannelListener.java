@@ -10,9 +10,14 @@ import com.serpenssolida.discordbot.interaction.ButtonAction;
 import com.serpenssolida.discordbot.interaction.InteractionGroup;
 import com.serpenssolida.discordbot.modal.ModalCallback;
 import com.serpenssolida.discordbot.module.BotListener;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.channel.ChannelDeleteEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
@@ -25,16 +30,15 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Paths;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 public class ForumChannelListener extends BotListener
 {
@@ -213,7 +217,7 @@ public class ForumChannelListener extends BotListener
 		this.removeInteractionGroup(guild.getId(), deletedMessageID);
 		
 		//Recreate the forum message.
-		Message forumMessage = this.createStartMessage(guild, event.getTextChannel(), forum);
+		Message forumMessage = this.createStartMessage(guild, event.getChannel().asTextChannel(), forum);
 		
 		//Update forum data.
 		forum.setMessageID(forumMessage.getId());
@@ -252,7 +256,7 @@ public class ForumChannelListener extends BotListener
 		//Check if user is an admin.
 		if (!UserUtils.hasMemberAdminPermissions(event.getMember()))
 		{
-			Message message = MessageUtils.buildErrorMessage("Forum channel", author, "Devi essere un admin per creare un forum.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Forum channel", author, "Devi essere un admin per creare un forum.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -260,7 +264,7 @@ public class ForumChannelListener extends BotListener
 		//Check argument.
 		if (channelNameArg == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Forum channel", author, "Devi inserire il parametro channel_name.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Forum channel", author, "Devi inserire il parametro channel_name.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -271,7 +275,7 @@ public class ForumChannelListener extends BotListener
 		//Check name format.
 		if (channelName.length() < 1 || channelName.length() > 100)
 		{
-			Message message = MessageUtils.buildErrorMessage("Forum channel", author, "Il nome del canale deve essere lungo da 1 a 100 caratteri.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Forum channel", author, "Il nome del canale deve essere lungo da 1 a 100 caratteri.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -279,7 +283,7 @@ public class ForumChannelListener extends BotListener
 		//Check if a channel with the given name already exists.
 		if (!guild.getTextChannelsByName(channelName, true).isEmpty())
 		{
-			Message message = MessageUtils.buildErrorMessage("Forum channel", author, "Un canale con il nome \"" + channelName + "\" è già presente.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Forum channel", author, "Un canale con il nome \"" + channelName + "\" è già presente.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -300,7 +304,7 @@ public class ForumChannelListener extends BotListener
 		//Check if user is an admin.
 		if (!UserUtils.hasMemberAdminPermissions(event.getMember()))
 		{
-			Message message = MessageUtils.buildErrorMessage("Forum channel", author, "Devi essere un admin per convertire un canale in un forum.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Forum channel", author, "Devi essere un admin per convertire un canale in un forum.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -308,13 +312,13 @@ public class ForumChannelListener extends BotListener
 		//Check argumets.
 		if (channelArg == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Forum channel", author, "Devi inserire il parametro channel.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Forum channel", author, "Devi inserire il parametro channel.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
 		
 		//Get parameters.
-		TextChannel targetChannel = channelArg.getAsTextChannel();
+		TextChannel targetChannel = channelArg.getAsChannel().asTextChannel();
 		
 		//Create and send the modal.
 		Modal modal = this.getForumDataModal();
@@ -368,7 +372,7 @@ public class ForumChannelListener extends BotListener
 			//Check modal input.
 			if (titleArg == null || descriptionArg == null || buttonLabelArg == null)
 			{
-				Message message = MessageUtils.buildErrorMessage("Forum channel", author, "Devi inserire tutti i parametri.");
+				MessageCreateData message = MessageUtils.buildErrorMessage("Forum channel", author, "Devi inserire tutti i parametri.");
 				event.reply(message).setEphemeral(true).queue();
 				return;
 			}
@@ -395,7 +399,7 @@ public class ForumChannelListener extends BotListener
 			this.forums.put(textChannel.getId(), forum);
 			this.saveForums();
 			
-			Message message = MessageUtils.buildSimpleMessage("Forum channel", author, "Forum inizializzato correttamente.");
+			MessageCreateData message = MessageUtils.buildSimpleMessage("Forum channel", author, "Forum inizializzato correttamente.");
 			event.reply(message).queue();
 		};
 	}
@@ -420,7 +424,7 @@ public class ForumChannelListener extends BotListener
 			//Check modal input.
 			if (titleArg == null || descriptionArg == null || buttonLabelArg == null)
 			{
-				Message message = MessageUtils.buildErrorMessage("Forum channel", author, "Devi inserire tutti i parametri.");
+				MessageCreateData message = MessageUtils.buildErrorMessage("Forum channel", author, "Devi inserire tutti i parametri.");
 				event.reply(message).setEphemeral(true).queue();
 				return;
 			}
@@ -451,7 +455,7 @@ public class ForumChannelListener extends BotListener
 			this.forums.put(targetChannel.getId(), forum);
 			this.saveForums();
 			
-			Message message = MessageUtils.buildSimpleMessage("Forum channel", author, "Canale inizializzato correttamente.");
+			MessageCreateData message = MessageUtils.buildSimpleMessage("Forum channel", author, "Canale inizializzato correttamente.");
 			event.reply(message).queue();
 		};
 	}
@@ -471,7 +475,7 @@ public class ForumChannelListener extends BotListener
 			//Check modal input.
 			if (titleArg == null)
 			{
-				Message message = MessageUtils.buildErrorMessage("Forum channel", author, "Devi inserire tutti i parametri.");
+				MessageCreateData message = MessageUtils.buildErrorMessage("Forum channel", author, "Devi inserire tutti i parametri.");
 				event.reply(message).setEphemeral(true).queue();
 				return;
 			}
@@ -480,25 +484,25 @@ public class ForumChannelListener extends BotListener
 			String title = titleArg.getAsString();
 			
 			//Create thread.
-			ThreadChannel threadChannel = event.getTextChannel().createThreadChannel(title).complete();
+			ThreadChannel threadChannel = event.getChannel().asTextChannel().createThreadChannel(title).complete();
 			threadChannel.addThreadMember(author).queue();
 			
 			//Get the forum data.
-			Forum forum = this.forums.get(event.getTextChannel().getId());
+			Forum forum = this.forums.get(event.getChannel().asTextChannel().getId());
 			
 			//Delete the previous forum message.
-			Message previousForumMessage = event.getTextChannel().retrieveMessageById(forum.getMessageID()).complete();
+			Message previousForumMessage = event.getChannel().asTextChannel().retrieveMessageById(forum.getMessageID()).complete();
 			previousForumMessage.delete().complete();
 			this.removeInteractionGroup(guild.getId(), previousForumMessage.getId());
 			
 			//Recreate the forum message.
-			Message forumMessage = this.createStartMessage(guild, event.getTextChannel(), forum);
+			Message forumMessage = this.createStartMessage(guild, event.getChannel().asTextChannel(), forum);
 			
 			//Update forum data.
 			forum.setMessageID(forumMessage.getId());
 			this.saveForums();
 			
-			Message message = MessageUtils.buildSimpleMessage("Forum channel", author, "Thread creato correttamente.");
+			MessageCreateData message = MessageUtils.buildSimpleMessage("Forum channel", author, "Thread creato correttamente.");
 			event.reply(message).setEphemeral(true).queue();
 		};
 	}
@@ -545,8 +549,8 @@ public class ForumChannelListener extends BotListener
 	private Message createStartMessage(Guild guild, TextChannel channel, Forum forum)
 	{
 		//Build forum message.
-		MessageBuilder initMessageBuilder = new MessageBuilder(MessageUtils.buildSimpleMessage(forum.getTitle(), forum.getDescription()));
-		initMessageBuilder.setActionRows(ActionRow.of(Button.primary("create_thread", forum.getButtonLabel())));
+		MessageCreateBuilder initMessageBuilder = MessageCreateBuilder.from(MessageUtils.buildSimpleMessage(forum.getTitle(), forum.getDescription()));
+		initMessageBuilder.addActionRow(List.of(Button.primary("create_thread", forum.getButtonLabel())));
 		Message forumMessage = channel.sendMessage(initMessageBuilder.build()).complete();
 		
 		//Add button callback.

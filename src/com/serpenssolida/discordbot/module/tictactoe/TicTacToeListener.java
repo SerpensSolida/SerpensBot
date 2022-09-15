@@ -7,17 +7,18 @@ import com.serpenssolida.discordbot.interaction.InteractionCallback;
 import com.serpenssolida.discordbot.interaction.InteractionGroup;
 import com.serpenssolida.discordbot.module.BotListener;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -61,10 +62,10 @@ public class TicTacToeListener extends BotListener
 		User opponent = opponentArg.getAsUser();
 		TicTacToeGame game = new TicTacToeGame(author, opponent);
 		
-		MessageBuilder messageBuilder = generateGameMessage(game, author);
+		MessageEditBuilder messageBuilder = TicTacToeListener.generateGameMessage(game, author);
 		
 		//Send the game message and get its id.
-		InteractionHook hook = event.reply(messageBuilder.build())
+		InteractionHook hook = event.reply(MessageCreateData.fromEditData(messageBuilder.build()))
 				.setEphemeral(false)
 				.complete();
 		Message message = hook.retrieveOriginal().complete();
@@ -139,7 +140,7 @@ public class TicTacToeListener extends BotListener
 		this.removeInteractionGroup(guild.getId(), game.getMessageId());
 	}
 	
-	private static void addTicTacToeButtons(MessageBuilder messageBuilder, TicTacToeGame game)
+	private static void addTicTacToeButtons(MessageEditBuilder messageBuilder, TicTacToeGame game)
 	{
 		ArrayList<Button> buttons = new ArrayList<>();
 		ArrayList<ActionRow> actionRows = new ArrayList<>();
@@ -174,7 +175,7 @@ public class TicTacToeListener extends BotListener
 			buttons.clear();
 		}
 
-		messageBuilder.setActionRows(actionRows);
+		messageBuilder.setComponents(actionRows);
 	}
 	
 	private InteractionGroup generateGameCallback()
@@ -252,9 +253,9 @@ public class TicTacToeListener extends BotListener
 		message.editMessage(TicTacToeListener.generateGameMessage(game, author).build()).queue();
 	}
 	
-	private static MessageBuilder generateGameMessage(TicTacToeGame game, User author)
+	private static MessageEditBuilder generateGameMessage(TicTacToeGame game, User author)
 	{
-		MessageBuilder messageBuilder = new MessageBuilder();
+		MessageEditBuilder messageBuilder = new MessageEditBuilder();
 		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Partita a TicTacToe", author);
 		
 		if (game.getMessageId() != null)

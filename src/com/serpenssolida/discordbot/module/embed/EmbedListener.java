@@ -4,15 +4,16 @@ import com.serpenssolida.discordbot.MessageUtils;
 import com.serpenssolida.discordbot.command.BotCommand;
 import com.serpenssolida.discordbot.module.BotListener;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.awt.*;
 
@@ -58,7 +59,7 @@ public class EmbedListener extends BotListener
 		//Check arugment title.
 		if (titleArg == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Creazione embed", author, "Devi impostare un titolo.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Creazione embed", author, "Devi impostare un titolo.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -66,7 +67,7 @@ public class EmbedListener extends BotListener
 		//Check argument description.
 		if (descriptionArg == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Creazione embed", author, "Devi impostare una descrizione.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Creazione embed", author, "Devi impostare una descrizione.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -88,7 +89,7 @@ public class EmbedListener extends BotListener
 			//A color is only 6 character long.
 			if (colorString.length() > 6)
 			{
-				Message message = MessageUtils.buildErrorMessage("Creazione embed", author, "Formato del colore errato.");
+				MessageCreateData message = MessageUtils.buildErrorMessage("Creazione embed", author, "Formato del colore errato.");
 				event.reply(message).setEphemeral(true).queue();
 				return;
 			}
@@ -100,7 +101,7 @@ public class EmbedListener extends BotListener
 			}
 			catch (NumberFormatException e)
 			{
-				Message message = MessageUtils.buildErrorMessage("Creazione embed", author, "Formato del colore errato.");
+				MessageCreateData message = MessageUtils.buildErrorMessage("Creazione embed", author, "Formato del colore errato.");
 				event.reply(message).setEphemeral(true).queue();
 				return;
 			}
@@ -108,7 +109,7 @@ public class EmbedListener extends BotListener
 			//Check if the color isn't outside range.
 			if (colorValue < 0 || colorValue > 0xFFFFFF)
 			{
-				Message message = MessageUtils.buildErrorMessage("Creazione embed", author, "Formato del colore errato.");
+				MessageCreateData message = MessageUtils.buildErrorMessage("Creazione embed", author, "Formato del colore errato.");
 				event.reply(message).setEphemeral(true).queue();
 				return;
 			}
@@ -128,14 +129,14 @@ public class EmbedListener extends BotListener
 			}
 			catch (IllegalArgumentException e)
 			{
-				Message message = MessageUtils.buildErrorMessage("Creazione embed", author, "Formato del link della thumbnail errato.");
+				MessageCreateData message = MessageUtils.buildErrorMessage("Creazione embed", author, "Formato del link della thumbnail errato.");
 				event.reply(message).setEphemeral(true).queue();
 				return;
 			}
 		}
 		
 		//Build and send the message with the embed.
-		MessageBuilder messageBuilder = new MessageBuilder();
+		MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
 		messageBuilder.setEmbeds(embedBuilder.build());
 		
 		event.reply(messageBuilder.build()).queue();
@@ -155,7 +156,7 @@ public class EmbedListener extends BotListener
 		//Check arugment title.
 		if (titleArg == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Creazione embed", author, "Devi impostare un titolo.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Creazione embed", author, "Devi impostare un titolo.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -163,7 +164,7 @@ public class EmbedListener extends BotListener
 		//Check argument description.
 		if (messageIdArg == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Creazione embed", author, "Devi impostare un id.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Creazione embed", author, "Devi impostare un id.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -184,7 +185,7 @@ public class EmbedListener extends BotListener
 		//Check if the message was found.
 		if (originalMessage == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Creazione embed", author, "Nessun messaggio trovato con id: " + messageIdArg.getAsString());
+			MessageCreateData message = MessageUtils.buildErrorMessage("Creazione embed", author, "Nessun messaggio trovato con id: " + messageIdArg.getAsString());
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -196,7 +197,7 @@ public class EmbedListener extends BotListener
 		//Check description content.
 		if (description.isBlank())
 		{
-			Message message = MessageUtils.buildErrorMessage("Creazione embed", author, "Il messaggio specificato non continene del testo.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Creazione embed", author, "Il messaggio specificato non continene del testo.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -214,7 +215,7 @@ public class EmbedListener extends BotListener
 			//A color is only 6 character long.
 			if (colorString.length() > 6)
 			{
-				Message message = MessageUtils.buildErrorMessage("Creazione embed", author, "Formato del colore errato.1");
+				MessageCreateData message = MessageUtils.buildErrorMessage("Creazione embed", author, "Formato del colore errato.1");
 				event.reply(message).setEphemeral(true).queue();
 				return;
 			}
@@ -226,7 +227,7 @@ public class EmbedListener extends BotListener
 			}
 			catch (NumberFormatException e)
 			{
-				Message message = MessageUtils.buildErrorMessage("Creazione embed", author, "Formato del colore errato.2");
+				MessageCreateData message = MessageUtils.buildErrorMessage("Creazione embed", author, "Formato del colore errato.2");
 				event.reply(message).setEphemeral(true).queue();
 				return;
 			}
@@ -234,7 +235,7 @@ public class EmbedListener extends BotListener
 			//Check if the color isn't outside range.
 			if (colorValue < 0 || colorValue > 0xFFFFFF)
 			{
-				Message message = MessageUtils.buildErrorMessage("Creazione embed", author, "Formato del colore errato.3");
+				MessageCreateData message = MessageUtils.buildErrorMessage("Creazione embed", author, "Formato del colore errato.3");
 				event.reply(message).setEphemeral(true).queue();
 				return;
 			}
@@ -254,14 +255,14 @@ public class EmbedListener extends BotListener
 			}
 			catch (IllegalArgumentException e)
 			{
-				Message message = MessageUtils.buildErrorMessage("Creazione embed", author, "Formato del link della thumbnail errato.");
+				MessageCreateData message = MessageUtils.buildErrorMessage("Creazione embed", author, "Formato del link della thumbnail errato.");
 				event.reply(message).setEphemeral(true).queue();
 				return;
 			}
 		}
 		
 		//Build the message with the embed.
-		MessageBuilder messageBuilder = new MessageBuilder();
+		MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
 		messageBuilder.setEmbeds(embedBuilder.build());
 		
 		//Delete the original message if specified.

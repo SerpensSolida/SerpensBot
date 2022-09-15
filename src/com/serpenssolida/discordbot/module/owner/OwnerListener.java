@@ -3,9 +3,9 @@ package com.serpenssolida.discordbot.module.owner;
 import com.serpenssolida.discordbot.MessageUtils;
 import com.serpenssolida.discordbot.SerpensBot;
 import com.serpenssolida.discordbot.module.BotListener;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,7 +27,7 @@ public class OwnerListener extends BotListener
 		if (event.isFromGuild())
 			return;
 		
-		PrivateChannel channel = event.getPrivateChannel();
+		PrivateChannel channel = event.getChannel().asPrivateChannel();
 		User user = event.getAuthor();
 		String message = event.getMessage().getContentDisplay();
 		

@@ -13,8 +13,9 @@ import com.serpenssolida.discordbot.interaction.InteractionCallback;
 import com.serpenssolida.discordbot.interaction.InteractionGroup;
 import com.serpenssolida.discordbot.module.BotListener;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
@@ -24,6 +25,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.managers.AudioManager;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -79,7 +84,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		//Check if the argument is present.
 		if (songArg == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Music Player", author, "Devi inserire il parametro song.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Music Player", author, "Devi inserire il parametro song.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -89,9 +94,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		
 		//Check if the user state is valid.
 		if (authorVoiceState == null)
-		{
 			return;
-		}
 		
 		//Get user voice channel.
 		AudioChannel voiceChannel = authorVoiceState.getChannel();
@@ -109,7 +112,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		}
 		else if (!audioController.getVoiceChannel().equals(voiceChannel)) //Check if the user voice channel is the same one of the bot.
 		{
-			Message message = MessageUtils.buildErrorMessage("Music Player", author, "Non sei nel canale vocale corretto. Vai dentro **#" + audioController.getVoiceChannel().getName() + "**.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Music Player", author, "Non sei nel canale vocale corretto. Vai dentro **#" + audioController.getVoiceChannel().getName() + "**.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -121,7 +124,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		
 		if (!m.find())
 		{
-			Message message = MessageUtils.buildErrorMessage("Music Player", author, "Devi inserire un link di YouTube.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Music Player", author, "Devi inserire un link di YouTube.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -155,13 +158,13 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		//Create new audio controller for guild if there isn't an active one yet.
 		if (audioController == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Music Player", author, "Non sono nel canale vocale. Usa il comando `/" + this.getModulePrefix(guild.getId()) + " play` per riprodurre una traccia.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Music Player", author, "Non sono nel canale vocale. Usa il comando `/" + this.getModulePrefix(guild.getId()) + " play` per riprodurre una traccia.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
 		else if (!audioController.getVoiceChannel().equals(voiceChannel)) //Check if the user voice channel is the same one of the bot.
 		{
-			Message message = MessageUtils.buildErrorMessage("Music Player", author, "Non sei nel canale vocale corretto. Vai dentro **#" + audioController.getVoiceChannel().getName() + "**.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Music Player", author, "Non sei nel canale vocale corretto. Vai dentro **#" + audioController.getVoiceChannel().getName() + "**.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -173,12 +176,12 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		//Check if there is a song playing.
 		if (!playingSong)
 		{
-			Message message = MessageUtils.buildSimpleMessage("Music Player", author, "Playlist conclusa.");
+			MessageCreateData message = MessageUtils.buildSimpleMessage("Music Player", author, "Playlist conclusa.");
 			event.reply(message).setEphemeral(false).queue();
 		}
 		else
 		{
-			Message message = MessageUtils.buildSimpleMessage("Music player", author, "Traccia saltata.");
+			MessageCreateData message = MessageUtils.buildSimpleMessage("Music player", author, "Traccia saltata.");
 			event.reply(message).queue();
 		}
 	}
@@ -204,13 +207,13 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		//Create new audio controller for guild if there isn't an active one yet.
 		if (audioController == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Music Player", author, "Non sono nel canale vocale. Usa il comando `/" + this.getModulePrefix(guild.getId()) + " play` per riprodurre una traccia.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Music Player", author, "Non sono nel canale vocale. Usa il comando `/" + this.getModulePrefix(guild.getId()) + " play` per riprodurre una traccia.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
 		else if (!audioController.getVoiceChannel().equals(voiceChannel)) //Check if the user voice channel is the same one of the bot.
 		{
-			Message message = MessageUtils.buildErrorMessage("Music Player", author, "Non sei nel canale vocale corretto. Vai dentro **#" + audioController.getVoiceChannel().getName() + "**.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Music Player", author, "Non sei nel canale vocale corretto. Vai dentro **#" + audioController.getVoiceChannel().getName() + "**.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -220,7 +223,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		//Remove audio controller and quit the voice channel.
 		this.closeConnection(guild);
 		
-		Message message = MessageUtils.buildSimpleMessage("Music Player", author, "Riproduzione interrotta.");
+		MessageCreateData message = MessageUtils.buildSimpleMessage("Music Player", author, "Riproduzione interrotta.");
 		event.reply(message).setEphemeral(false).queue();
 		
 		this.deleteTrackStatusMessage(guild, audioController);
@@ -246,7 +249,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		
 		//Remove the user votes and update the track status message.
 		audioController.removeVote(event.getMember().getUser());
-		MessageBuilder messageBuilder = new MessageBuilder(audioController.getStatusMessage());
+		MessageEditBuilder messageBuilder = MessageEditBuilder.from(MessageEditData.fromMessage(audioController.getStatusMessage()));
 		MusicPlayerListener.generateControlButtons(audioController, messageBuilder);
 		audioController.getStatusMessage().editMessage(messageBuilder.build()).queue();
 	}
@@ -276,7 +279,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		
 		//Remove the user votes and update the track status message.
 		audioController.removeVote(event.getMember().getUser());
-		MessageBuilder messageBuilder = new MessageBuilder(audioController.getStatusMessage());
+		MessageEditBuilder messageBuilder = MessageEditBuilder.from(MessageEditData.fromMessage(audioController.getStatusMessage()));
 		MusicPlayerListener.generateControlButtons(audioController, messageBuilder);
 		audioController.getStatusMessage().editMessage(messageBuilder.build()).queue();
 	}
@@ -300,7 +303,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 			return;
 		
 		//Update the track status message.
-		MessageBuilder messageBuilder = new MessageBuilder(audioController.getStatusMessage());
+		MessageEditBuilder messageBuilder = MessageEditBuilder.from(MessageEditData.fromMessage(audioController.getStatusMessage()));
 		MusicPlayerListener.generateControlButtons(audioController, messageBuilder);
 		audioController.getStatusMessage().editMessage(messageBuilder.build()).queue();
 	}
@@ -383,10 +386,9 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 	 * @param audioController
 	 * 		The {@link GuildAudioController} containing the status to be reppresented inside the message.
 	 *
-	 * @return
-	 * 		The message containing the status of the given {@link GuildAudioController}.
+	 * @return The message containing the status of the given {@link GuildAudioController}.
 	 */
-	public static Message generateTrackStatusMessage(GuildAudioController audioController)
+	public static MessageEditData generateTrackStatusMessage(GuildAudioController audioController)
 	{
 		//Get track that is currently playing.
 		AudioTrack track = audioController.getPlayer().getPlayingTrack();
@@ -396,7 +398,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 				.setThumbnail("https://img.youtube.com/vi/" + track.getIdentifier() + "/hqdefault.jpg")
 				.setDescription("Now playing:\n**" + track.getInfo().title + "**");
 		
-		MessageBuilder messageBuilder = new MessageBuilder();
+		MessageEditBuilder messageBuilder = new MessageEditBuilder();
 		messageBuilder.setEmbeds(embedBuilder.build());
 		
 		//Add buttons to the message.
@@ -420,7 +422,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		
 		//Generate and send new track status message.
 		MessageChannel channel = audioController.getMessageChannel();
-		Message statusMessage = channel.sendMessage(MusicPlayerListener.generateTrackStatusMessage(audioController)).complete();
+		Message statusMessage = channel.sendMessage(MessageCreateData.fromEditData(MusicPlayerListener.generateTrackStatusMessage(audioController))).complete();
 		
 		audioController.setStatusMessage(statusMessage);
 	}
@@ -447,14 +449,14 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 	}
 	
 	/**
-	 * Adds the control buttons (play, skip, stop) to the given {@link MessageBuilder}.
+	 * Adds the control buttons (play, skip, stop) to the given {@link MessageCreateBuilder}.
 	 *
 	 * @param audioController
 	 * 		The {@link GuildAudioController} containing the status of the player.
 	 * @param messageBuilder
-	 * 		The {@link MessageBuilder} to add control buttons to.
+	 * 		The {@link MessageCreateBuilder} to add control buttons to.
 	 */
-	private static void generateControlButtons(GuildAudioController audioController, MessageBuilder messageBuilder)
+	private static void generateControlButtons(GuildAudioController audioController, MessageEditBuilder messageBuilder)
 	{
 		//Get voice channel users.
 		AudioChannel voiceChannel = audioController.getVoiceChannel();
@@ -477,7 +479,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		Button skipButton = Button.primary("skip", skipLabel);
 		Button stopButton = Button.danger("stop", stopLabel);
 		Button showQueue = Button.secondary("show-queue", "Show queue");
-		messageBuilder.setActionRows(ActionRow.of(skipButton, stopButton, showQueue));
+		messageBuilder.setComponents(ActionRow.of(skipButton, stopButton, showQueue));
 	}
 	
 	/**
@@ -582,7 +584,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 			embedBuilder.addField("N.", fields.getRight(), true);
 			embedBuilder.addField("Titolo", fields.getLeft(), true);
 			
-			MessageBuilder messageBuilder = new MessageBuilder();
+			MessageEditBuilder messageBuilder = new MessageEditBuilder();
 			messageBuilder.setEmbeds(embedBuilder.build());
 			
 			event.getHook().editOriginal(messageBuilder.build()).queue();
@@ -651,7 +653,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		//Check if the member was correctly retrieved.
 		if (authorMember == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Music Player", author, "Utente non trovato.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Music Player", author, "Utente non trovato.");
 			event.reply(message).setEphemeral(true).queue();
 			return null;
 		}
@@ -660,14 +662,14 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		GuildVoiceState authorVoiceState = authorMember.getVoiceState();
 		if (authorVoiceState == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Music Player", author, "Impossibile ottenere lo stato del utente.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Music Player", author, "Impossibile ottenere lo stato del utente.");
 			event.reply(message).setEphemeral(true).queue();
 			return null;
 		}
 		
 		if (!authorVoiceState.inAudioChannel())
 		{
-			Message message = MessageUtils.buildErrorMessage("Music Player", author, "Devi essere in un canale vocale per usare questo comando.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Music Player", author, "Devi essere in un canale vocale per usare questo comando.");
 			event.reply(message).setEphemeral(true).queue();
 			return null;
 		}

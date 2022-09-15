@@ -1,7 +1,7 @@
 package com.serpenssolida.discordbot.module.poll;
 
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 
 import java.util.*;
 import java.util.stream.Stream;

@@ -6,9 +6,9 @@ import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.serpenssolida.discordbot.MessageUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +37,7 @@ public class TrackLoadResultHandler implements AudioLoadResultHandler
 				.setThumbnail("https://img.youtube.com/vi/" + track.getIdentifier() + "/hqdefault.jpg")
 				.setDescription("Traccia aggiunta alla coda: **" + track.getInfo().title + "**.");
 		
-		this.event.reply(new MessageBuilder().setEmbeds(embedBuilder.build()).build()).setEphemeral(false).queue();
+		this.event.reply(new MessageCreateBuilder().setEmbeds(embedBuilder.build()).build()).setEphemeral(false).queue();
 		
 		//Add the track to the queue.
 		this.audioController.getScheduler().queue(track);
@@ -59,7 +59,7 @@ public class TrackLoadResultHandler implements AudioLoadResultHandler
 		embedBuilder.addField("N.", fields.getRight(), true);
 		embedBuilder.addField("Titolo", fields.getLeft(), true);
 		
-		this.event.reply(new MessageBuilder().setEmbeds(embedBuilder.build()).build()).setEphemeral(false).queue();
+		this.event.reply(new MessageCreateBuilder().setEmbeds(embedBuilder.build()).build()).setEphemeral(false).queue();
 		
 		//Add tracks to the queue.
 		for (AudioTrack track : tracks)
@@ -69,7 +69,7 @@ public class TrackLoadResultHandler implements AudioLoadResultHandler
 	@Override
 	public void noMatches()
 	{
-		Message message = MessageUtils.buildErrorMessage("Music Player", this.event.getUser(), "Traccia non trovata.");
+		MessageCreateData message = MessageUtils.buildErrorMessage("Music Player", this.event.getUser(), "Traccia non trovata.");
 		this.event.reply(message).setEphemeral(true).queue();
 	}
 	
@@ -84,7 +84,7 @@ public class TrackLoadResultHandler implements AudioLoadResultHandler
 			this.listener.onQueueEmpty(this.event.getGuild());
 		
 		logger.error(exception.getMessage());
-		Message message = MessageUtils.buildErrorMessage("Music Player", this.event.getUser(), "Si è verificato un errore durante il caricamento della traccia: *" + exception.getMessage() + "*");
+		MessageCreateData message = MessageUtils.buildErrorMessage("Music Player", this.event.getUser(), "Si è verificato un errore durante il caricamento della traccia: *" + exception.getMessage() + "*");
 		this.event.reply(message).setEphemeral(true).queue();
 	}
 }

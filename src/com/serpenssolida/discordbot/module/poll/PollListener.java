@@ -7,11 +7,10 @@ import com.serpenssolida.discordbot.interaction.InteractionCallback;
 import com.serpenssolida.discordbot.interaction.InteractionGroup;
 import com.serpenssolida.discordbot.module.BotListener;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
@@ -20,7 +19,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
+import net.dv8tion.jda.api.utils.FileUpload;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import org.jetbrains.annotations.NotNull;
 
@@ -133,7 +135,7 @@ public class PollListener extends BotListener
 			previousPollMessage.delete().queue();
 			
 			//Resend message.
-			Message pollMessage = channel.sendMessage(PollListener.generatePollMessage(poll, author).build()).complete();
+			Message pollMessage = channel.sendMessage(MessageCreateData.fromEditData(PollListener.generatePollMessage(poll, author).build())).complete();
 			
 			//Set the correct message id for poll, map, and interaction group.
 			this.switchInteractionGroupMessage(guild.getId(), poll.getMessageID(), pollMessage.getId());
@@ -184,11 +186,11 @@ public class PollListener extends BotListener
 		}
 		
 		//Create the poll message.
-		MessageBuilder messageBuilder = PollListener.generatePollMessage(poll, author);
+		MessageEditBuilder messageBuilder = PollListener.generatePollMessage(poll, author);
 		InteractionGroup interactionGroup = PollListener.generateButtonCallback(poll);
 		
 		//Send the pool and get the message id.
-		InteractionHook hook = event.reply(messageBuilder.build())
+		InteractionHook hook = event.reply(MessageCreateData.fromEditData(messageBuilder.build()))
 				.setEphemeral(false)
 				.complete();
 		Message message = hook.retrieveOriginal().complete();
@@ -220,7 +222,7 @@ public class PollListener extends BotListener
 		//Check if a poll was found.
 		if (poll == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Rimozione voto", author, "Nessun sondaggio trovato con id: " + pollIdArg.getAsString());
+			MessageCreateData message = MessageUtils.buildErrorMessage("Rimozione voto", author, "Nessun sondaggio trovato con id: " + pollIdArg.getAsString());
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -229,7 +231,7 @@ public class PollListener extends BotListener
 		
 		if (!removed)
 		{
-			Message message = MessageUtils.buildErrorMessage("Rimozione voto", author, "Non hai aggiunto nessun voto al sondaggio con id: " + pollIdArg.getAsString());
+			MessageCreateData message = MessageUtils.buildErrorMessage("Rimozione voto", author, "Non hai aggiunto nessun voto al sondaggio con id: " + pollIdArg.getAsString());
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -238,8 +240,8 @@ public class PollListener extends BotListener
 		Message message = channel.retrieveMessageById(poll.getMessageID()).complete();
 		PollListener.refreshPollMessage(poll, message);
 		
-		message = MessageUtils.buildSimpleMessage("Rimozione voto", author, "Voto rimosso con successo.");
-		event.reply(message).setEphemeral(true).queue();
+		MessageCreateData replyMessage = MessageUtils.buildSimpleMessage("Rimozione voto", author, "Voto rimosso con successo.");
+		event.reply(replyMessage).setEphemeral(true).queue();
 	}
 	
 	private void editPollDescription(SlashCommandInteractionEvent event, Guild guild, MessageChannel channel, User author)
@@ -256,7 +258,7 @@ public class PollListener extends BotListener
 		//Check if a poll was found.
 		if (poll == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Modifica descrizione del sondaggio", author, "Nessuna poll trovata con id: " + pollIdArg.getAsString());
+			MessageCreateData message = MessageUtils.buildErrorMessage("Modifica descrizione del sondaggio", author, "Nessuna poll trovata con id: " + pollIdArg.getAsString());
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -264,7 +266,7 @@ public class PollListener extends BotListener
 		//Check if the user trying to edit the poll is also its author.
 		if (!author.equals(poll.getAuthor()))
 		{
-			Message message = MessageUtils.buildErrorMessage("Modifica descrizione del sondaggio", author, "Questo sondaggio non appartiene a te.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Modifica descrizione del sondaggio", author, "Questo sondaggio non appartiene a te.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -279,7 +281,7 @@ public class PollListener extends BotListener
 		InteractionGroup interactionGroup = PollListener.generateButtonCallback(poll);
 		this.addInteractionGroup(guild.getId(), poll.getMessageID(), interactionGroup);
 		
-		Message message = MessageUtils.buildSimpleMessage("Modifica descrizione del sondaggio", author, "Descrizione cambiata con successo.");
+		MessageCreateData message = MessageUtils.buildSimpleMessage("Modifica descrizione del sondaggio", author, "Descrizione cambiata con successo.");
 		event.reply(message).setEphemeral(false).queue();
 	}
 	
@@ -297,7 +299,7 @@ public class PollListener extends BotListener
 		//Check if a poll was found.
 		if (poll == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Aggiunta opzione al sondaggio", author, "Nessuna poll trovata con id: " + pollIdArg.getAsString());
+			MessageCreateData message = MessageUtils.buildErrorMessage("Aggiunta opzione al sondaggio", author, "Nessuna poll trovata con id: " + pollIdArg.getAsString());
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -305,7 +307,7 @@ public class PollListener extends BotListener
 		//Check if the user is the auhor of the poll.
 		if (!author.equals(poll.getAuthor()))
 		{
-			Message message = MessageUtils.buildErrorMessage("Aggiunta opzione al sondaggio", author, "Questo sondaggio non appartiene a te.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Aggiunta opzione al sondaggio", author, "Questo sondaggio non appartiene a te.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -314,7 +316,7 @@ public class PollListener extends BotListener
 		int pollSize = poll.getOptions().size();
 		if (pollSize >= MAX_OPTIONS)
 		{
-			Message message = MessageUtils.buildErrorMessage("Aggiunta opzione al sondaggio", author, "Non è possibile aggiungere più di " + MAX_OPTIONS + " opzioni ad un sondaggio.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Aggiunta opzione al sondaggio", author, "Non è possibile aggiungere più di " + MAX_OPTIONS + " opzioni ad un sondaggio.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -330,7 +332,7 @@ public class PollListener extends BotListener
 		InteractionGroup interactionGroup = PollListener.generateButtonCallback(poll);
 		this.addInteractionGroup(guild.getId(), poll.getMessageID(), interactionGroup);
 		
-		Message message = MessageUtils.buildSimpleMessage("Aggiunta opzione al sondaggio", author, "Aggiunta l'opzione \"" + option.getText() + "\" al sondaggio.");
+		MessageCreateData message = MessageUtils.buildSimpleMessage("Aggiunta opzione al sondaggio", author, "Aggiunta l'opzione \"" + option.getText() + "\" al sondaggio.");
 		event.reply(message).setEphemeral(false).queue();
 	}
 	
@@ -348,7 +350,7 @@ public class PollListener extends BotListener
 		//Check if a poll was found.
 		if (poll == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Rimozione opzione dal sondaggio", author, "Nessuna poll trovata con id: " + pollIdArg.getAsString());
+			MessageCreateData message = MessageUtils.buildErrorMessage("Rimozione opzione dal sondaggio", author, "Nessuna poll trovata con id: " + pollIdArg.getAsString());
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -356,7 +358,7 @@ public class PollListener extends BotListener
 		//Check if the user is the auhor of the poll.
 		if (!author.equals(poll.getAuthor()))
 		{
-			Message message = MessageUtils.buildErrorMessage("Rimozione opzione dal sondaggio", author, "Questo sondaggio non appartiene a te.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Rimozione opzione dal sondaggio", author, "Questo sondaggio non appartiene a te.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -364,7 +366,7 @@ public class PollListener extends BotListener
 		//Minimum number of poll option is 2.
 		if (poll.getOptions().size() <= 2)
 		{
-			Message message = MessageUtils.buildErrorMessage("Rimozione opzione dal sondaggio", author, "Un sondaggio deve avere almeno 2 opzioni.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Rimozione opzione dal sondaggio", author, "Un sondaggio deve avere almeno 2 opzioni.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -376,7 +378,7 @@ public class PollListener extends BotListener
 		//Check if the option was succesfully deleted.
 		if (!success)
 		{
-			Message message = MessageUtils.buildErrorMessage("Rimozione opzione dal sondaggio", author, "Non è stata trovata nessun opzione con id: " + optionIndex);
+			MessageCreateData message = MessageUtils.buildErrorMessage("Rimozione opzione dal sondaggio", author, "Non è stata trovata nessun opzione con id: " + optionIndex);
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -386,7 +388,7 @@ public class PollListener extends BotListener
 		PollListener.refreshPollMessage(poll, message);
 		
 		//Send message info.
-		Message messageInfo = MessageUtils.buildSimpleMessage("Rimozione opzione dal sondaggio", author, "Opzione rimossa con successo.");
+		MessageCreateData messageInfo = MessageUtils.buildSimpleMessage("Rimozione opzione dal sondaggio", author, "Opzione rimossa con successo.");
 		event.reply(messageInfo).setEphemeral(false).queue();
 	}
 	
@@ -403,7 +405,7 @@ public class PollListener extends BotListener
 		//Check if a poll was found.
 		if (poll == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Arresto sondaggio", author, "Nessun sondaggio trovato con id: " + pollIdArg.getAsString());
+			MessageCreateData message = MessageUtils.buildErrorMessage("Arresto sondaggio", author, "Nessun sondaggio trovato con id: " + pollIdArg.getAsString());
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -411,7 +413,7 @@ public class PollListener extends BotListener
 		//Check if the user is the owner of the poll.
 		if (!author.equals(poll.getAuthor()))
 		{
-			Message message = MessageUtils.buildErrorMessage("Arresto sondaggio", author, "Non sei il proprietario del sondaggio.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Arresto sondaggio", author, "Non sei il proprietario del sondaggio.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -419,7 +421,7 @@ public class PollListener extends BotListener
 		//Stop the poll.
 		this.stopPoll(poll, guild, channel);
 		
-		Message message = MessageUtils.buildSimpleMessage("Arresto sondaggio", author, "Sondaggio fermato correttamente.");
+		MessageCreateData message = MessageUtils.buildSimpleMessage("Arresto sondaggio", author, "Sondaggio fermato correttamente.");
 		event.reply(message).setEphemeral(false).queue();
 	}
 	
@@ -513,9 +515,9 @@ public class PollListener extends BotListener
 		return interactionGroup;
 	}
 	
-	private static MessageBuilder generatePollMessage(Poll poll, User author)
+	private static MessageEditBuilder generatePollMessage(Poll poll, User author)
 	{
-		MessageBuilder messageBuilder = new MessageBuilder();
+		MessageEditBuilder messageBuilder = new MessageEditBuilder();
 		EmbedBuilder pollEmbedBuilder= MessageUtils.getDefaultEmbed(poll.getQuestion(), author)
 				.setDescription("*Sondaggio in corso...*")
 				.setFooter("Richiesto da " + author.getName() + " | ID: " + poll.getMessageID(), author.getAvatarUrl());
@@ -524,7 +526,7 @@ public class PollListener extends BotListener
 		if (poll.isFinished())
 			pollEmbedBuilder.setDescription(PollListener.getWinnerDescription(poll));
 		else
-			messageBuilder.setActionRows(PollListener.buildPollMessageButtons(poll)); //Add buttons.
+			messageBuilder.setComponents(PollListener.buildPollMessageButtons(poll)); //Add buttons.
 		
 		if (poll.getVotesCount() > 0)
 		{
@@ -561,11 +563,8 @@ public class PollListener extends BotListener
 	
 	private static void refreshPollMessage(Poll poll, Message message)
 	{
-		MessageBuilder messageBuilder = PollListener.generatePollMessage(poll, poll.getAuthor());
-		MessageAction editMessage = message.editMessage(messageBuilder.build());
-		
-		//Remove all old attachments to create new ones.
-		editMessage.retainFiles(new ArrayList<>());
+		MessageEditBuilder messageBuilder = PollListener.generatePollMessage(poll, poll.getAuthor());
+		MessageEditAction editMessage = message.editMessage(messageBuilder.build());
 		
 		//If there are votes in the poll we can generate an image.
 		if (poll.getVotesCount() > 0)
@@ -577,8 +576,7 @@ public class PollListener extends BotListener
 			
 			if (pollChart != null)
 			{
-				editMessage.addFile(pollChart, "pie_chart.png");
-				editMessage.addFile(pollLegend, "chart_legend.png");
+				editMessage.setFiles(FileUpload.fromData(pollChart, "pie_chart.png"), FileUpload.fromData(pollLegend, "chart_legend.png"));
 			}
 		}
 		

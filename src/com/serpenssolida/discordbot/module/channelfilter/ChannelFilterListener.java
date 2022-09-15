@@ -7,11 +7,17 @@ import com.serpenssolida.discordbot.SerpensBot;
 import com.serpenssolida.discordbot.UserUtils;
 import com.serpenssolida.discordbot.command.BotCommand;
 import com.serpenssolida.discordbot.module.BotListener;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageType;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -107,7 +113,7 @@ public class ChannelFilterListener extends BotListener
 			else
 				filterText = "delle immagini o degli URL.";
 			
-			Message errorMessage = MessageUtils.buildErrorMessage("Messaggio non permesso", author, "I messaggi inviati nel canale *#" + channel.getName() + "* di **" + guild.getName() + "** devono contenere " + filterText);
+			MessageCreateData errorMessage = MessageUtils.buildErrorMessage("Messaggio non permesso", author, "I messaggi inviati nel canale *#" + channel.getName() + "* di **" + guild.getName() + "** devono contenere " + filterText);
 			PrivateChannel privateChannel = author.openPrivateChannel().complete();
 			privateChannel.sendMessage(errorMessage).queue();
 		}
@@ -204,7 +210,7 @@ public class ChannelFilterListener extends BotListener
 		//Check if user is an admin.
 		if (!UserUtils.hasMemberAdminPermissions(event.getMember()))
 		{
-			Message message = MessageUtils.buildErrorMessage("Channel Filter", author, "Devi essere un admin per impostare un filtro.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Channel Filter", author, "Devi essere un admin per impostare un filtro.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -212,7 +218,7 @@ public class ChannelFilterListener extends BotListener
 		//Check if argument is present.
 		if (channelArg == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Channel Filter", author, "Parametro channel assente.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Channel Filter", author, "Parametro channel assente.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -229,11 +235,11 @@ public class ChannelFilterListener extends BotListener
 			filter.setRequiresLinks(requireLinksArg.getAsBoolean());
 		
 		//Update the filter and save the data.
-		this.setFilter(guild.getId(), channelArg.getAsGuildChannel().getId(), filter);
+		this.setFilter(guild.getId(), channelArg.getAsChannel().getId(), filter);
 		this.saveFilters(guild.getId());
 		
 		//Reply to the event.
-		Message message = MessageUtils.buildSimpleMessage("Channel Filter", author, "Filtro per il canale assegnato correttamente.");
+		MessageCreateData message = MessageUtils.buildSimpleMessage("Channel Filter", author, "Filtro per il canale assegnato correttamente.");
 		event.reply(message).setEphemeral(false).queue();
 	}
 	
@@ -247,7 +253,7 @@ public class ChannelFilterListener extends BotListener
 		//Check if user is an admin.
 		if (!UserUtils.hasMemberAdminPermissions(event.getMember()))
 		{
-			Message message = MessageUtils.buildErrorMessage("Channel Filter", author, "Devi essere un admin per rimuovere un filtro.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Channel Filter", author, "Devi essere un admin per rimuovere un filtro.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -255,25 +261,25 @@ public class ChannelFilterListener extends BotListener
 		//Check if argument is present.
 		if (channelArg == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Channel Filter", author, "Parametro channel assente.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Channel Filter", author, "Parametro channel assente.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
 		
 		//Check if the channel has a filter.
-		if (this.getFilter(guild.getId(), channelArg.getAsGuildChannel().getId()) == null)
+		if (this.getFilter(guild.getId(), channelArg.getAsChannel().getId()) == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Channel Filter", author, "Il canale non ha nessun filtro assegnato.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Channel Filter", author, "Il canale non ha nessun filtro assegnato.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
 		
 		//Remove the filter.
-		this.removeFilter(guild.getId(), channelArg.getAsGuildChannel().getId());
+		this.removeFilter(guild.getId(), channelArg.getAsChannel().getId());
 		this.saveFilters(guild.getId());
 		
 		//Reply to the event.
-		Message message = MessageUtils.buildSimpleMessage("Channel Filter", author, "Filtro per il canale rimosso correttamente.");
+		MessageCreateData message = MessageUtils.buildSimpleMessage("Channel Filter", author, "Filtro per il canale rimosso correttamente.");
 		event.reply(message).setEphemeral(false).queue();
 	}
 	

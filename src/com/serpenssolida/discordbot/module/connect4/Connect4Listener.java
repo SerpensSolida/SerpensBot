@@ -8,18 +8,21 @@ import com.serpenssolida.discordbot.interaction.InteractionCallback;
 import com.serpenssolida.discordbot.interaction.InteractionGroup;
 import com.serpenssolida.discordbot.module.BotListener;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.SlashCommandInteraction;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.requests.restaction.MessageAction;
+import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
+import net.dv8tion.jda.api.utils.FileUpload;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -70,10 +73,10 @@ public class Connect4Listener extends BotListener
 		User opponent = opponentArg.getAsUser();
 		Connect4Game game = new Connect4Game(author, opponent);
 		
-		MessageBuilder messageBuilder = generateGameMessage(game, author);
+		MessageEditBuilder messageBuilder = generateGameMessage(game, author);
 		
 		//Send the game message and get its id.
-		InteractionHook hook = event.reply(messageBuilder.build())
+		InteractionHook hook = event.reply(MessageCreateData.fromEditData(messageBuilder.build()))
 				.setEphemeral(false)
 				.complete();
 		Message message = hook.retrieveOriginal().complete();
@@ -107,7 +110,7 @@ public class Connect4Listener extends BotListener
 		//Check if a game was found.
 		if (game == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Connect4", author, "Nessuna partita trovata con l'id: " + gameIdArg.getAsString());
+			MessageCreateData message = MessageUtils.buildErrorMessage("Connect4", author, "Nessuna partita trovata con l'id: " + gameIdArg.getAsString());
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -115,7 +118,7 @@ public class Connect4Listener extends BotListener
 		//Check if the user is one of the players.
 		if (!game.getPlayers().contains(author))
 		{
-			Message message = MessageUtils.buildErrorMessage("Connect4", author, "Non puoi fermare una partita di cui non sei il partecipante.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Connect4", author, "Non puoi fermare una partita di cui non sei il partecipante.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -123,7 +126,7 @@ public class Connect4Listener extends BotListener
 		//Stop the game.
 		this.stopGame(game, guild, channel);
 		
-		Message message = MessageUtils.buildSimpleMessage("Connect4", author, "La partita è stata interrotta con successo.");
+		MessageCreateData message = MessageUtils.buildSimpleMessage("Connect4", author, "La partita è stata interrotta con successo.");
 		event.reply(message).setEphemeral(false).queue();
 	}
 	
@@ -164,7 +167,7 @@ public class Connect4Listener extends BotListener
 		embedBuilder.addField("Vittorie", values.toString(), true);
 		
 		//Send the leaderboard.
-		MessageBuilder messageBuilder = new MessageBuilder();
+		MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
 		messageBuilder.setEmbeds(embedBuilder.build());
 		
 		event.reply(messageBuilder.build()).queue();
@@ -198,11 +201,11 @@ public class Connect4Listener extends BotListener
 	 * Adds the game button components to the given message.
 	 *
  	 * @param messageBuilder
-	 * 		The MessageBuilder that will have the buttons added to it.
+	 * 		The MessageCreateBuilder that will have the buttons added to it.
 	 * @param game
 	 * 		The state of the game that is currently being played.
 	 */
-	private static void addConnect4Buttons(MessageBuilder messageBuilder, Connect4Game game)
+	private static void addConnect4Buttons(MessageEditBuilder messageBuilder, Connect4Game game)
 	{
 		ArrayList<Button> buttons = new ArrayList<>();
 		ArrayList<ActionRow> actionRows = new ArrayList<>();
@@ -228,7 +231,7 @@ public class Connect4Listener extends BotListener
 		if (!buttons.isEmpty())
 			actionRows.add(ActionRow.of(buttons));
 		
-		messageBuilder.setActionRows(actionRows);
+		messageBuilder.setComponents(actionRows);
 	}
 	
 	/**
@@ -342,18 +345,18 @@ public class Connect4Listener extends BotListener
 	 */
 	private static void refreshGameMessage(Connect4Game game, Message message, User author)
 	{
-		MessageAction editMessage = message.editMessage(Connect4Listener.generateGameMessage(game, author).build());
+		MessageEditAction editMessage = message.editMessage(Connect4Listener.generateGameMessage(game, author).build());
 		
 		byte[] fieldImage = Connect4GameDrawer.generateFieldImage(game);
 		
 		//Check if the image was generated correctly.
 		if (fieldImage != null)
 		{
-			//Remove all old attachments to create new ones.
-			editMessage.retainFiles(new ArrayList<>());
+			/*//Remove all old attachments to create new ones.
+			editMessage.retainFiles(new ArrayList<>());*/
 			
 			//Add field imaged to the message.
-			editMessage.addFile(fieldImage, "field.png");
+			editMessage.setFiles(FileUpload.fromData(fieldImage, "field.png"));
 		}
 		
 		editMessage.queue();
@@ -370,9 +373,9 @@ public class Connect4Listener extends BotListener
 	 * @return
 	 * 		The message of the game.
 	 */
-	private static MessageBuilder generateGameMessage(Connect4Game game, User author)
+	private static MessageEditBuilder generateGameMessage(Connect4Game game, User author)
 	{
-		MessageBuilder messageBuilder = new MessageBuilder();
+		MessageEditBuilder messageBuilder = new MessageEditBuilder();
 		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Partita a Connect4", author);
 		
 		if (game.getMessageId() != null)

@@ -8,11 +8,10 @@ import com.serpenssolida.discordbot.interaction.InteractionGroup;
 import com.serpenssolida.discordbot.modal.ModalCallback;
 import com.serpenssolida.discordbot.module.BotListener;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.Command;
@@ -25,6 +24,9 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.ModalMapping;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +96,7 @@ public class HungerGamesListener extends BotListener
 	{
 		if (HungerGamesController.isHungerGamesRunning(guild.getId()))
 		{
-			Message message = MessageUtils.buildErrorMessage("Forum channel", author, "Non puoi usare questo comando perchè è in corso un HungerGames.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Forum channel", author, "Non puoi usare questo comando perchè è in corso un HungerGames.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -108,9 +110,9 @@ public class HungerGamesListener extends BotListener
 				.appendDescription("Per impostare correttamente le caratteristiche devi inserire 7 numeri separati da uno spazio, in questo modo: **V F A S Ve R G** (Es: 10 5 5 10 4 1 5)")
 				.appendDescription("\nLa somma dei valori delle caratteristiche deve essere " + HungerGamesController.SUM_STATS + " punti e ogni caratteristica deve essere compresa tra 0 e 10!");
 		
-		MessageBuilder messageBuilder = new MessageBuilder()
+		MessageCreateBuilder messageBuilder = new MessageCreateBuilder()
 				.setEmbeds(embedBuilder.build())
-				.setActionRows(ActionRow.of(Button.primary("continue", "Continua"), Button.danger("abort", "Annulla")));
+				.addActionRow(List.of(Button.primary("continue", "Continua"), Button.danger("abort", "Annulla")));
 		
 		InteractionGroup interactionGroup = this.generateCharacterTaskInteractionGroup();
 		
@@ -128,7 +130,7 @@ public class HungerGamesListener extends BotListener
 		//Check if no Hunger Games is running.
 		if (HungerGamesController.isHungerGamesRunning(guild.getId()))
 		{
-			Message message = MessageUtils.buildErrorMessage("Hunger Games", author, "Non puoi usare questo comando mentre è in corso un HungerGames.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Hunger Games", author, "Non puoi usare questo comando mentre è in corso un HungerGames.");
 			event.reply(message).queue();
 			return;
 		}
@@ -161,7 +163,7 @@ public class HungerGamesListener extends BotListener
 		//Check if a character was found.
 		if (character == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Card personaggio", author, "L'utente non ha creato nessun personaggio.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Card personaggio", author, "L'utente non ha creato nessun personaggio.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -214,7 +216,7 @@ public class HungerGamesListener extends BotListener
 		embedBuilder.setFooter("Creato da " + ownerName);
 		
 		//Add the embed to the message.
-		MessageBuilder messageBuilder = new MessageBuilder();
+		MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
 		messageBuilder.setEmbeds(embedBuilder.build());
 		
 		event.reply(messageBuilder.build()).setEphemeral(false).queue();
@@ -231,7 +233,7 @@ public class HungerGamesListener extends BotListener
 		//This command cannot be used while HungerGames is running.
 		if (HungerGamesController.isHungerGamesRunning(guild.getId()))
 		{
-			Message message = MessageUtils.buildErrorMessage("Attivazione/disattivazione personaggio", author, "Non puoi usare questo comando mentre è in corso un HungerGames.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Attivazione/disattivazione personaggio", author, "Non puoi usare questo comando mentre è in corso un HungerGames.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -239,7 +241,7 @@ public class HungerGamesListener extends BotListener
 		//Check if the user has a character.
 		if (character == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Attivazione/disattivazione personaggio", author, "Nessun personaggio trovato, crea il tuo personaggio.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Attivazione/disattivazione personaggio", author, "Nessun personaggio trovato, crea il tuo personaggio.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -247,7 +249,7 @@ public class HungerGamesListener extends BotListener
 		//Check the argument.
 		if (valueArg == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Attivazione/disattivazione personaggio", author, "L'argomento deve essere (true|false).");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Attivazione/disattivazione personaggio", author, "L'argomento deve essere (true|false).");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -258,7 +260,7 @@ public class HungerGamesListener extends BotListener
 		
 		//Send info message.
 		String embedDescrition = "**" + character.getDisplayName() + "** è stato " + (valueArg.getAsBoolean() ? "abilitato." : "disabilitato.");
-		Message message = MessageUtils.buildSimpleMessage("Attivazione/disattivazione personaggio", author, embedDescrition);
+		MessageCreateData message = MessageUtils.buildSimpleMessage("Attivazione/disattivazione personaggio", author, embedDescrition);
 		
 		event.reply(message).setEphemeral(false).queue();
 	}
@@ -273,7 +275,7 @@ public class HungerGamesListener extends BotListener
 		//Check argument format.
 		if (secondsArg == null || secondsArg.getAsLong() < 1.0f)
 		{
-			Message message = MessageUtils.buildErrorMessage("Velocità degli Hunger Games", author, "L'argomento seconds non è stato inviato oppure il suo valore è minore di 1 secondo.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Velocità degli Hunger Games", author, "L'argomento seconds non è stato inviato oppure il suo valore è minore di 1 secondo.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -284,7 +286,7 @@ public class HungerGamesListener extends BotListener
 		HungerGamesController.saveSettings(guild.getId());
 		
 		//Send info message.
-		Message message = MessageUtils.buildSimpleMessage("Velocità degli Hunger Games", author, "Velocità di riproduzione degli HungerGames settata a " + playbackSpeed + " secondi.");
+		MessageCreateData message = MessageUtils.buildSimpleMessage("Velocità degli Hunger Games", author, "Velocità di riproduzione degli HungerGames settata a " + playbackSpeed + " secondi.");
 		event.reply(message).setEphemeral(false).queue();
 	}
 	
@@ -299,7 +301,7 @@ public class HungerGamesListener extends BotListener
 		//Check argument.
 		if (typeArg == null)
 		{
-			Message message = MessageUtils.buildErrorMessage("Classifiche Hunger Games", author, "L'argomento deve essere (wins|kills).");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Classifiche Hunger Games", author, "L'argomento deve essere (wins|kills).");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -338,7 +340,7 @@ public class HungerGamesListener extends BotListener
 				break;
 				
 			default:
-				Message message = MessageUtils.buildErrorMessage("Classifiche Hunger Games", author, "Sei riuscito a mettere un argomento invalido. Bravo.");
+				MessageCreateData message = MessageUtils.buildErrorMessage("Classifiche Hunger Games", author, "Sei riuscito a mettere un argomento invalido. Bravo.");
 				event.reply(message).setEphemeral(true).queue();
 				return;
 		}
@@ -354,7 +356,7 @@ public class HungerGamesListener extends BotListener
 		embedBuilder.addField(fieldName, values.toString(), true);
 		
 		//Send the leaderboard.
-		MessageBuilder messageBuilder = new MessageBuilder();
+		MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
 		messageBuilder.setEmbeds(embedBuilder.build());
 		
 		event.reply(messageBuilder.build()).setEphemeral(false).queue();
@@ -370,7 +372,7 @@ public class HungerGamesListener extends BotListener
 		//Check if there is a Hunger Games running.
 		if (!isRunning)
 		{
-			Message message = MessageUtils.buildErrorMessage("Hunger Games", author, "Nessun HungerGames in esecuzione.");
+			MessageCreateData message = MessageUtils.buildErrorMessage("Hunger Games", author, "Nessun HungerGames in esecuzione.");
 			event.reply(message).setEphemeral(true).queue();
 			return;
 		}
@@ -379,7 +381,7 @@ public class HungerGamesListener extends BotListener
 		HungerGamesController.stopHungerGames(guild.getId());
 		
 		//Send message info.
-		Message message = MessageUtils.buildSimpleMessage("Hunger Games", author, "Gli HungerGames sono stati fermati da " + author.getName() + ".");
+		MessageCreateData message = MessageUtils.buildSimpleMessage("Hunger Games", author, "Gli HungerGames sono stati fermati da " + author.getName() + ".");
 		event.reply(message).setEphemeral(false).queue();
 	}
 	
@@ -519,9 +521,9 @@ public class HungerGamesListener extends BotListener
 			{
 				embedBuilder.appendDescription("La somma dei valori delle caratteristiche deve essere " +  HungerGamesController.SUM_STATS + " punti! Somma dei valori inseriti: " + e.getSum());
 				
-				MessageBuilder messageBuilder = new MessageBuilder()
+				MessageEditBuilder messageBuilder = new MessageEditBuilder()
 						.setEmbeds(embedBuilder.build())
-						.setActionRows(ActionRow.of(Button.primary("continue", "Continua"), Button.danger("abort", "Annulla")));
+						.setActionRow(List.of(Button.primary("continue", "Continua"), Button.danger("abort", "Annulla")));
 				
 				event.editMessage(messageBuilder.build()).queue();
 				return;
@@ -530,9 +532,9 @@ public class HungerGamesListener extends BotListener
 			{
 				embedBuilder.appendDescription("Formato delle caratteristiche errato. Inserisci solo numeri tra 0 e 10!");
 				
-				MessageBuilder messageBuilder = new MessageBuilder()
+				MessageEditBuilder messageBuilder = new MessageEditBuilder()
 						.setEmbeds(embedBuilder.build())
-						.setActionRows(ActionRow.of(Button.primary("continue", "Continua"), Button.danger("abort", "Annulla")));
+						.setActionRow(List.of(Button.primary("continue", "Continua"), Button.danger("abort", "Annulla")));
 				
 				event.editMessage(messageBuilder.build()).queue();
 				return;
@@ -544,9 +546,9 @@ public class HungerGamesListener extends BotListener
 						.appendDescription("Vitalità, Forza, Abilità, Special, Velocità, Resistenza e Gusto. ")
 						.appendDescription("\nLa somma dei valori delle caratteristiche deve essere " + HungerGamesController.SUM_STATS + " punti e ogni caratteristica deve essere compresa tra 0 e 10!");
 				
-				MessageBuilder messageBuilder = new MessageBuilder()
+				MessageEditBuilder messageBuilder = new MessageEditBuilder()
 						.setEmbeds(embedBuilder.build())
-						.setActionRows(ActionRow.of(Button.primary("continue", "Continua"), Button.danger("abort", "Annulla")));
+						.setActionRow(List.of(Button.primary("continue", "Continua"), Button.danger("abort", "Annulla")));
 				
 				event.editMessage(messageBuilder.build()).queue();
 				return;
@@ -572,7 +574,7 @@ public class HungerGamesListener extends BotListener
 			
 			this.removeInteractionGroup(guild.getId(), message.getId());
 			
-			MessageBuilder messageBuilder = new MessageBuilder()
+			MessageCreateBuilder messageBuilder = new MessageCreateBuilder()
 					.setEmbeds(embedBuilder.build());
 			
 			event.editComponents(List.of()).queue();
