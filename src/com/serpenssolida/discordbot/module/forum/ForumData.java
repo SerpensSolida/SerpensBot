@@ -1,22 +1,22 @@
 package com.serpenssolida.discordbot.module.forum;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public class ForumData
 {
-	private HashMap<String, Forum> forums;
+	private Map<String, Forum> forums;
 	
-	public ForumData(HashMap<String, Forum> forums)
+	public ForumData(Map<String, Forum> forums)
 	{
 	    this.forums = forums;
 	}
 	
-	public HashMap<String, Forum> getForums()
+	public Map<String, Forum> getForums()
 	{
 		return this.forums;
 	}
 	
-	public void setForums(HashMap<String, Forum> forums)
+	public void setForums(Map<String, Forum> forums)
 	{
 		this.forums = forums;
 	}

@@ -2,19 +2,18 @@ package com.serpenssolida.discordbot.module.hungergames.io;
 
 import com.serpenssolida.discordbot.module.hungergames.Character;
 
-import java.io.Serializable;
-import java.util.HashMap;
+import java.util.Map;
 
-public class CharacterData implements Serializable
+public class CharacterData
 {
-	private HashMap<String, Character> characters;
+	private Map<String, Character> characters;
 	
-	public HashMap<String, Character> getCharacters()
+	public Map<String, Character> getCharacters()
 	{
 		return this.characters;
 	}
 	
-	public void setCharacters(HashMap<String, Character> characters)
+	public void setCharacters(Map<String, Character> characters)
 	{
 		this.characters = characters;
 	}

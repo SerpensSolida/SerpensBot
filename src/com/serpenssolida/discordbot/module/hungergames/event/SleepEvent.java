@@ -5,6 +5,7 @@ import com.serpenssolida.discordbot.module.hungergames.HungerGames;
 import com.serpenssolida.discordbot.module.hungergames.Player;
 
 import java.util.HashSet;
+import java.util.Set;
 
 public class SleepEvent implements HungerGamesEvent
 {
@@ -21,12 +22,12 @@ public class SleepEvent implements HungerGamesEvent
 	{
 		StringBuilder stringBuilder = new StringBuilder();
 		
-		HashSet<Player> alivePlayers = hg.getAlivePlayers();
-		HashSet<Player> involvedPlayers = hg.getInvolvedPlayers();
-		HashSet<Player> sleepPlayers = hg.getSleepPlayers();
-		HashSet<Player> combatPlayers = hg.getCombatPlayers();
-		HashSet<Player> healedPlayers = hg.getHealedPlayers();
-		HashSet<Player> foundItemPlayers = hg.getFoundItemPlayers();
+		Set<Player> alivePlayers = hg.getAlivePlayers();
+		Set<Player> involvedPlayers = hg.getInvolvedPlayers();
+		Set<Player> sleepPlayers = hg.getSleepPlayers();
+		Set<Player> combatPlayers = hg.getCombatPlayers();
+		Set<Player> healedPlayers = hg.getHealedPlayers();
+		Set<Player> foundItemPlayers = hg.getFoundItemPlayers();
 		
 		//Get list of player that did not sleep during this turn.
 		HashSet<Player> noSleepPlayers = new HashSet<>(alivePlayers);

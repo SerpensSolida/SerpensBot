@@ -6,8 +6,9 @@ import com.serpenssolida.discordbot.module.hungergames.inventory.Inventory;
 import com.serpenssolida.discordbot.module.hungergames.inventory.Weapon;
 import net.dv8tion.jda.api.entities.User;
 
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class Player
 {
@@ -82,7 +83,7 @@ public class Player
 	 */
 	public Weapon getEquippedWeapon()
 	{
-		ArrayList<Weapon> weapons = this.inventory.getWeapons();
+		List<Weapon> weapons = this.inventory.getWeapons();
 		
 		//If the player has no weapon return "fists"
 		if (weapons.isEmpty())
@@ -176,12 +177,12 @@ public class Player
 		this.health = health;
 	}
 	
-	public HashSet<Player> getFriends()
+	public Set<Player> getFriends()
 	{
 		return this.friends;
 	}
 	
-	public HashSet<Player> getEnemies()
+	public Set<Player> getEnemies()
 	{
 		return this.enemies;
 	}

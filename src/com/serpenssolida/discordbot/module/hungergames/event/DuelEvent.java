@@ -6,16 +6,17 @@ import com.serpenssolida.discordbot.module.hungergames.HungerGames;
 import com.serpenssolida.discordbot.module.hungergames.Player;
 
 import java.util.HashSet;
+import java.util.Set;
 
 public class DuelEvent implements BattleEvent
 {
 	public EventResult doEvent(HungerGames hg)
 	{
 		StringBuilder stringBuilder = new StringBuilder();
-		HashSet<Player> alivePlayers = hg.getAlivePlayers();
-		HashSet<Player> deadPlayers = hg.getDeadPlayers();
-		HashSet<Player> involvedPlayers = hg.getInvolvedPlayers();
-		HashSet<Player> combatPlayers = hg.getCombatPlayers();
+		Set<Player> alivePlayers = hg.getAlivePlayers();
+		Set<Player> deadPlayers = hg.getDeadPlayers();
+		Set<Player> involvedPlayers = hg.getInvolvedPlayers();
+		Set<Player> combatPlayers = hg.getCombatPlayers();
 		
 		//List of player that did not fight during this turn.
 		HashSet<Player> availablePlayers = new HashSet<>(hg.getAlivePlayers());
@@ -29,7 +30,7 @@ public class DuelEvent implements BattleEvent
 		availablePlayers.remove(player1);
 		
 		//Get the target category where the second player will be chosen from.
-		HashSet<Player> targetSet = this.getRelationshipSet(player1, alivePlayers, availablePlayers);
+		HashSet<Player> targetSet = new HashSet<>(this.getRelationshipSet(player1, alivePlayers, availablePlayers));
 		
 		if (targetSet.isEmpty())
 			return new EventResult("", EventResult.State.FAILED); //Quit event.

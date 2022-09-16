@@ -5,24 +5,24 @@ import com.serpenssolida.discordbot.module.hungergames.inventory.Food;
 import com.serpenssolida.discordbot.module.hungergames.inventory.Weapon;
 import com.serpenssolida.discordbot.module.hungergames.io.ItemData;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.List;
+import java.util.Set;
 
 public class HungerGames
 {
 	private final String guildID;
 	private ItemData itemData; //Collection of items of the HungerGames.
-	private HashSet<Weapon> weaponPool; //Pool of weapons that can be found during the HungerGames.
+	private Set<Weapon> weaponPool; //Pool of weapons that can be found during the HungerGames.
 	private int day; //Current day of the HungerGames.
-	private HashSet<Player> alivePlayers; //List of alive players.
-	private HashSet<Player> deadPlayers = new HashSet<>(); //List of dead players.
-	private HashSet<Player> involvedPlayers = new HashSet<>(); //List of player active during the turn.
-	private HashSet<Player> combatPlayers = new HashSet<>(); //List of players that fought during the turn.
-	private HashSet<Player> healedPlayers = new HashSet<>(); //List of players that healed during the turn.
-	private HashSet<Player> foundItemPlayers = new HashSet<>(); //List of players that found an item during the turn.
-	private HashSet<Player> incidentPlayers = new HashSet<>(); //List of players that had an incident during the turm.
-	private HashSet<Player> sleepPlayers = new HashSet<>(); //List of players that slept during the turn.
+	private Set<Player> alivePlayers; //List of alive players.
+	private Set<Player> deadPlayers = new HashSet<>(); //List of dead players.
+	private Set<Player> involvedPlayers = new HashSet<>(); //List of player active during the turn.
+	private Set<Player> combatPlayers = new HashSet<>(); //List of players that fought during the turn.
+	private Set<Player> healedPlayers = new HashSet<>(); //List of players that healed during the turn.
+	private Set<Player> foundItemPlayers = new HashSet<>(); //List of players that found an item during the turn.
+	private Set<Player> incidentPlayers = new HashSet<>(); //List of players that had an incident during the turm.
+	private Set<Player> sleepPlayers = new HashSet<>(); //List of players that slept during the turn.
 	
 	public HungerGames(String guildID, ItemData itemData)
 	{
@@ -38,14 +38,12 @@ public class HungerGames
 	 *
 	 * @return The list of players.
 	 */
-	public HashSet<Player> generatePlayers()
+	public Set<Player> generatePlayers()
 	{
-		HashSet<Player> players = new HashSet<>();
+		Set<Player> players = new HashSet<>();
 		
-		for (Map.Entry<String, Character> characterEntry : HungerGamesController.getCharacters(this.guildID).entrySet())
+		for (Character character : HungerGamesController.getCharacters(this.guildID).values())
 		{
-			Character character = characterEntry.getValue();
-			
 			if (character.isEnabled())
 			{
 				Player player = new Player(character);
@@ -85,7 +83,7 @@ public class HungerGames
 	 */
 	public Food getRandomFood()
 	{
-		ArrayList<Food> foods = this.getItemData().getFoods();
+		List<Food> foods = this.getItemData().getFoods();
 		float[] probabilities = new float[foods.size()];
 		
 		for (int i = 0; i < foods.size(); i++)
@@ -101,7 +99,7 @@ public class HungerGames
 	 */
 	public Weapon getRandomWeapon()
 	{
-		HashSet<Weapon> pool = this.getWeaponPool();
+		Set<Weapon> pool = this.getWeaponPool();
 		
 		float[] probabilities = new float[pool.size()];
 		int i = 0;
@@ -127,22 +125,22 @@ public class HungerGames
 		this.itemData = itemData;
 	}
 	
-	public HashSet<Weapon> getWeaponPool()
+	public Set<Weapon> getWeaponPool()
 	{
 		return this.weaponPool;
 	}
 	
-	public void setWeaponPool(HashSet<Weapon> weaponPool)
+	public void setWeaponPool(Set<Weapon> weaponPool)
 	{
 		this.weaponPool = weaponPool;
 	}
 	
-	public HashSet<Player> getAlivePlayers()
+	public Set<Player> getAlivePlayers()
 	{
 		return this.alivePlayers;
 	}
 	
-	public void setAlivePlayers(HashSet<Player> alivePlayers)
+	public void setAlivePlayers(Set<Player> alivePlayers)
 	{
 		this.alivePlayers = alivePlayers;
 	}
@@ -162,72 +160,72 @@ public class HungerGames
 		this.day++;
 	}
 	
-	public HashSet<Player> getDeadPlayers()
+	public Set<Player> getDeadPlayers()
 	{
 		return this.deadPlayers;
 	}
 	
-	public void setDeadPlayers(HashSet<Player> deadPlayers)
+	public void setDeadPlayers(Set<Player> deadPlayers)
 	{
 		this.deadPlayers = deadPlayers;
 	}
 	
-	public HashSet<Player> getInvolvedPlayers()
+	public Set<Player> getInvolvedPlayers()
 	{
 		return this.involvedPlayers;
 	}
 	
-	public void setInvolvedPlayers(HashSet<Player> involvedPlayers)
+	public void setInvolvedPlayers(Set<Player> involvedPlayers)
 	{
 		this.involvedPlayers = involvedPlayers;
 	}
 	
-	public HashSet<Player> getCombatPlayers()
+	public Set<Player> getCombatPlayers()
 	{
 		return this.combatPlayers;
 	}
 	
-	public void setCombatPlayers(HashSet<Player> combatPlayers)
+	public void setCombatPlayers(Set<Player> combatPlayers)
 	{
 		this.combatPlayers = combatPlayers;
 	}
 	
-	public HashSet<Player> getHealedPlayers()
+	public Set<Player> getHealedPlayers()
 	{
 		return this.healedPlayers;
 	}
 	
-	public void setHealedPlayers(HashSet<Player> healedPlayers)
+	public void setHealedPlayers(Set<Player> healedPlayers)
 	{
 		this.healedPlayers = healedPlayers;
 	}
 	
-	public HashSet<Player> getFoundItemPlayers()
+	public Set<Player> getFoundItemPlayers()
 	{
 		return this.foundItemPlayers;
 	}
 	
-	public void setFoundItemPlayers(HashSet<Player> foundItemPlayers)
+	public void setFoundItemPlayers(Set<Player> foundItemPlayers)
 	{
 		this.foundItemPlayers = foundItemPlayers;
 	}
 	
-	public HashSet<Player> getIncidentPlayers()
+	public Set<Player> getIncidentPlayers()
 	{
 		return this.incidentPlayers;
 	}
 	
-	public void setIncidentPlayers(HashSet<Player> incidentPlayers)
+	public void setIncidentPlayers(Set<Player> incidentPlayers)
 	{
 		this.incidentPlayers = incidentPlayers;
 	}
 	
-	public HashSet<Player> getSleepPlayers()
+	public Set<Player> getSleepPlayers()
 	{
 		return this.sleepPlayers;
 	}
 	
-	public void setSleepPlayers(HashSet<Player> sleepPlayers)
+	public void setSleepPlayers(Set<Player> sleepPlayers)
 	{
 		this.sleepPlayers = sleepPlayers;
 	}

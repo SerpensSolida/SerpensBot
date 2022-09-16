@@ -154,6 +154,9 @@ public class ForumChannelListener extends BotListener
 				case MISSING_PERMISSIONS, MISSING_ACCESS: //Kicked from the guild or missing permissions..
 					logger.info("Il forum nel canale #{} del server \"#{}\" è diventato orfano. Cancellazione forum.", channel.getName(), guild.getName());
 					return true;
+					
+				default:
+					break;
 			}
 		}
 		

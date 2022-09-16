@@ -8,7 +8,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
+import java.util.Set;
 
 public class HungerGameStatusImageDrawer
 {
@@ -23,7 +23,7 @@ public class HungerGameStatusImageDrawer
 	public static byte[] generateStatusImage(HungerGames hg)
 	{
 		//List of players that participated in the turn.
-		HashSet<Player> involvedPlayers = hg.getInvolvedPlayers();
+		Set<Player> involvedPlayers = hg.getInvolvedPlayers();
 		int avatarNum = involvedPlayers.size(); //Count of the avatars.
 		
 		//Calculate image dimensions.
@@ -40,7 +40,7 @@ public class HungerGameStatusImageDrawer
 		return ImageUtils.toByteArray(statusImage);
 	}
 	
-	private static void drawInvolvedPlayers(Graphics g, HashSet<Player> involvedPlayers)
+	private static void drawInvolvedPlayers(Graphics g, Set<Player> involvedPlayers)
 	{
 		int i = 0;
 		for (Player involvedPlayer : involvedPlayers)

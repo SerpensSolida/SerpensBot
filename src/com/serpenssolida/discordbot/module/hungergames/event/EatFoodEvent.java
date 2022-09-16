@@ -5,8 +5,9 @@ import com.serpenssolida.discordbot.module.hungergames.HungerGames;
 import com.serpenssolida.discordbot.module.hungergames.Player;
 import com.serpenssolida.discordbot.module.hungergames.inventory.Food;
 
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class EatFoodEvent implements HungerGamesEvent
 {
@@ -32,10 +33,10 @@ public class EatFoodEvent implements HungerGamesEvent
 	public EventResult doEvent(HungerGames hg)
 	{
 		StringBuilder stringBuilder = new StringBuilder();
-		HashSet<Player> alivePlayers = hg.getAlivePlayers();
-		HashSet<Player> deadPlayers = hg.getDeadPlayers();
-		HashSet<Player> healedPlayers = hg.getHealedPlayers();
-		HashSet<Player> involvedPlayers = hg.getInvolvedPlayers();
+		Set<Player> alivePlayers = hg.getAlivePlayers();
+		Set<Player> deadPlayers = hg.getDeadPlayers();
+		Set<Player> healedPlayers = hg.getHealedPlayers();
+		Set<Player> involvedPlayers = hg.getInvolvedPlayers();
 		
 		//List of players that did not heal during this turn.
 		HashSet<Player> notHeleadPlayers = new HashSet<>(alivePlayers);
@@ -48,7 +49,7 @@ public class EatFoodEvent implements HungerGamesEvent
 		Player player = (Player) RandomChoice.getRandom(notHeleadPlayers.toArray());
 		
 		//List of foods from player's inventory.
-		ArrayList<Food> foodList = player.getInventory().getFoods();
+		List<Food> foodList = player.getInventory().getFoods();
 		
 		if (foodList.isEmpty())
 		{

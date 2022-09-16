@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.HashSet;
+import java.util.Set;
 
 public class HungerGamesThread extends Thread
 {
@@ -66,7 +66,7 @@ public class HungerGamesThread extends Thread
 	{
 		MessageCreateBuilder messageBuilder = new MessageCreateBuilder();
 		EmbedBuilder embedBuilder = new EmbedBuilder();
-		HashSet<Player> alivePlayers = this.hg.getAlivePlayers();
+		Set<Player> alivePlayers = this.hg.getAlivePlayers();
 		
 		//Check if there are enough player to play the game.
 		if (alivePlayers.size() < 2)
@@ -271,8 +271,8 @@ public class HungerGamesThread extends Thread
 		
 		for (Player alivePlayer : this.hg.getAlivePlayers())
 		{
-			HashSet<Player> friends = alivePlayer.getFriends();
-			HashSet<Player> enemies = alivePlayer.getEnemies();
+			Set<Player> friends = alivePlayer.getFriends();
+			Set<Player> enemies = alivePlayer.getEnemies();
 			
 			if (!friends.isEmpty() || !enemies.isEmpty())
 			{

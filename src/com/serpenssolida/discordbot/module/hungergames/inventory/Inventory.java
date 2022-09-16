@@ -4,6 +4,7 @@ import com.serpenssolida.discordbot.RandomChoice;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Inventory
@@ -63,17 +64,17 @@ public class Inventory
 		}
 	}
 	
-	public ArrayList<Food> getFoods()
+	public List<Food> getFoods()
 	{
 		return new ArrayList<>(this.foods.keySet());
 	}
 	
-	public ArrayList<Weapon> getWeapons()
+	public List<Weapon> getWeapons()
 	{
 		return new ArrayList<>(this.weapons.keySet());
 	}
 	
-	public ArrayList<Item> getItems()
+	public List<Item> getItems()
 	{
 		ArrayList<Item> items = new ArrayList<>();
 		
@@ -114,7 +115,7 @@ public class Inventory
 	 */
 	public Item getRandomItemFromInventory()
 	{
-		ArrayList<Item> items = this.getItems();
+		List<Item> items = this.getItems();
 		
 		return !items.isEmpty() ? (Item) RandomChoice.getRandom(items.toArray()) : null;
 	}

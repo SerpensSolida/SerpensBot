@@ -8,6 +8,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 import net.dv8tion.jda.api.entities.Guild;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -89,7 +90,7 @@ public class TrackScheduler extends AudioEventAdapter
 			this.listener.onQueueEmpty(this.guild);
 	}
 	
-	public ArrayList<AudioTrack> getTrackQueue()
+	public List<AudioTrack> getTrackQueue()
 	{
 		return new ArrayList<>(this.queue);
 	}

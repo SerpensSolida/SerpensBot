@@ -7,6 +7,7 @@ import com.serpenssolida.discordbot.module.hungergames.inventory.Item;
 import com.serpenssolida.discordbot.module.hungergames.inventory.Weapon;
 
 import java.util.HashSet;
+import java.util.Set;
 
 public class FoundItemEvent implements HungerGamesEvent
 {
@@ -23,8 +24,8 @@ public class FoundItemEvent implements HungerGamesEvent
 	
 	public EventResult doEvent(HungerGames hg)
 	{
-		HashSet<Player> involvedPlayers = hg.getInvolvedPlayers();
-		HashSet<Player> foundItemPlayers = hg.getFoundItemPlayers();
+		Set<Player> involvedPlayers = hg.getInvolvedPlayers();
+		Set<Player> foundItemPlayers = hg.getFoundItemPlayers();
 		
 		//List of player that did not found an item this turn.
 		HashSet<Player> notFoundItemPlayers = new HashSet<>(hg.getAlivePlayers());
@@ -42,9 +43,7 @@ public class FoundItemEvent implements HungerGamesEvent
 		
 		//Weapon are unique so if the item found is a weapon it must be removed from the weapon pool.
 		if (item instanceof Weapon)
-		{
 			hg.getWeaponPool().remove(item);
-		}
 		
 		//Add the item to the player's invetory.
 		player.getInventory().addItem(item, 1);

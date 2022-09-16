@@ -5,6 +5,7 @@ import com.serpenssolida.discordbot.module.hungergames.HungerGames;
 import com.serpenssolida.discordbot.module.hungergames.Player;
 
 import java.util.HashSet;
+import java.util.Set;
 
 public class RandomEvent implements HungerGamesEvent
 {
@@ -22,8 +23,8 @@ public class RandomEvent implements HungerGamesEvent
 	
 	public EventResult doEvent(HungerGames hg)
 	{
-		HashSet<Player> alivePlayers = hg.getAlivePlayers();
-		HashSet<Player> involvedPlayers = hg.getInvolvedPlayers();
+		Set<Player> alivePlayers = hg.getAlivePlayers();
+		Set<Player> involvedPlayers = hg.getInvolvedPlayers();
 		
 		//List of player that did nothing during this turn.
 		HashSet<Player> availablePlayers = new HashSet<>(alivePlayers);

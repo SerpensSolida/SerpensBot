@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.User;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 
 public class Connect4Game
 {
@@ -178,7 +179,7 @@ public class Connect4Game
 	 * @return
 	 * 		An HashSet of User containing the users that are playing the game.
 	 */
-	public HashSet<User> getPlayers()
+	public Set<User> getPlayers()
 	{
 		return new HashSet<>(Arrays.asList(this.players));
 	}

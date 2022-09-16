@@ -5,6 +5,7 @@ import com.serpenssolida.discordbot.module.hungergames.Player;
 import com.serpenssolida.discordbot.module.hungergames.inventory.Item;
 
 import java.util.HashSet;
+import java.util.Set;
 
 public interface BattleEvent extends HungerGamesEvent
 {
@@ -22,7 +23,7 @@ public interface BattleEvent extends HungerGamesEvent
 	 * @return
 	 * 		The string of the event.
 	 */
-	public default String onPlayerKilled(Player killer, Player victim, HashSet<Player> alivePlayers, HashSet<Player> deadPlayers)
+	public default String onPlayerKilled(Player killer, Player victim, Set<Player> alivePlayers, Set<Player> deadPlayers)
 	{
 		StringBuilder stringBuilder = new StringBuilder();
 		
@@ -67,7 +68,7 @@ public interface BattleEvent extends HungerGamesEvent
 	 * @return
 	 * 		A set of relationship.
 	 */
-	public default HashSet<Player> getRelationshipSet(Player player, HashSet<Player> alivePlayers, HashSet<Player> availablePlayers)
+	public default Set<Player> getRelationshipSet(Player player, Set<Player> alivePlayers, Set<Player> availablePlayers)
 	{
 		//List of alive players that are neutral to the player.
 		HashSet<Player> neutralAlivePlayers = new HashSet<>(alivePlayers);

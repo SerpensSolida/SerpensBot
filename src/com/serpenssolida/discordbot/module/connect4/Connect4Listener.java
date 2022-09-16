@@ -352,9 +352,6 @@ public class Connect4Listener extends BotListener
 		//Check if the image was generated correctly.
 		if (fieldImage != null)
 		{
-			/*//Remove all old attachments to create new ones.
-			editMessage.retainFiles(new ArrayList<>());*/
-			
 			//Add field imaged to the message.
 			editMessage.setFiles(FileUpload.fromData(fieldImage, "field.png"));
 		}

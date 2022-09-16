@@ -14,6 +14,8 @@ import java.io.*;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class HungerGamesController
 {
@@ -27,8 +29,8 @@ public class HungerGamesController
 	private int count = 0; //Number of editions of the HungerGames.
 	private long messageSpeed = 1000; //Speed of the messages.
 	private Thread gameThread;
-	private ArrayList<String> winners = new ArrayList<>(); //List of winners.
-	private HashMap<String, Character> characters = new HashMap<>(); //List of characters.
+	private List<String> winners = new ArrayList<String>(); //List of winners.
+	private Map<String, Character> characters = new HashMap<>(); //List of characters.
 	
 	private static HungerGamesController getInstance(String guildID)
 	{
@@ -225,7 +227,7 @@ public class HungerGamesController
 		HungerGamesController.save(guildID);
 	}
 	
-	public static HashMap<String, Character> getCharacters(String guildID)
+	public static Map<String, Character> getCharacters(String guildID)
 	{
 		return HungerGamesController.getInstance(guildID).characters;
 	}
@@ -240,7 +242,7 @@ public class HungerGamesController
 		HungerGamesController.getInstance(guildID).count = count;
 	}
 	
-	public static ArrayList<String> getWinners(String guildID)
+	public static List<String> getWinners(String guildID)
 	{
 		return HungerGamesController.getInstance(guildID).winners;
 	}

@@ -1,19 +1,19 @@
 package com.serpenssolida.discordbot.module.hungergames.io;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class HungerGamesData
 {
 	private int hgCount;
 	private long messageSpeed;
-	private ArrayList<String> winners;
+	private List<String> winners;
 	
-	public ArrayList<String> getWinners()
+	public List<String> getWinners()
 	{
 		return this.winners;
 	}
 	
-	public void setWinners(ArrayList<String> winners)
+	public void setWinners(List<String> winners)
 	{
 		this.winners = winners;
 	}

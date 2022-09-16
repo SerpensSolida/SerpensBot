@@ -13,7 +13,7 @@ public class Poll
 	private final MessageChannel channel;
 	private String messageID; //ID of the message the poll is in.
 	private String question; //Question of the poll.
-	private LinkedHashMap<String, PollOption> options = new LinkedHashMap<>(); //Options of the poll.
+	private Map<String, PollOption> options = new LinkedHashMap<>(); //Options of the poll.
 	private boolean keepDown;
 	private boolean finished; //If the poll is finished.
 	private int messageCount = 0; //Number of message that are below the poll.
@@ -30,9 +30,9 @@ public class Poll
 	 * Return the winners of the poll.
 	 * @return A list of winners of the poll.
 	 */
-	public ArrayList<PollOption> getWinners()
+	public List<PollOption> getWinners()
 	{
-		ArrayList<PollOption> winners = new ArrayList<>();
+		List<PollOption> winners = new ArrayList<>();
 		Stream<PollOption> sorted = this.getOptions().parallelStream().sorted((o1, o2) -> o2.getVotesCount() - o1.getVotesCount());
 		
 		Optional<PollOption> topOptional = sorted.findFirst();
@@ -321,7 +321,7 @@ public class Poll
 			this.id = id;
 		}
 		
-		public HashSet<User> getUsers()
+		public Set<User> getUsers()
 		{
 			return this.users;
 		}

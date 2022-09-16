@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.entities.User;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 
 public class TicTacToeGame
 {
@@ -147,7 +148,7 @@ public class TicTacToeGame
 		return this.field;
 	}
 	
-	public HashSet<User> getPlayers()
+	public Set<User> getPlayers()
 	{
 		return new HashSet<>(Arrays.asList(this.players));
 	}

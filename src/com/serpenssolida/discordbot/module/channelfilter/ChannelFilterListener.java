@@ -101,6 +101,7 @@ public class ChannelFilterListener extends BotListener
 		boolean hasLinks = m.find();
 		
 		//Check filters.
+		//TODO: Fix filter logic.
 		if ((filter.getRequiresImages() && !hasImages) || (filter.getRequiresLinks() && !hasLinks))
 		{
 			message.delete().queue();

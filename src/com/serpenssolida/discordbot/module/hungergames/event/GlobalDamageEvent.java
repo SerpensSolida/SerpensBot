@@ -4,7 +4,7 @@ import com.serpenssolida.discordbot.RandomChoice;
 import com.serpenssolida.discordbot.module.hungergames.HungerGames;
 import com.serpenssolida.discordbot.module.hungergames.Player;
 
-import java.util.HashSet;
+import java.util.Set;
 
 public class GlobalDamageEvent implements HungerGamesEvent
 {
@@ -18,9 +18,9 @@ public class GlobalDamageEvent implements HungerGamesEvent
 	public EventResult doEvent(HungerGames hg)
 	{
 		StringBuilder stringBuilder = new StringBuilder();
-		HashSet<Player> alivePlayers = hg.getAlivePlayers();
-		HashSet<Player> deadPlayers = hg.getDeadPlayers();
-		HashSet<Player> involvedPlayers = hg.getInvolvedPlayers();
+		Set<Player> alivePlayers = hg.getAlivePlayers();
+		Set<Player> deadPlayers = hg.getDeadPlayers();
+		Set<Player> involvedPlayers = hg.getInvolvedPlayers();
 		
 		//Damage dealt by the event.
 		float damage = (15 + RandomChoice.getRandom().nextInt(30));

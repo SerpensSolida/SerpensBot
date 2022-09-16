@@ -5,6 +5,7 @@ import com.serpenssolida.discordbot.module.hungergames.HungerGames;
 import com.serpenssolida.discordbot.module.hungergames.Player;
 
 import java.util.HashSet;
+import java.util.Set;
 
 public class RelationshipEvent implements HungerGamesEvent
 {
@@ -36,9 +37,9 @@ public class RelationshipEvent implements HungerGamesEvent
 	public EventResult doEvent(HungerGames hg)
 	{
 		StringBuilder stringBuilder = new StringBuilder();
-		HashSet<Player> alivePlayers = hg.getAlivePlayers();
-		HashSet<Player> involvedPlayers = hg.getInvolvedPlayers();
-		HashSet<Player> availablePlayers = new HashSet<>(alivePlayers);
+		Set<Player> alivePlayers = hg.getAlivePlayers();
+		Set<Player> involvedPlayers = hg.getInvolvedPlayers();
+		Set<Player> availablePlayers = new HashSet<>(alivePlayers);
 		
 		if (availablePlayers.isEmpty())
 			return new EventResult("", EventResult.State.FAILED); //Quit the event.

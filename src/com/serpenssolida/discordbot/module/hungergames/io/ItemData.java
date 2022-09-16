@@ -4,28 +4,29 @@ import com.serpenssolida.discordbot.module.hungergames.inventory.Food;
 import com.serpenssolida.discordbot.module.hungergames.inventory.Weapon;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ItemData
 {
-	private ArrayList<Food> foods = new ArrayList<>();
-	private ArrayList<Weapon> weapons = new ArrayList<>();
+	private List<Food> foods = new ArrayList<>();
+	private List<Weapon> weapons = new ArrayList<>();
 	
-	public ArrayList<Food> getFoods()
+	public List<Food> getFoods()
 	{
 		return this.foods;
 	}
 	
-	public void setFoods(ArrayList<Food> foods)
+	public void setFoods(List<Food> foods)
 	{
 		this.foods = foods;
 	}
 	
-	public ArrayList<Weapon> getWeapons()
+	public List<Weapon> getWeapons()
 	{
 		return this.weapons;
 	}
 	
-	public void setWeapons(ArrayList<Weapon> weapons)
+	public void setWeapons(List<Weapon> weapons)
 	{
 		this.weapons = weapons;
 	}

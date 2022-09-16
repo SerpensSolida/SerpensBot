@@ -29,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class PollListener extends BotListener
@@ -544,7 +545,7 @@ public class PollListener extends BotListener
 	{
 		StringBuilder stringBuilder = new StringBuilder();
 		
-		ArrayList<Poll.PollOption> winners = pool.getWinners();
+		List<Poll.PollOption> winners = pool.getWinners();
 		
 		//Only one winner.
 		if (winners.size() == 1)

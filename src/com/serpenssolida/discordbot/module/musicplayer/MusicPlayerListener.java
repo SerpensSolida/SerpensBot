@@ -34,7 +34,6 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -579,7 +578,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 					.setDescription("Now playing:\n**" + playingTrack.getInfo().title + "**");
 			
 			//Generate playlist text.
-			ArrayList<AudioTrack> tracks = audioController.getScheduler().getTrackQueue();
+			List<AudioTrack> tracks = audioController.getScheduler().getTrackQueue();
 			ImmutablePair<String, String> fields = MusicPlayerListener.generateEmbedPlaylistFields(tracks);
 			embedBuilder.addField("N.", fields.getRight(), true);
 			embedBuilder.addField("Titolo", fields.getLeft(), true);
