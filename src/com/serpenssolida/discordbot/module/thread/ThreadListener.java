@@ -25,6 +25,11 @@ public class ThreadListener extends BotListener
 		option = new MessageContextMenuOption("Stacca messaggio");
 		option.setAction(this::unpinMessage);
 		this.addMessageContextMenuOption(option);
+		
+		//Context menu "Elimina messaggio".
+		option = new MessageContextMenuOption("Elimina messaggio");
+		option.setAction(this::deleteMessage);
+		this.addMessageContextMenuOption(option);
 	}
 	
 	/**
@@ -105,6 +110,46 @@ public class ThreadListener extends BotListener
 		eventMessage.unpin().complete();
 		
 		MessageCreateData message = MessageUtils.buildSimpleMessage("Stacca messaggio", author, "Messaggio spinnato correttamente.");
+		event.reply(message).setEphemeral(true).queue();
+	}
+	
+	/**
+	 * Callback for "Delete message" context menù.
+	 */
+	private void deleteMessage(MessageContextInteractionEvent event)
+	{
+		Message eventMessage = event.getTarget();
+		MessageChannelUnion channel = event.getChannel();
+		User author = event.getUser();
+		
+		//Check if the channel is null.
+		if (channel == null)
+		{
+			MessageCreateData message = MessageUtils.buildErrorMessage("Elimina messaggio", author, "Non è stato possibile trovare il canale specificato.");
+			event.reply(message).setEphemeral(true).queue();
+			return;
+		}
+		
+		//Check if the channel is a thread.
+		if (!channel.getType().isThread())
+		{
+			MessageCreateData message = MessageUtils.buildErrorMessage("Elimina messaggio", author, "Puoi usare questa opzione solo su un messaggio all'interno di un thread.");
+			event.reply(message).setEphemeral(true).queue();
+			return;
+		}
+		
+		//Check if the author of the event is the owner of the thread.
+		if (!author.getId().equals(channel.asThreadChannel().getOwnerId()))
+		{
+			MessageCreateData message = MessageUtils.buildErrorMessage("Elimina messaggio", author, "Puoi usare questa opzione solo se sei il creatore del thread.");
+			event.reply(message).setEphemeral(true).queue();
+			return;
+		}
+		
+		//Pin the message and send confirmation.
+		eventMessage.delete().complete();
+		
+		MessageCreateData message = MessageUtils.buildSimpleMessage("Elimina messaggio", author, "Messaggio elimato correttamente.");
 		event.reply(message).setEphemeral(true).queue();
 	}
 }
