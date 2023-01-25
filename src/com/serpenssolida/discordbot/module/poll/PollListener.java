@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -21,21 +22,24 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.MessageEditAction;
 import net.dv8tion.jda.api.utils.FileUpload;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.swing.Timer;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 public class PollListener extends BotListener
 {
-	private final HashMap<String, Poll> polls = new HashMap<>();
+	private static final Logger logger = LoggerFactory.getLogger(PollListener.class);
 	private static final int MAX_OPTIONS = 21;
+	
+	private final HashMap<String, Poll> polls = new HashMap<>();
 	
 	public PollListener()
 	{
@@ -48,7 +52,7 @@ public class PollListener extends BotListener
 		SubcommandData subCommand = command.getSubcommand();
 		subCommand
 				.addOption(OptionType.STRING, "question", "La domanda del sondaggio", true)
-				.addOption(OptionType.INTEGER, "duration", "Durata in minuti del sondaggio. (default: 60 minuti)", true)
+				.addOption(OptionType.INTEGER, "duration", "Durata in minuti del sondaggio. (60 = 1 ora)", true)
 				.addOption(OptionType.BOOLEAN, "multi-choice", "Se il sondaggio è a scelta multipla o no", true)
 				.addOption(OptionType.STRING, "option1", "Opzione del sondaggio", true)
 				.addOption(OptionType.STRING, "option2", "Opzione del sondaggio", true);
@@ -117,16 +121,13 @@ public class PollListener extends BotListener
 		{
 			Poll poll = pollEntry.getValue();
 			
-			if (!poll.getChannel().equals(channel))
+			if (!poll.getChannel().equals(channel) || !poll.isKeepDown())
 				continue;
-			
-			if (!poll.isKeepDown())
-				break;
 			
 			if (poll.getMessageCount() < 10)
 			{
 				poll.setMessageCount(poll.getMessageCount() + 1);
-				break;
+				continue;
 			}
 			
 			//Reset message count.
@@ -457,6 +458,24 @@ public class PollListener extends BotListener
 		Message message = channel.retrieveMessageById(poll.getMessageID()).complete();
 		PollListener.refreshPollMessage(poll, message);
 		this.removeInteractionGroup(guild.getId(), poll.getMessageID());
+		
+		//Open private channel.
+		PrivateChannel privateChannel = poll.getAuthor().openPrivateChannel().complete();
+		
+		//Crete message.
+		EmbedBuilder embedBuilder = MessageUtils.getDefaultEmbed("Risultati sondaggio", poll.getAuthor())
+				.setDescription(getWinnerDescription(poll));
+		MessageCreateBuilder messageBuilder = new MessageCreateBuilder()
+				.addEmbeds(embedBuilder.build());
+
+		//Get result data and add it to the message.
+		if (poll.getVotesCount() > 0)
+		{
+			String data = Poll.generatePollResultData(poll);
+			messageBuilder.setFiles(FileUpload.fromData(data.getBytes(StandardCharsets.UTF_8), "risultati_sondaggio.txt"));
+		}
+		
+		privateChannel.sendMessage(messageBuilder.build()).queue();
 	}
 	
 	private static ArrayList<ActionRow> buildPollMessageButtons(Poll poll)
@@ -513,7 +532,8 @@ public class PollListener extends BotListener
 	private static MessageEditBuilder generatePollMessage(Poll poll, User author)
 	{
 		MessageEditBuilder messageBuilder = new MessageEditBuilder()
-				.setAttachments(); //Set attachment list to empty.
+				.setAttachments() //Set attachment list to empty.
+				.setComponents(); //Set component list to empty.
 		EmbedBuilder pollEmbedBuilder = MessageUtils.getDefaultEmbed(poll.getQuestion(), author)
 				.setDescription("*Sondaggio in corso...*")
 				.setFooter("Richiesto da " + author.getName() + " | ID: " + poll.getMessageID(), author.getAvatarUrl());

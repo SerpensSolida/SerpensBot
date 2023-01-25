@@ -36,7 +36,7 @@ public class Poll
 		Optional<PollOption> topOptional = sorted.findFirst();
 		
 		if (topOptional.isEmpty())
-			throw new RuntimeException("Bhoooo");
+			throw new IllegalStateException("Optional is null, but it can't be null.");
 		
 		//Get the option with most votes.
 		PollOption top = topOptional.get();
@@ -175,6 +175,47 @@ public class Poll
 		this.removeVote(user);
 		this.addVote(optionId, user);
 		return true;
+	}
+	
+	public static String generatePollResultData(Poll poll)
+	{
+		//Sort results.
+		List<Poll.PollOption> sortedResult = poll.getOptions().values().stream().sorted(Comparator.comparingInt(p -> -p.getVotesCount())).toList();
+		
+		//Calculate column length.
+		OptionalInt maxLengthOptional = sortedResult.stream().mapToInt(option -> option.getText().length()).max();
+		int maxLength = 100;
+		
+		if (maxLengthOptional.isPresent())
+			maxLength = maxLengthOptional.getAsInt();
+		
+		String tableBar = "-".repeat(maxLength);
+		String tableBarLong = "-".repeat(maxLength + 15);
+		
+		StringBuilder dataBuilder = new StringBuilder();
+		StringBuilder userVotesBuilder = new StringBuilder();
+		
+		dataBuilder.append(tableBar + "\nTotale voti\n" + tableBar + "\n");
+		
+		dataBuilder.append(String.format("%-" + maxLength + "s\t|\tVoti\n", "Opzioni"));
+		for (Poll.PollOption option : sortedResult)
+		{
+			dataBuilder.append(String.format("%-" + maxLength + "s\t|\t%s (%.2f%%)\n", option.getText(), option.getVotesCount(), (float) option.getVotesCount() / poll.getVotesCount() * 100));
+			
+			userVotesBuilder.append(tableBarLong + "\n")
+					.append("Voti opzione \"" + option.getText() + "\"\n")
+					.append(tableBarLong + "\n");
+			
+			for (User user : option.getUsers())
+				userVotesBuilder.append(user.getAsTag() + "\n");
+			
+			userVotesBuilder.append("\n\n");
+		}
+		
+		dataBuilder.append("\n\n")
+				.append(userVotesBuilder);
+		
+		return dataBuilder.toString();
 	}
 	
 	protected HashSet<User> getUsers()
