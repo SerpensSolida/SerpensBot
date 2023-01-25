@@ -32,39 +32,24 @@ public class Poll
 	 */
 	public List<PollOption> getWinners()
 	{
-		List<PollOption> winners = new ArrayList<>();
-		Stream<PollOption> sorted = this.getOptions().parallelStream().sorted((o1, o2) -> o2.getVotesCount() - o1.getVotesCount());
-		
+		Stream<PollOption> sorted = this.getOptionsCollection().parallelStream().sorted((o1, o2) -> o2.getVotesCount() - o1.getVotesCount());
 		Optional<PollOption> topOptional = sorted.findFirst();
 		
 		if (topOptional.isEmpty())
-			return winners;
+			throw new RuntimeException("Bhoooo");
 		
 		//Get the option with most votes.
 		PollOption top = topOptional.get();
-		winners.add(top);
 		
-		//Recreate the stream and find other option that may have the same vote as the top option.
-		sorted = this.getOptions().stream().sorted((o1, o2) -> o2.getVotesCount() - o1.getVotesCount());
-		for (PollOption pollOption : sorted.toList())
-		{
-			if (top == pollOption)
-				continue;
-			
-			if (top.getVotesCount() == pollOption.getVotesCount())
-				winners.add(pollOption);
-			else
-				break;
-		}
-		
-		return winners;
+		//Recreate the stream and find other options that may have the same vote as the top option.
+		return this.getOptionsCollection().stream().filter(pollOption -> pollOption.getVotesCount() == top.getVotesCount()).toList();
 	}
 	
 	/**
 	 * Get a collection of {@link PollOption} of this poll.
 	 * @return A collection of {@link PollOption}.
 	 */
-	public Collection<PollOption> getOptions()
+	public Collection<PollOption> getOptionsCollection()
 	{
 		return this.options.values();
 	}
@@ -149,6 +134,9 @@ public class Poll
 	 */
 	public boolean addVote(String optionId, User user)
 	{
+		if (this.hasUserVoted(user))
+			return this.switchVote(optionId, user);
+		
 		if (this.users.contains(user))
 			return false;
 		
@@ -166,12 +154,12 @@ public class Poll
 		
 		for (PollOption pollOption : this.options.values())
 		{
-			if (pollOption.users.contains(user))
-			{
-				this.users.remove(user);
-				pollOption.removeVote(user);
-				return true;
-			}
+			if (!pollOption.users.contains(user))
+				continue;
+			
+			this.users.remove(user);
+			pollOption.removeVote(user);
+			return true;
 		}
 		
 		return false;
@@ -187,6 +175,16 @@ public class Poll
 		this.removeVote(user);
 		this.addVote(optionId, user);
 		return true;
+	}
+	
+	protected HashSet<User> getUsers()
+	{
+		return this.users;
+	}
+	
+	protected Map<String, PollOption> getOptions()
+	{
+		return this.options;
 	}
 	
 	public PollOption getVote(User user)
@@ -298,7 +296,6 @@ public class Poll
 			
 			if (removed)
 				this.votesCount--;
-			
 		}
 		
 		public int getVotesCount()

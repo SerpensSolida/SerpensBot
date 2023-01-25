@@ -35,7 +35,7 @@ import java.util.Map;
 public class PollListener extends BotListener
 {
 	private final HashMap<String, Poll> polls = new HashMap<>();
-	private static final int MAX_OPTIONS = 22;
+	private static final int MAX_OPTIONS = 21;
 	
 	public PollListener()
 	{
@@ -48,13 +48,14 @@ public class PollListener extends BotListener
 		SubcommandData subCommand = command.getSubcommand();
 		subCommand
 				.addOption(OptionType.STRING, "question", "La domanda del sondaggio", true)
+				.addOption(OptionType.INTEGER, "duration", "Durata in minuti del sondaggio. (default: 60 minuti)", true)
+				.addOption(OptionType.BOOLEAN, "multi-choice", "Se il sondaggio è a scelta multipla o no", true)
 				.addOption(OptionType.STRING, "option1", "Opzione del sondaggio", true)
 				.addOption(OptionType.STRING, "option2", "Opzione del sondaggio", true);
 		
 		for (int i = 3; i <= MAX_OPTIONS; i++)
 			subCommand.addOption(OptionType.STRING, "option" + i, "Opzione del sondaggio", false);
 		
-		subCommand.addOption(OptionType.INTEGER, "duration", "Durata in minuti del sondaggio. (default: 60 minuti)", false);
 		subCommand.addOption(OptionType.BOOLEAN, "keep-down", "Se tenere il sondaggio in fondo alla chat oppure no. (default: true)", false);
 		this.addBotCommand(command);
 		
@@ -156,6 +157,7 @@ public class PollListener extends BotListener
 		OptionMapping questionArg = event.getOption("question");
 		OptionMapping durationArg = event.getOption("duration");
 		OptionMapping keepDownArg = event.getOption("keep-down");
+		OptionMapping multiChoiceArg = event.getOption("multi-choice");
 		
 		//Null check for arguments.
 		if (questionArg == null)
@@ -168,9 +170,18 @@ public class PollListener extends BotListener
 		
 		//Get the keep down flag.
 		boolean keepDown = keepDownArg == null || keepDownArg.getAsBoolean();
-
-		//Create the poll.
-		Poll poll = new Poll(questionArg.getAsString(), author, channel, keepDown);
+		
+		//Null check for arguments.
+		if (multiChoiceArg == null)
+			return;
+		
+		//Check if poll is multi choice or not then create the poll.
+		Poll poll;
+		
+		if (multiChoiceArg.getAsBoolean())
+			poll = new MultipleChoicePoll(questionArg.getAsString(), author, channel, keepDown);
+		else
+			poll = new Poll(questionArg.getAsString(), author, channel, keepDown);
 		
 		//Generate poll options.
 		int k = 1;
@@ -314,7 +325,7 @@ public class PollListener extends BotListener
 		}
 		
 		//Check if poll are less than MAX_OPTIONS.
-		int pollSize = poll.getOptions().size();
+		int pollSize = poll.getOptionsCollection().size();
 		if (pollSize >= MAX_OPTIONS)
 		{
 			MessageCreateData message = MessageUtils.buildErrorMessage("Aggiunta opzione al sondaggio", author, "Non è possibile aggiungere più di " + MAX_OPTIONS + " opzioni ad un sondaggio.");
@@ -365,7 +376,7 @@ public class PollListener extends BotListener
 		}
 		
 		//Minimum number of poll option is 2.
-		if (poll.getOptions().size() <= 2)
+		if (poll.getOptionsCollection().size() <= 2)
 		{
 			MessageCreateData message = MessageUtils.buildErrorMessage("Rimozione opzione dal sondaggio", author, "Un sondaggio deve avere almeno 2 opzioni.");
 			event.reply(message).setEphemeral(true).queue();
@@ -454,7 +465,7 @@ public class PollListener extends BotListener
 		ArrayList<Button> buttons = new ArrayList<>();
 		
 		//Build button interaction for the message.
-		for (Poll.PollOption pollOption : poll.getOptions())
+		for (Poll.PollOption pollOption : poll.getOptionsCollection())
 		{
 			Button button = Button.primary(pollOption.getId(), pollOption.getText());
 			buttons.add(button);
@@ -477,27 +488,10 @@ public class PollListener extends BotListener
 		InteractionGroup interactionGroup = new InteractionGroup();
 		
 		//For each option create a callback that the listener will call.
-		for (Poll.PollOption option : poll.getOptions())
+		for (Poll.PollOption option : poll.getOptionsCollection())
 		{
 			interactionGroup.addButtonCallback(option.getId(), (event, guild, messageChannel, message, author) ->
 			{
-				//If the user already voted try to switch vote.
-				if (poll.hasUserVoted(author))
-				{
-					boolean switched = poll.switchVote(option.getId(), author);
-					
-					//The user tried to switch the with the same vote.
-					if (!switched)
-					{
-						event.reply(MessageUtils.buildErrorMessage("Votazione sondaggio", author, "Hai già votato per l'opzione: *" + option.getText() + "*")).setEphemeral(true).queue();
-						return InteractionCallback.LEAVE_MESSAGE;
-					}
-					
-					event.deferEdit().queue();
-					PollListener.refreshPollMessage(poll, message);
-					return InteractionCallback.LEAVE_MESSAGE;
-				}
-				
 				event.deferEdit().queue();
 				
 				//Add the vote.
@@ -518,8 +512,9 @@ public class PollListener extends BotListener
 	
 	private static MessageEditBuilder generatePollMessage(Poll poll, User author)
 	{
-		MessageEditBuilder messageBuilder = new MessageEditBuilder();
-		EmbedBuilder pollEmbedBuilder= MessageUtils.getDefaultEmbed(poll.getQuestion(), author)
+		MessageEditBuilder messageBuilder = new MessageEditBuilder()
+				.setAttachments(); //Set attachment list to empty.
+		EmbedBuilder pollEmbedBuilder = MessageUtils.getDefaultEmbed(poll.getQuestion(), author)
 				.setDescription("*Sondaggio in corso...*")
 				.setFooter("Richiesto da " + author.getName() + " | ID: " + poll.getMessageID(), author.getAvatarUrl());
 		EmbedBuilder legendEmbedBuilder = new EmbedBuilder();
@@ -537,6 +532,7 @@ public class PollListener extends BotListener
 		}
 		else
 			messageBuilder.setEmbeds(pollEmbedBuilder.build());
+		
 		
 		return messageBuilder;
 	}
@@ -576,9 +572,7 @@ public class PollListener extends BotListener
 			byte[] pollLegend = pieChartImages.getRight();
 			
 			if (pollChart != null)
-			{
 				editMessage.setFiles(FileUpload.fromData(pollChart, "pie_chart.png"), FileUpload.fromData(pollLegend, "chart_legend.png"));
-			}
 		}
 		
 		editMessage.queue();

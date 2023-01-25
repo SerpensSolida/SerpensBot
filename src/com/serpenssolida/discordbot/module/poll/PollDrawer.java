@@ -88,7 +88,7 @@ public class PollDrawer
 		
 		//Create legend entries and sort them.
 		int i = 0;
-		for (Poll.PollOption option : poll.getOptions())
+		for (Poll.PollOption option : poll.getOptionsCollection())
 		{
 			pollOptionChartEntry.add(new PollOptionChartEntry(option, seriesColors[i]));
 			i++;
@@ -135,7 +135,7 @@ public class PollDrawer
 		chart.getStyler().setSeriesColors(colors);
 		
 		//Add poll data to the chart.
-		for (Poll.PollOption option : poll.getOptions())
+		for (Poll.PollOption option : poll.getOptionsCollection())
 			chart.addSeries(option.getId(), option.getVotesCount());
 		
 		byte[] pieChart = generatePieChart(chart);
