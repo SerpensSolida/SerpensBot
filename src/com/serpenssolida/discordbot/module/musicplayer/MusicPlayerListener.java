@@ -16,9 +16,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceJoinEvent;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceLeaveEvent;
-import net.dv8tion.jda.api.events.guild.voice.GuildVoiceMoveEvent;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -30,7 +28,6 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import net.dv8tion.jda.api.utils.messages.MessageEditBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageEditData;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -229,7 +226,78 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 	}
 	
 	@Override
-	public void onGuildVoiceLeave(@NotNull GuildVoiceLeaveEvent event)
+	public void onGuildVoiceUpdate(GuildVoiceUpdateEvent event)
+	{
+		if (event.getChannelLeft() != null)
+			this.onVoiceLeave(event);
+		
+		if (event.getChannelJoined() != null)
+			this.onVoiceJoin(event);
+		
+	}
+	
+	private void onVoiceLeave(GuildVoiceUpdateEvent event)
+	{
+		//Get audio controller.
+		GuildAudioController audioController = this.getGuildAudioController(event.getGuild().getId());
+		
+		//Check if the bot is playing tracks.
+		if (audioController == null)
+			return;
+		
+		//Check if the user that left the channel is the bot.
+		if (SerpensBot.getApi().getSelfUser().equals(event.getMember().getUser()))
+		{
+			//Delete track status message and close the connection.
+			this.deleteTrackStatusMessage(event.getGuild(), audioController);
+			this.closeConnection(event.getGuild());
+			return;
+		}
+		
+		//Check if the channel the user left is the one the bot is playing tracks.
+		if (!event.getChannelLeft().equals(audioController.getVoiceChannel()) && !event.getChannelJoined().equals(audioController.getVoiceChannel()))
+			return;
+		
+		//Remove the user votes and update the track status message.
+		audioController.removeVote(event.getMember().getUser());
+		MessageEditBuilder messageBuilder = MessageEditBuilder.from(MessageEditData.fromMessage(audioController.getStatusMessage()));
+		MusicPlayerListener.generateControlButtons(audioController, messageBuilder);
+		audioController.getStatusMessage().editMessage(messageBuilder.build()).queue();
+		
+		//Check if all user have left the channel.
+		if (event.getChannelLeft().asVoiceChannel().getMembers().size() > 1)
+			return;
+		
+		//Remove audio controller and quit the voice channel.
+		this.closeConnection(event.getGuild());
+		this.deleteTrackStatusMessage(event.getGuild(), audioController);
+	}
+	
+	private void onVoiceJoin(GuildVoiceUpdateEvent event)
+	{
+		//Check if the user that joined the channel is the bot.
+		if (SerpensBot.getApi().getSelfUser().equals(event.getMember().getUser()))
+			return;
+		
+		//Get audio controller.
+		GuildAudioController audioController = this.getGuildAudioController(event.getGuild().getId());
+		
+		//Check if the bot is playing tracks.
+		if (audioController == null)
+			return;
+		
+		//Check if the channel the user joined is the one the bot is playing tracks.
+		if (!event.getChannelJoined().equals(audioController.getVoiceChannel()))
+			return;
+		
+		//Update the track status message.
+		MessageEditBuilder messageBuilder = MessageEditBuilder.from(MessageEditData.fromMessage(audioController.getStatusMessage()));
+		MusicPlayerListener.generateControlButtons(audioController, messageBuilder);
+		audioController.getStatusMessage().editMessage(messageBuilder.build()).queue();
+	}
+	
+	/*@Override
+	public void onGuildVoiceLeave(@NotNull GuildVoiceUpdateEvent event)
 	{
 		//Check if the user that left the channel is not the bot.
 		if (SerpensBot.getApi().getSelfUser().equals(event.getMember().getUser()))
@@ -251,9 +319,9 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		MessageEditBuilder messageBuilder = MessageEditBuilder.from(MessageEditData.fromMessage(audioController.getStatusMessage()));
 		MusicPlayerListener.generateControlButtons(audioController, messageBuilder);
 		audioController.getStatusMessage().editMessage(messageBuilder.build()).queue();
-	}
+	}*/
 	
-	@Override
+	/*@Override
 	public void onGuildVoiceMove(@NotNull GuildVoiceMoveEvent event)
 	{
 		//Get audio controller.
@@ -281,9 +349,9 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		MessageEditBuilder messageBuilder = MessageEditBuilder.from(MessageEditData.fromMessage(audioController.getStatusMessage()));
 		MusicPlayerListener.generateControlButtons(audioController, messageBuilder);
 		audioController.getStatusMessage().editMessage(messageBuilder.build()).queue();
-	}
+	}*/
 	
-	@Override
+	/*@Override
 	public void onGuildVoiceJoin(@NotNull GuildVoiceJoinEvent event)
 	{
 		//Check if the user that joined the channel is the bot.
@@ -305,7 +373,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		MessageEditBuilder messageBuilder = MessageEditBuilder.from(MessageEditData.fromMessage(audioController.getStatusMessage()));
 		MusicPlayerListener.generateControlButtons(audioController, messageBuilder);
 		audioController.getStatusMessage().editMessage(messageBuilder.build()).queue();
-	}
+	}*/
 	
 	public void closeConnection(Guild guild)
 	{
