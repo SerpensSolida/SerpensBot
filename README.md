@@ -1,5 +1,5 @@
 # SerpensBot
-Command bot for Discord
+Command bot for Discord developed with [SerpensBotLibrary](https://github.com/SerpensSolida/SerpensBotLibrary).
 
 # How to use
 1) Clone the repository.
@@ -10,9 +10,11 @@ Command bot for Discord
 
     ```json
     {
-       "token" : "place your token here.", 
-       "owner" : "place your discord id here."
-    }
+      "token": "Your bot token.",
+      "owner": "Discord id of the owner of the bot (used to indentify bot owner).",
+      "apiPort": "Port of the web interface of the bot.",
+      "apiPassword": "Password of the web interface of the bot."
+   }
     ```
     
 7) You can start coding.
