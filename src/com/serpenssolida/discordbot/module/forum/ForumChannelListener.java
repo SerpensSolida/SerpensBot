@@ -54,14 +54,14 @@ public class ForumChannelListener extends BotListener
 		//Command for creating a forum channel.
 		BotCommand command = new BotCommand("create", "Crea un canale da usare come forum.");
 		command.setAction(this::initForum);
-		command.getSubcommand()
+		command.getCommandData()
 				.addOption(OptionType.STRING, "channel-name", "Il nome del canale da creare.", true);
 		this.addBotCommand(command);
 		
 		//Command for converting a channel into a forum channel.
 		command = new BotCommand("init", "Converte un canale in un forum.");
 		command.setAction(this::convertChannelToForum);
-		command.getSubcommand()
+		command.getCommandData()
 				.addOption(OptionType.CHANNEL, "channel", "Il canale da convertire", true);
 		this.addBotCommand(command);
 		

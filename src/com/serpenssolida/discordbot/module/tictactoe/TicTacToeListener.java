@@ -36,14 +36,14 @@ public class TicTacToeListener extends BotListener
 		//Command for creating a game.
 		BotCommand command = new BotCommand("start", "Comincia una partita di tris.");
 		command.setAction(this::startGame);
-		command.getSubcommand()
+		command.getCommandData()
 				.addOption(OptionType.USER, "opponent", "L'avversario della partita", true);
 		this.addBotCommand(command);
 		
 		//Command for stopping a game.
 		command = new BotCommand("stop", "Ferma una partita di tris.");
 		command.setAction(this::removeGame);
-		command.getSubcommand()
+		command.getCommandData()
 				.addOption(OptionType.STRING, "game-id", "Id della partita", true);
 		this.addBotCommand(command);
 	}

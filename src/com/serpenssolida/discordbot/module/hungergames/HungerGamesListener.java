@@ -50,14 +50,14 @@ public class HungerGamesListener extends BotListener
 		//Command for displaying character info.
 		command = new BotCommand("card", "Invia alla chat la card delle statistiche del personaggio.");
 		command.setAction(this::sendCharacterCard);
-		command.getSubcommand()
+		command.getCommandData()
 				.addOption(OptionType.USER, "tag", "L'utente di cui visualizzare le statistiche.", false);
 		this.addBotCommand(command);
 		
 		//Command for enabling or disabling a character.
 		command = new BotCommand("enable", "Abilita/Disabilita il personaggio. Un personaggio disabilitato non parteciperà agli HungerGames.");
 		command.setAction(this::setCharacterEnabled);
-		command.getSubcommand()
+		command.getCommandData()
 				.addOption(OptionType.BOOLEAN, "value", "True per abilitare il personaggio, false per disabilitarlo.", true);
 		this.addBotCommand(command);
 		
@@ -69,14 +69,14 @@ public class HungerGamesListener extends BotListener
 		//Command for editing playback speed of the HungerGames.
 		command = new BotCommand("speed", "Modifica la velocità di riproduzione degli Hunger Games (velocità minima 1 secondo).");
 		command.setAction(this::setPlaybackSpeed);
-		command.getSubcommand()
+		command.getCommandData()
 				.addOption(OptionType.INTEGER, "seconds", "Numero di secondi tra un messaggio e l'altro (min 1). ", true);
 		this.addBotCommand(command);
 		
 		//Command for displaying leaderboards of the Hunger Games.
 		command = new BotCommand("leaderboard", "Visualizza le classifiche degli HungerGames.");
 		command.setAction(this::sendLeaderboard);
-		command.getSubcommand()
+		command.getCommandData()
 				.addOptions(
 						new OptionData(OptionType.STRING, "type", "Il tipo di leaderboard da mostrare.", true)
 								.addChoices(new Command.Choice("wins", "wins"), new Command.Choice("kills", "kills"))

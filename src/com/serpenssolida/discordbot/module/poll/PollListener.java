@@ -49,7 +49,7 @@ public class PollListener extends BotListener
 		//Command for creating a poll.
 		BotCommand command = new BotCommand("create", "Crea un nuovo sondaggio");
 		command.setAction(this::createNewPoll);
-		SubcommandData subCommand = command.getSubcommand();
+		SubcommandData subCommand = command.getCommandData();
 		subCommand
 				.addOption(OptionType.STRING, "question", "La domanda del sondaggio", true)
 				.addOption(OptionType.INTEGER, "duration", "Durata in minuti del sondaggio. (60 = 1 ora)", true)
@@ -66,14 +66,14 @@ public class PollListener extends BotListener
 		//Command for deleting a poll.
 		command = new BotCommand("stop", "Ferma un sondaggio in corso.");
 		command.setAction(this::removePoll);
-		command.getSubcommand()
+		command.getCommandData()
 				.addOption(OptionType.STRING, "poll-id", "Identificatore univoco del sondaggio", true);
 		this.addBotCommand(command);
 		
 		//Command for deleting a poll.
 		command = new BotCommand("edit", "Modifica la descrizione di un sondaggio.");
 		command.setAction(this::editPollDescription);
-		command.getSubcommand()
+		command.getCommandData()
 				.addOption(OptionType.STRING, "poll-id", "Identificatore univoco del sondaggio", true)
 				.addOption(OptionType.STRING, "description", "Nuova descrizione del sondaggio", true);
 		this.addBotCommand(command);
@@ -81,7 +81,7 @@ public class PollListener extends BotListener
 		//Command for adding an option to the pool.
 		command = new BotCommand("add", "Aggiunge un opzione al sondaggio.");
 		command.setAction(this::addOption);
-		command.getSubcommand()
+		command.getCommandData()
 				.addOption(OptionType.STRING, "poll-id", "Identificatore univoco del sondaggio", true)
 				.addOption(OptionType.STRING, "description", "Testo dell'opzione da aggiungere", true);
 		this.addBotCommand(command);
@@ -89,14 +89,14 @@ public class PollListener extends BotListener
 		//Command for removing a vote from the pool.
 		command = new BotCommand("remove-vote", "Rimuove il proprio voto da un sondaggio.");
 		command.setAction(this::removeVote);
-		command.getSubcommand()
+		command.getCommandData()
 				.addOption(OptionType.STRING, "poll-id", "Identificatore univoco del sondaggio", true);
 		this.addBotCommand(command);
 		
 		//Command for removing an option from the pool.
 		command = new BotCommand("remove-option", "Rimuove un opzione dal sondaggio.");
 		command.setAction(this::removeOption);
-		command.getSubcommand()
+		command.getCommandData()
 				.addOption(OptionType.STRING, "poll-id", "Identificatore univoco del sondaggio", true)
 				.addOption(OptionType.STRING, "position", "Posizione dell'opzione da rimuovere (parte da 1)", true);
 		this.addBotCommand(command);

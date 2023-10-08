@@ -43,7 +43,7 @@ public class ChannelFilterListener extends BotListener
 		//Command for creating a filter.
 		BotCommand command = new BotCommand("set", "Setta o modifica il filtro per il canale specificato.");
 		command.setAction(this::setChannelFilter);
-		command.getSubcommand()
+		command.getCommandData()
 				.addOption(OptionType.CHANNEL, "channel", "Canale su cui settare il filtro.", true)
 				.addOption(OptionType.BOOLEAN, "requires_images", "Se settato a true i messaggi dovranno contenere un immagine per essere accettati.", false)
 				.addOption(OptionType.BOOLEAN, "requires_links", "Se settato a true i messaggi dovranno contenere un link per essere accettati.", false);
@@ -52,7 +52,7 @@ public class ChannelFilterListener extends BotListener
 		//Command for removing a filter.
 		command = new BotCommand("remove", "Rimuove il filtro per il canale specificato.");
 		command.setAction(this::removeChannelFilter);
-		command.getSubcommand()
+		command.getCommandData()
 				.addOption(OptionType.CHANNEL, "channel", "Canale da cui rimuovere il filtro.", true);
 		this.addBotCommand(command);
 	}

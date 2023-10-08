@@ -27,7 +27,7 @@ public class EmbedListener extends BotListener
 		//Command for creating an embed.
 		BotCommand command = new BotCommand("send", "Invia un embed nel canale corrente.");
 		command.setAction(this::sendEmbed);
-		command.getSubcommand()
+		command.getCommandData()
 				.addOption(OptionType.STRING, "title", "Titolo dell'embed", true)
 				.addOption(OptionType.STRING, "description", "Descrizione dell'embed", true)
 				.addOption(OptionType.STRING, "color", "Colore dell'embed, formato esadecimale (es: FF0000 = rosso)", false)
@@ -37,7 +37,7 @@ public class EmbedListener extends BotListener
 		//Command for creating an embed from a message.
 		command = new BotCommand("generate", "Genera un embed usando il contenuto di un messaggio esistente.");
 		command.setAction(this::generateEmbed);
-		command.getSubcommand()
+		command.getCommandData()
 				.addOption(OptionType.STRING, "title", "Titolo dell'embed", true)
 				.addOption(OptionType.STRING, "message-id", "Messaggio da convertire in embed", true)
 				.addOption(OptionType.BOOLEAN, "delete-original", "Se cancellare il messaggio originale o no", true)

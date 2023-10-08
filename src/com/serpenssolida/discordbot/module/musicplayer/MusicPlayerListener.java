@@ -52,7 +52,7 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		
 		//Command for adding a song to the queue.
 		BotCommand command = new BotCommand("play", "Agginunge alla coda una traccia.");
-		command.getSubcommand()
+		command.getCommandData()
 						.addOption(OptionType.STRING, "song", "Youtube URL/id della traccia da riprodurre.", true);
 		command.setAction(this::playTrack);
 		this.addBotCommand(command);
