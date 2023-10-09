@@ -150,7 +150,7 @@ public class TicTacToeListener extends BotListener
 		{
 			for (int j = 0; j < TicTacToeGame.FIELD_SIZE; j++)
 			{
-				String label = " ";
+				String label = "_";
 				switch (game.getCell(i, j))
 				{
 					case 0:
