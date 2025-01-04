@@ -70,7 +70,7 @@
         <repository>
             <id>serpenssolida</id>
             <name>serpensbot-library</name>
-            <url>http://ddns.serpenssolida.com:3035</url>
+            <url>http://ddns.serpenssolida.com:3035/releases</url>
         </repository>
 
         <repository>

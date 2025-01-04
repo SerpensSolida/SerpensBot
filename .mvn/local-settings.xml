@@ -1,0 +1,12 @@
+<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 http://maven.apache.org/xsd/settings-1.2.0.xsd">
+    <mirrors>
+        <mirror>
+            <id>serpenssolida-http-unblocker</id>
+            <mirrorOf>serpenssolida</mirrorOf>
+            <name></name>
+            <url>http://ddns.serpenssolida.com:3035/releases</url>
+        </mirror>
+    </mirrors>
+</settings>
