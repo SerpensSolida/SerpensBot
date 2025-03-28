@@ -12,6 +12,7 @@ import com.serpenssolida.discordbot.interaction.ButtonAction;
 import com.serpenssolida.discordbot.interaction.InteractionCallback;
 import com.serpenssolida.discordbot.interaction.InteractionGroup;
 import com.serpenssolida.discordbot.module.BotListener;
+import dev.lavalink.youtube.YoutubeAudioSourceManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
@@ -66,8 +67,12 @@ public class MusicPlayerListener extends BotListener implements TrackEventHandle
 		command = new BotCommand("stop", "Ferma la riproduzione corrente, il bot perderà le tracce inserite nella coda.");
 		command.setAction(this::stopPlayback);
 		this.addBotCommand(command);
-		
+
+		playerManager.registerSourceManager(new YoutubeAudioSourceManager());
 		AudioSourceManagers.registerRemoteSources(MusicPlayerListener.playerManager);
+		AudioSourceManagers.registerRemoteSources(playerManager, com.sedmelluq.discord.lavaplayer.source.youtube.YoutubeAudioSourceManager.class);
+
+
 	}
 	
 	/**

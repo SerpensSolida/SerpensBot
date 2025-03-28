@@ -351,7 +351,7 @@ public class ForumChannelListener extends BotListener
 		
 		//Create modal.
 		return Modal.create("forum", "Forum Channel")
-				.addActionRows(ActionRow.of(forumTitle), ActionRow.of(forumDescription), ActionRow.of(buttonLabel))
+				.addComponents(ActionRow.of(forumTitle), ActionRow.of(forumDescription), ActionRow.of(buttonLabel))
 				.build();
 	}
 	
@@ -527,7 +527,7 @@ public class ForumChannelListener extends BotListener
 			
 			//Create and send the modal.
 			Modal modal = Modal.create("forum", "Forum Channel")
-					.addActionRows(ActionRow.of(forumTitle))
+					.addComponents(ActionRow.of(forumTitle))
 					.build();
 			event.replyModal(modal).queue();
 			this.addModalCallback(guild.getId(), author.getId(), this.generateCreateThreadModalCallback());

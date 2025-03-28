@@ -479,7 +479,7 @@ public class HungerGamesListener extends BotListener
 		
 		//Create modal.
 		return Modal.create("create_character", "Creazione pesonaggio")
-				.addActionRows(ActionRow.of(name), ActionRow.of(stats))
+				.addComponents(ActionRow.of(name), ActionRow.of(stats))
 				.build();
 	}
 	
