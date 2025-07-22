@@ -9,6 +9,8 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 
+import java.util.List;
+
 public class SendReminderJob implements Job
 {
     @Override
@@ -26,8 +28,10 @@ public class SendReminderJob implements Job
             reminderMessage = MessageUtils.createSimpleMessage("Reminder", reminder.getMessage());
         else
             reminderMessage = MessageUtils.createSimpleMessage("Reminder", author, reminder.getMessage());
-        
-        for (User user : reminder.getMentions())
+
+        List<User> list = reminder.getMentions().stream().map(s -> SerpensBot.getApi().getUserById(Long.parseLong(s))).toList();
+
+        for (User user : list)
             reminderMessage.addContent(user.getAsMention());
         
         MessageChannel messageChannel = SerpensBot.getApi().getChannelById(MessageChannel.class, reminder.getChannelID());

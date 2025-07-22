@@ -1,6 +1,5 @@
 package com.serpenssolida.discordbot.module.reminder;
 
-import net.dv8tion.jda.api.entities.User;
 import org.quartz.DateBuilder;
 
 import java.util.Date;
@@ -12,12 +11,12 @@ public class Reminder
     private String channelID;
     private String message;
     private Date date;
-    private List<User> mentions;
+    private List<String> mentions;
     private DateBuilder.IntervalUnit intervalUnit;
     private int intervalValue;
     private boolean repeat;
     
-    public Reminder(String author, String channelID, String message, Date date, boolean repeat, List<User> mentions, DateBuilder.IntervalUnit intervalUnit, int intervalValue)
+    public Reminder(String author, String channelID, String message, Date date, boolean repeat, List<String> mentions, DateBuilder.IntervalUnit intervalUnit, int intervalValue)
     {
         this.authorID = author;
         this.channelID = channelID;
@@ -79,12 +78,12 @@ public class Reminder
         this.date = date;
     }
     
-    public List<User> getMentions()
+    public List<String> getMentions()
     {
         return this.mentions;
     }
     
-    public void setMentions(List<User> mentions)
+    public void setMentions(List<String> mentions)
     {
         this.mentions = mentions;
     }

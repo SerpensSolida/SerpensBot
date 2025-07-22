@@ -4,6 +4,7 @@ import com.serpenssolida.discordbot.MessageUtils;
 import com.serpenssolida.discordbot.command.BotCommand;
 import com.serpenssolida.discordbot.module.BotListener;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -35,7 +36,7 @@ public class ReminderListener extends BotListener
         BotCommand command = new BotCommand("create", "Crea un nuovo reminder.");
         command.setAction(this::createReminder);
         command.getCommandData()
-                .addOption(OptionType.STRING, "date", "Data del reminder.", true)
+                .addOption(OptionType.STRING, "date", "Data del reminder. (DD/MM/YYYY mm:HH)", true)
                 .addOption(OptionType.STRING, "description", "Descrizione del reminder.", true)
                 .addOption(OptionType.STRING, "mentions", "Lista di utenti da pingare.");
         
@@ -90,12 +91,12 @@ public class ReminderListener extends BotListener
             return;
         }
         
-        List<User> mentions = new ArrayList<>();
+        List<String> mentions = new ArrayList<>();
         
         //Check if the argument was set.
         if (mentionsArg != null)
         {
-            mentions = mentionsArg.getMentions().getUsers();
+            mentions.addAll(mentionsArg.getMentions().getUsers().stream().map(ISnowflake::getId).toList());
         }
         
         DateBuilder.IntervalUnit intervalUnit = null;
