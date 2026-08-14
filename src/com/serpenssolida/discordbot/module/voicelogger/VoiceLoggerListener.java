@@ -18,6 +18,8 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
+
 public class VoiceLoggerListener extends BotListener
 {
 	public VoiceLoggerListener()
@@ -51,7 +53,7 @@ public class VoiceLoggerListener extends BotListener
 			return;
 
 		VoiceLog voiceLog = VoiceLoggerController.getInstance().getVoiceLog(guildID);
-		TextChannel channel = SerpensBot.getApi().getTextChannelById(voiceLog.channel());
+		TextChannel channel = SerpensBot.getApi().getTextChannelById(voiceLog.getChannel());
 
 		channel.sendMessage(getVoiceLogMessage(event)).queue();
 	}
@@ -90,17 +92,28 @@ public class VoiceLoggerListener extends BotListener
 		AudioChannelUnion leftChannel = event.getChannelLeft();
 
 		String message;
+		Color color;
 
 		if (joinedChannel != null && leftChannel != null)
-			message = " switched voice channels " + leftChannel.getAsMention() + " -> " + joinedChannel.getAsMention();
+		{
+			message = "Switched voice channels " + leftChannel.getAsMention() + " -> " + joinedChannel.getAsMention();
+			color = new Color(0x57F287);
+		}
 		else if (leftChannel == null && joinedChannel != null)
-			message = " joined voice channel " + joinedChannel.getAsMention();
+		{
+			message = "Joined voice channel " + joinedChannel.getAsMention();
+			color = new Color(0x57F287);
+		}
 		else
-			message = " left voice channel " + leftChannel.getAsMention();
+		{
+			message = "Left voice channel " + leftChannel.getAsMention();
+			color = new Color(0xED4245);
+		}
 
-
-		EmbedBuilder embed = MessageUtils.getDefaultEmbed("Voice Log");
-		embed.setDescription(event.getEntity().getAsMention() + message);
+		EmbedBuilder embed = new EmbedBuilder()
+				.setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getUser().getAvatarUrl())
+				.setDescription(message)
+				.setColor(color);
 		return new MessageCreateBuilder().setEmbeds(embed.build()).build();
 	}
 }

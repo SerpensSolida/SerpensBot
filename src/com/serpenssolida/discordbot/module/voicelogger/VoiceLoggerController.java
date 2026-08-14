@@ -53,7 +53,7 @@ public class VoiceLoggerController
 	 */
 	public void loadVoiceLogs()
 	{
-		File fileCharacters = new File(Paths.get("global_data", "reminder",  "voicelog.json").toString());
+		File fileCharacters = new File(Paths.get("global_data", "voicelog",  "voicelog.json").toString());
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
 		logger.info("Cariamento dei voice log.");
@@ -61,8 +61,8 @@ public class VoiceLoggerController
 		//Load data from file.
 		try (BufferedReader reader = new BufferedReader(new FileReader(fileCharacters)))
 		{
-			VoiceLogData reminderData = gson.fromJson(reader, VoiceLogData.class);
-			this.voiceLoggers.putAll(reminderData.getReminders());
+			VoiceLogData voiceLogData = gson.fromJson(reader, VoiceLogData.class);
+			this.voiceLoggers.putAll(voiceLogData.getReminders());
 		}
 		catch (FileNotFoundException e)
 		{
@@ -79,7 +79,7 @@ public class VoiceLoggerController
 	 */
 	public void saveVoiceLogs()
 	{
-		File voiceLogFile = new File(Paths.get("global_data", "voiceLog",  "voicelog.json").toString());
+		File voiceLogFile = new File(Paths.get("global_data", "voicelog",  "voicelog.json").toString());
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
 		logger.info("Salvataggio/aggiornamento dei voice log.");
@@ -87,8 +87,8 @@ public class VoiceLoggerController
 		//Save data to file.
 		try (PrintWriter writer = new PrintWriter(new FileWriter(voiceLogFile)))
 		{
-			VoiceLogData reminderData = new VoiceLogData(this.voiceLoggers);
-			writer.println(gson.toJson(reminderData));
+			VoiceLogData voiceLogData = new VoiceLogData(this.voiceLoggers);
+			writer.println(gson.toJson(voiceLogData));
 		}
 		catch (FileNotFoundException e)
 		{
