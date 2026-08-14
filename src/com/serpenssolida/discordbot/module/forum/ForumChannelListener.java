@@ -74,13 +74,13 @@ public class ForumChannelListener extends BotListener
 	 */
 	private void loadForums()
 	{
-		File fileCharacters = new File(Paths.get("global_data", "forum",  "forums.json").toString());
+		File forumFile = new File(Paths.get("global_data", "forum",  "forums.json").toString());
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
 		
 		logger.info("Cariamento dei forum aperti.");
 		
 		//Load data from file.
-		try (BufferedReader reader = new BufferedReader(new FileReader(fileCharacters)))
+		try (BufferedReader reader = new BufferedReader(new FileReader(forumFile)))
 		{
 			ForumData forumData = gson.fromJson(reader, ForumData.class);
 			this.forums.putAll(forumData.getForums());

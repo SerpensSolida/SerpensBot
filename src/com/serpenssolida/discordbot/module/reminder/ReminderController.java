@@ -58,13 +58,13 @@ public class ReminderController
      */
     public void loadReminders()
     {
-        File fileCharacters = new File(Paths.get("global_data", "reminder",  "reminder.json").toString());
+        File reminderFile = new File(Paths.get("global_data", "reminder",  "reminder.json").toString());
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         
         logger.info("Cariamento dei reminder.");
         
         //Load data from file.
-        try (BufferedReader reader = new BufferedReader(new FileReader(fileCharacters)))
+        try (BufferedReader reader = new BufferedReader(new FileReader(reminderFile)))
         {
             ReminderData reminderData = gson.fromJson(reader, ReminderData.class);
             this.reminders.putAll(reminderData.getReminders());
@@ -89,13 +89,13 @@ public class ReminderController
      */
     public void saveReminders()
     {
-        File forumFile = new File(Paths.get("global_data", "reminder",  "reminder.json").toString());
+        File reminderFile = new File(Paths.get("global_data", "reminder",  "reminder.json").toString());
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         
         logger.info("Salvataggio/aggiornamento dei reminder.");
         
         //Save data to file.
-        try (PrintWriter writer = new PrintWriter(new FileWriter(forumFile)))
+        try (PrintWriter writer = new PrintWriter(new FileWriter(reminderFile)))
         {
             ReminderData reminderData = new ReminderData(this.reminders);
             writer.println(gson.toJson(reminderData));
@@ -104,9 +104,9 @@ public class ReminderController
         {
             try
             {
-                forumFile.getParentFile().mkdirs();
+                reminderFile.getParentFile().mkdirs();
                 
-                if (forumFile.createNewFile())
+                if (reminderFile.createNewFile())
                     this.saveReminders();
             }
             catch (IOException ex)
